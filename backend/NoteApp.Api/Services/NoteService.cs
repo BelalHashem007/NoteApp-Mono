@@ -3,10 +3,11 @@ using NoteApp.Api.Data;
 using NoteApp.Api.DTOs;
 using NoteApp.Api.Entities;
 using NoteApp.Api.Interfaces;
+using NoteApp.Api.Repositories;
 
 namespace NoteApp.Api.Services
 {
-    public class NoteService(AppDbContext context) : INoteService
+    public class NoteService(INoteRepository noteRepo) : INoteService
     {
         public async Task<Note> CreateNote(CreateNoteDto dto)
         {
@@ -19,41 +20,30 @@ namespace NoteApp.Api.Services
             var newNote = new Note();
             newNote.Title = dto.Title;
             newNote.Body = dto.Body;
-            context.Notes.Add(newNote);
-            await context.SaveChangesAsync();
+            await noteRepo.CreateNote(newNote);
             return newNote;
         }
 
         public async Task DeleteNote(Guid id)
         {
-            var noteToDelete = await context.Notes.FindAsync(id);
-            if (noteToDelete == null)
-                throw new ArgumentException("Note doesn`t exist");
-
-            context.Notes.Remove(noteToDelete);
-            await context.SaveChangesAsync();
+            var noteToDelete = await noteRepo.GetNote(id) ?? throw new ArgumentException("Note doesn`t exist");
+            await noteRepo.DeleteNote(id);
         }
 
         public async Task<Note> GetNote(Guid id)
         {
-            var note = await context.Notes.FindAsync(id);
-
-            if (note == null)
-                throw new ArgumentException("Note doesn`t exist");
+            var note = await noteRepo.GetNote(id) ?? throw new ArgumentException("Note doesn`t exist");
             return note;
         }
 
         public async Task<List<Note>> GetNotes()
         {
-            var notes = await context.Notes.ToListAsync();
-            return notes;
+            return await noteRepo.GetNotes();
         }
 
         public async Task<Note> UpdateNote(Guid id,UpdateNoteDto dto)
         {
-            var note = await context.Notes.FindAsync(id);
-            if (note == null)
-                throw new ArgumentException("Note doesn`t exist");
+            var note = await noteRepo.GetNote(id) ?? throw new ArgumentException("Note doesn`t exist");
 
             if (dto.Body != null)
                 note.Body = dto.Body;
@@ -61,7 +51,7 @@ namespace NoteApp.Api.Services
             if (dto.Title != null)
                 note.Title = dto.Title;
 
-            await context.SaveChangesAsync();
+            await noteRepo.UpdateNote(note);
 
             return note;
         }

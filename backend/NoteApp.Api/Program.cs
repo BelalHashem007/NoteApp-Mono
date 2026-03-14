@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using NoteApp.Api.Data;
 using NoteApp.Api.Interfaces;
+using NoteApp.Api.Repositories;
 using NoteApp.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +12,7 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddDbContext<AppDbContext>(opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 builder.Services.AddScoped<INoteService, NoteService>();
+builder.Services.AddScoped<INoteRepository, NoteRepository>();
 
 var app = builder.Build();
 
