@@ -11,7 +11,7 @@ namespace NoteApp.Api.Controllers
     {
         [HttpGet]
         [Route("")]
-        public async Task<IActionResult> GetNotes()
+        public async Task<ActionResult<List<Note>>> GetNotes()
         {
             var notes = await service.GetNotes();
             return Ok(notes);
@@ -19,7 +19,7 @@ namespace NoteApp.Api.Controllers
 
         [HttpGet]
         [Route("{id}")]
-        public async Task<IActionResult> GetNote(Guid id)
+        public async Task<ActionResult<Note>> GetNote(Guid id)
         {
             var note = await service.GetNote(id);
             return Ok(note);
@@ -27,7 +27,7 @@ namespace NoteApp.Api.Controllers
 
         [HttpPost]
         [Route("")]
-        public async Task<IActionResult> CreateNote(CreateNoteDto dto)
+        public async Task<ActionResult> CreateNote(CreateNoteDto dto)
         {
             var note = await service.CreateNote(dto);
             return CreatedAtAction(nameof(GetNote) , new { id = note.Id}, note);
@@ -35,7 +35,7 @@ namespace NoteApp.Api.Controllers
 
         [HttpPut]
         [Route("{id}")]
-        public async Task<IActionResult> UpdateNote(Guid id,UpdateNoteDto dto)
+        public async Task<ActionResult<Note>> UpdateNote(Guid id,UpdateNoteDto dto)
         {
             var note = await service.UpdateNote(id, dto);
             return Ok(note);

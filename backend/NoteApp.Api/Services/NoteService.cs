@@ -14,9 +14,6 @@ namespace NoteApp.Api.Services
             if (string.IsNullOrWhiteSpace(dto.Title))
                 throw new ArgumentException("Note name is required");
 
-            if (string.IsNullOrWhiteSpace(dto.Body))
-                throw new ArgumentException("Note body is required");
-
             var newNote = new Note();
             newNote.Title = dto.Title;
             newNote.Body = dto.Body;

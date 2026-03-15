@@ -15,7 +15,7 @@ namespace NoteApp.Api.Repositories
 
         public async Task DeleteNote(Guid id)
         {
-            var note = context.Notes.Find(id);
+            var note = await context.Notes.FindAsync(id);
             if (note != null)
             {
                 context.Notes.Remove(note);
