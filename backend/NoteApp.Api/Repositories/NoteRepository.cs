@@ -29,9 +29,9 @@ namespace NoteApp.Api.Repositories
             return note;
         }
 
-        public async Task<List<Note>> GetNotes()
+        public async Task<List<Note>> GetNotes(Guid folderId)
         {
-            return await context.Notes.ToListAsync();
+            return await context.Notes.Where(x => x.FolderId == folderId).ToListAsync();
         }
 
         public async Task UpdateNote(Note noteToUpdate)

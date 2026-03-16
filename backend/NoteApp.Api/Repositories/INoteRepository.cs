@@ -5,7 +5,7 @@ namespace NoteApp.Api.Repositories
 {
     public interface INoteRepository
     {
-        public Task<List<Note>> GetNotes();
+        public Task<List<Note>> GetNotes(Guid folderId);
         public Task<Note?> GetNote(Guid id);
         public Task<Note> CreateNote(Note note);
         public Task UpdateNote(Note noteToUpdate);
