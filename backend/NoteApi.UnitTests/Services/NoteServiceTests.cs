@@ -3,32 +3,35 @@ using NoteApp.Api.Entities;
 using NoteApp.Api.DTOs;
 using NoteApp.Api.Repositories;
 using NoteApp.Api.Services;
+using NoteApp.Api.Exceptions;
 namespace NoteApi.UnitTests.Services
 {
     public class NoteServiceTests
     {
         [Fact]
-        public async Task GetNote_WhenNoteDoesNotExist_ShouldThrowArgumentException()
+        public async Task GetNote_WhenNoteDoesNotExist_ShouldThrowNotFoundException()
         {
             // Arrange
-            var repo = A.Fake<INoteRepository>();
-            A.CallTo(() => repo.GetNote(A<Guid>.Ignored)).Returns(Task.FromResult<Note?>(null));
-            var sut = new NoteService(repo);
+            var noteRepository = A.Fake<INoteRepository>();
+            var folderRepository = A.Fake<IFolderRepository>();
+            A.CallTo(() => noteRepository.GetNote(A<Guid>.Ignored)).Returns(Task.FromResult<Note?>(null));
+            var sut = new NoteService(noteRepository, folderRepository);
 
             // Act / Assert
-            var exception = await Assert.ThrowsAsync<ArgumentException>(async Task ()=> await sut.GetNote(Guid.NewGuid()));
+            var exception = await Assert.ThrowsAsync<NotFoundException>(async Task ()=> await sut.GetNote(Guid.NewGuid()));
             Assert.Equal("Note doesn`t exist", exception.Message);
-            A.CallTo(() => repo.GetNote(A<Guid>.Ignored)).MustHaveHappened();
+            A.CallTo(() => noteRepository.GetNote(A<Guid>.Ignored)).MustHaveHappened();
         }
 
         [Fact]
         public async Task GetNote_WhenNoteExists_ShouldReturnTheNote()
         {
             // Arrange
-            var repo = A.Fake<INoteRepository>();
+            var noteRepository = A.Fake<INoteRepository>();
+            var folderRepository = A.Fake<IFolderRepository>();
             var note = new Note { Title="test title", Body= "test body"};
-            A.CallTo(() => repo.GetNote(A<Guid>.Ignored)).Returns(note);
-            var sut = new NoteService(repo);
+            A.CallTo(() => noteRepository.GetNote(A<Guid>.Ignored)).Returns(note);
+            var sut = new NoteService(noteRepository, folderRepository);
 
             // Act
             var returnedNote = await sut.GetNote(Guid.NewGuid());
@@ -37,21 +40,22 @@ namespace NoteApi.UnitTests.Services
             Assert.NotNull(returnedNote);
             Assert.Equal(note.Title, returnedNote.Title);
             Assert.Equal(note.Body, returnedNote.Body);
-            A.CallTo(() => repo.GetNote(A<Guid>.Ignored)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => noteRepository.GetNote(A<Guid>.Ignored)).MustHaveHappenedOnceExactly();
         }
 
         [Fact]
         public async Task GetNotes_WhenCalled_ShouldAlwaysReturnAllNotes()
         {
             // Arrange
-            var repo = A.Fake<INoteRepository>();
+            var noteRepository = A.Fake<INoteRepository>();
+            var folderRepository = A.Fake<IFolderRepository>();
             var note1 = new Note { Title = "1", Body = "body 1"};
             var note2 = new Note { Title = "2", Body = "body 2"};
-            A.CallTo(() => repo.GetNotes()).Returns(new List<Note> { note1,note2});
-            var sut = new NoteService(repo);
+            A.CallTo(() => noteRepository.GetNotes(A<Guid>.Ignored)).Returns(new List<Note> { note1,note2});
+            var sut = new NoteService(noteRepository, folderRepository);
 
             // Act 
-            var result = await sut.GetNotes();
+            var result = await sut.GetNotes(Guid.NewGuid());
 
             // Assert
             Assert.Equal(2, result.Count);
@@ -70,107 +74,117 @@ namespace NoteApi.UnitTests.Services
         }
 
         [Fact]
-        public async Task DeleteNote_WhenNoteDoesNotExist_ShouldThrowArgumentException()
+        public async Task DeleteNote_WhenNoteDoesNotExist_ShouldThrowNotFoundException()
         {
             // Arrange
-            var repo = A.Fake<INoteRepository>();
-            A.CallTo(() => repo.GetNote(A<Guid>.Ignored)).Returns(Task.FromResult<Note?>(null));
-            var sut = new NoteService(repo);
+            var noteRepository = A.Fake<INoteRepository>();
+            var folderRepository = A.Fake<IFolderRepository>();
+            A.CallTo(() => noteRepository.GetNote(A<Guid>.Ignored)).Returns(Task.FromResult<Note?>(null));
+            var sut = new NoteService(noteRepository, folderRepository);
 
             // Act / Assert
-            var exception = await Assert.ThrowsAsync<ArgumentException>(async Task () => await sut.DeleteNote(Guid.NewGuid()));
+            var exception = await Assert.ThrowsAsync<NotFoundException>(async Task () => await sut.DeleteNote(Guid.NewGuid()));
             Assert.Equal("Note doesn`t exist", exception.Message);
-            A.CallTo(() => repo.DeleteNote(A<Guid>.Ignored)).MustNotHaveHappened();
+            A.CallTo(() => noteRepository.DeleteNote(A<Guid>.Ignored)).MustNotHaveHappened();
         }
 
         [Fact]
         public async Task DeleteNote_WhenNoteExists_ShouldDeleteTheNote()
         {
             // Arrange
-            var repo = A.Fake<INoteRepository>();
+            var noteRepository = A.Fake<INoteRepository>();
+            var folderRepository = A.Fake<IFolderRepository>();
             var note = new Note {Id = Guid.NewGuid(), Title = "test title", Body = "test body" };
-            A.CallTo(() => repo.GetNote(A<Guid>.Ignored)).Returns(note);
-            var sut = new NoteService(repo);
+            A.CallTo(() => noteRepository.GetNote(A<Guid>.Ignored)).Returns(note);
+            var sut = new NoteService(noteRepository, folderRepository);
             // Act
              await sut.DeleteNote(note.Id);
 
             // Assert
-            A.CallTo(() => repo.DeleteNote(note.Id)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => noteRepository.DeleteNote(note.Id)).MustHaveHappenedOnceExactly();
         }
 
         [Fact]
         public async Task CreateNote_WhenDtoIsValid_ShouldCreateNoteAndCallRepo()
         {
             // Arrange
-            var repo = A.Fake<INoteRepository>();
-            A.CallTo(() => repo.CreateNote(A<Note>.Ignored)).Returns(Task.FromResult(new Note()));
-            var sut = new NoteService(repo);
+            var noteRepository = A.Fake<INoteRepository>();
+            var folderRepository = A.Fake<IFolderRepository>();
+            A.CallTo(() => noteRepository.CreateNote(A<Note>.Ignored)).Returns(Task.FromResult(new Note()));
+            var sut = new NoteService(noteRepository, folderRepository);
 
             var dto = new CreateNoteDto { Title = "title", Body = "body" };
 
             // Act
-            var result = await sut.CreateNote(dto);
+            var result = await sut.CreateNote(Guid.NewGuid(),dto);
 
             // Assert
             Assert.NotNull(result);
             Assert.Equal("title", result.Title);
             Assert.Equal("body", result.Body);
-            A.CallTo(() => repo.CreateNote(A<Note>.Ignored)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => noteRepository.CreateNote(A<Note>.Ignored)).MustHaveHappenedOnceExactly();
         }
 
         [Fact]
         public async Task CreateNote_MissingTitle_ShouldThrowArgumentException()
         {
             // Arrange
-            var repo = A.Fake<INoteRepository>();
-            var sut = new NoteService(repo);
+            var noteRepository = A.Fake<INoteRepository>();
+            var folderRepository = A.Fake<IFolderRepository>();
+            var sut = new NoteService(noteRepository, folderRepository);
 
             var dto = new CreateNoteDto { Title = " ", Body = "body" };
 
             // Act / Assert
-            var ex = await Assert.ThrowsAsync<ArgumentException>(async Task () => await sut.CreateNote(dto));
-            Assert.Equal("Note name is required", ex.Message);
-            A.CallTo(() => repo.CreateNote(A<Note>.Ignored)).MustNotHaveHappened();
+            var ex = await Assert.ThrowsAsync<ValidationException>(async Task () => await sut.CreateNote(Guid.NewGuid(),dto));
+            Assert.Equal("Note title is required", ex.Message);
+            A.CallTo(() => noteRepository.CreateNote(A<Note>.Ignored)).MustNotHaveHappened();
         }
 
         [Fact]
-        public async Task CreateNote_MissingBody_ShouldThrowArgumentException()
+        public async Task CreateNote_MissingBody_ShouldCreateANoteWithNullBody()
         {
             // Arrange
-            var repo = A.Fake<INoteRepository>();
-            var sut = new NoteService(repo);
+            var noteRepository = A.Fake<INoteRepository>();
+            var folderRepository = A.Fake<IFolderRepository>();
+            var sut = new NoteService(noteRepository, folderRepository);
 
             var dto = new CreateNoteDto { Title = "title", Body = null };
 
-            // Act / Assert
-            var ex = await Assert.ThrowsAsync<ArgumentException>(async Task () => await sut.CreateNote(dto));
-            Assert.Equal("Note body is required", ex.Message);
-            A.CallTo(() => repo.CreateNote(A<Note>.Ignored)).MustNotHaveHappened();
+            // Assert
+            var result = await sut.CreateNote(Guid.NewGuid(), dto);
+
+            // Act
+            Assert.Equal(dto.Title, result.Title);
+            Assert.Null(result.Body);
+            A.CallTo(() => noteRepository.CreateNote(A<Note>.Ignored)).MustHaveHappened();
         }
 
         [Fact]
-        public async Task UpdateNote_WhenNoteDoesNotExist_ShouldThrowArgumentException()
+        public async Task UpdateNote_WhenNoteDoesNotExist_ShouldThrowNotFoundException()
         {
             // Arrange
-            var repo = A.Fake<INoteRepository>();
-            A.CallTo(() => repo.GetNote(A<Guid>.Ignored)).Returns(Task.FromResult<Note?>(null));
-            var sut = new NoteService(repo);
+            var noteRepository = A.Fake<INoteRepository>();
+            var folderRepository = A.Fake<IFolderRepository>();
+            A.CallTo(() => noteRepository.GetNote(A<Guid>.Ignored)).Returns(Task.FromResult<Note?>(null));
+            var sut = new NoteService(noteRepository, folderRepository);
 
             // Act / Assert
-            var ex = await Assert.ThrowsAsync<ArgumentException>(async Task () => await sut.UpdateNote(Guid.NewGuid(), new UpdateNoteDto()));
+            var ex = await Assert.ThrowsAsync<NotFoundException>(async Task () => await sut.UpdateNote(Guid.NewGuid(), new UpdateNoteDto()));
             Assert.Equal("Note doesn`t exist", ex.Message);
-            A.CallTo(() => repo.UpdateNote(A<Note>.Ignored)).MustNotHaveHappened();
+            A.CallTo(() => noteRepository.UpdateNote(A<Note>.Ignored)).MustNotHaveHappened();
         }
 
         [Fact]
-        public async Task UpdateNote_WhenNoteExists_ShouldUpdateFieldsAndCallRepo()
+        public async Task UpdateNote_WhenNoteExistsAndTitleExists_ShouldUpdateTitleAndCallRepo()
         {
             // Arrange
-            var repo = A.Fake<INoteRepository>();
+            var noteRepository = A.Fake<INoteRepository>();
+            var folderRepository = A.Fake<IFolderRepository>();
             var note = new Note { Id = Guid.NewGuid(), Title = "Old", Body = "OldBody" };
-            A.CallTo(() => repo.GetNote(A<Guid>.Ignored)).Returns(note);
-            A.CallTo(() => repo.UpdateNote(A<Note>.Ignored)).Returns(Task.CompletedTask);
-            var sut = new NoteService(repo);
+            A.CallTo(() => noteRepository.GetNote(A<Guid>.Ignored)).Returns(note);
+            A.CallTo(() => noteRepository.UpdateNote(A<Note>.Ignored)).Returns(Task.CompletedTask);
+            var sut = new NoteService(noteRepository, folderRepository);
 
             // Act
             var updated = await sut.UpdateNote(note.Id, new UpdateNoteDto { Title = "New", Body = null });
@@ -178,7 +192,45 @@ namespace NoteApi.UnitTests.Services
             // Assert
             Assert.Equal("New", updated.Title);
             Assert.Equal("OldBody", updated.Body);
-            A.CallTo(() => repo.UpdateNote(note)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => noteRepository.UpdateNote(note)).MustHaveHappenedOnceExactly();
+        }
+
+        [Fact]
+        public async Task UpdateNote_WhenNoteExistsAndBodyExists_ShouldUpdateBodyAndCallRepo()
+        {
+            // Arrange
+            var noteRepository = A.Fake<INoteRepository>();
+            var folderRepository = A.Fake<IFolderRepository>();
+            var note = new Note { Id = Guid.NewGuid(), Title = "Old", Body = "OldBody" };
+            A.CallTo(() => noteRepository.GetNote(A<Guid>.Ignored)).Returns(note);
+            A.CallTo(() => noteRepository.UpdateNote(A<Note>.Ignored)).Returns(Task.CompletedTask);
+            var sut = new NoteService(noteRepository, folderRepository);
+
+            // Act
+            var updated = await sut.UpdateNote(note.Id, new UpdateNoteDto { Title = null, Body = "NewBody" });
+
+            // Assert
+            Assert.Equal(note.Title, updated.Title);
+            Assert.Equal("NewBody", updated.Body);
+            A.CallTo(() => noteRepository.UpdateNote(note)).MustHaveHappenedOnceExactly();
+        }
+
+        [Fact]
+        public async Task UpdateNote_WhenNoteExistsAndBodyIsNullAndTitleIsNull_ShouldThrowValidationException()
+        {
+            // Arrange
+            var noteRepository = A.Fake<INoteRepository>();
+            var folderRepository = A.Fake<IFolderRepository>();
+            var note = new Note { Id = Guid.NewGuid(), Title = "Old", Body = "OldBody" };
+            A.CallTo(() => noteRepository.GetNote(A<Guid>.Ignored)).Returns(note);
+            var sut = new NoteService(noteRepository, folderRepository);
+
+
+
+            // Assert  / Act
+            var e = await Assert.ThrowsAsync<ValidationException>(async ()=>await sut.UpdateNote(note.Id, new UpdateNoteDto { Title = null, Body = null }));
+            Assert.Equal("Body and Title are empty!", e.Message);
+            A.CallTo(() => noteRepository.UpdateNote(note)).MustNotHaveHappened();
         }
     }
 }

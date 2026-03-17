@@ -37,7 +37,7 @@ namespace NoteApp.Api.Services
         public async Task<NoteDto> CreateNote(Guid folderId, CreateNoteDto dto)
         {
             if (string.IsNullOrWhiteSpace(dto.Title))
-                throw new ValidationException("Note name is required");
+                throw new ValidationException("Note title is required");
 
             var folder = await folderRepo.GetFolder(folderId) ?? throw new NotFoundException("Folder doesn`t exist");
 

@@ -30,7 +30,6 @@ namespace NoteApp.Api.Services
         {
             var folder = await folderRepo.GetFolder(id) ?? throw new NotFoundException("Folder doesn`t exist");
             return folder;
-
         }
 
         public async Task<List<Folder>> GetFolders()
