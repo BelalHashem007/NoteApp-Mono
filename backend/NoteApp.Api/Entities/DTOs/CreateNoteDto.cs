@@ -1,4 +1,4 @@
-﻿namespace NoteApp.Api.DTOs
+﻿namespace NoteApp.Api.Entities.DTOs
 {
     public class CreateNoteDto
     {

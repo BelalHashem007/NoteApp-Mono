@@ -1,5 +1,5 @@
-﻿using NoteApp.Api.DTOs;
-using NoteApp.Api.Entities;
+﻿using NoteApp.Api.Entities;
+using NoteApp.Api.Entities.DTOs;
 
 namespace NoteApp.Api.Interfaces
 {

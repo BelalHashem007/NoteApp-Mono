@@ -1,11 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using NoteApp.Api.DTOs;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using NoteApp.Api.Entities;
+using NoteApp.Api.Entities.DTOs;
 using NoteApp.Api.Interfaces;
 using static Azure.Core.HttpHeader;
 
 namespace NoteApp.Api.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("folders/{folderId}/notes")]
     public class NotesController(INoteService service) : ControllerBase

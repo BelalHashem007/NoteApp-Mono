@@ -3,7 +3,7 @@ using NoteApp.Api.Exceptions;
 
 namespace NoteApp.Api.Middlewares
 {
-    public class ExceptionHandlerMiddleware(RequestDelegate _next, IProblemDetailsService _problemDetailsService)
+    public class ExceptionHandlerMiddleware(RequestDelegate _next, IProblemDetailsService _problemDetailsService, ILogger<ExceptionHandlerMiddleware> logger)
     {
         public async Task InvokeAsync(HttpContext context)
         {
@@ -13,6 +13,7 @@ namespace NoteApp.Api.Middlewares
             }
             catch (Exception e)
             {
+                logger.LogError(e,"Error Happened");
                 await HandleException(context, e);
             }
         }

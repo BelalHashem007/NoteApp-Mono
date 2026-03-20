@@ -1,11 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using NoteApp.Api.DTOs;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using NoteApp.Api.Entities;
+using NoteApp.Api.Entities.DTOs;
 using NoteApp.Api.Interfaces;
-using NoteApp.Api.Repositories;
 
 namespace NoteApp.Api.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("[controller]")]
     public class FoldersController(IFolderService service) : ControllerBase

@@ -1,9 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using NoteApp.Api.Entities;
 
 namespace NoteApp.Api.Data
 {
-    public class AppDbContext : DbContext
+    public class AppDbContext : IdentityDbContext<ApplicationUser>
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
@@ -41,6 +43,11 @@ namespace NoteApp.Api.Data
             modelBuilder.Entity<Folder>()
                 .Property(f => f.CreatedAt)
                 .HasDefaultValueSql("GETUTCDATE()");
+
+            //users constraints
+            modelBuilder.Entity<ApplicationUser>()
+                .Property(x => x.FullName)
+                .HasMaxLength(50);
         }
 
         public DbSet<Note> Notes { get; set; }

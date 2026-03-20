@@ -1,5 +1,4 @@
-﻿using NoteApp.Api.DTOs;
-using NoteApp.Api.Entities;
+﻿using NoteApp.Api.Entities;
 
 namespace NoteApp.Api.Repositories
 {
