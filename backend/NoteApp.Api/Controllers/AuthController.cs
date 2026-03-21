@@ -7,7 +7,7 @@ using NoteApp.Api.Data;
 using NoteApp.Api.Entities;
 using NoteApp.Api.Entities.DTOs;
 using NoteApp.Api.Exceptions;
-using NoteApp.Api.Interfaces;
+using NoteApp.Api.Interfaces.IService;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;

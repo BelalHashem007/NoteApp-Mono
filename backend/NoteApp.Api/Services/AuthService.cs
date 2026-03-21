@@ -2,7 +2,7 @@
 using NoteApp.Api.Entities;
 using NoteApp.Api.Entities.DTOs;
 using NoteApp.Api.Exceptions;
-using NoteApp.Api.Interfaces;
+using NoteApp.Api.Interfaces.IService;
 
 namespace NoteApp.Api.Services
 {

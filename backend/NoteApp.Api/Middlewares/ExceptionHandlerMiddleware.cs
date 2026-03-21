@@ -24,6 +24,7 @@ namespace NoteApp.Api.Middlewares
             {
                 ValidationException => StatusCodes.Status400BadRequest,
                 NotFoundException => StatusCodes.Status404NotFound,
+                UnauthorizedException => StatusCodes.Status401Unauthorized,
                 _ => StatusCodes.Status500InternalServerError
             };
 
@@ -49,6 +50,7 @@ namespace NoteApp.Api.Middlewares
             return statusCode switch
             {
                 400 => "Bad Request",
+                401 => "Unauthorized",
                 404 => "Not Found",
                 _ => "Server Error"
             };

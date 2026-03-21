@@ -2,7 +2,7 @@
 using NoteApp.Api.DTOs;
 using NoteApp.Api.Entities;
 using NoteApp.Api.Exceptions;
-using NoteApp.Api.Repositories;
+using NoteApp.Api.Interfaces.IRepositories;
 using NoteApp.Api.Services;
 namespace NoteApi.UnitTests.Services
 {

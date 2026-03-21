@@ -1,9 +1,9 @@
 ﻿using FakeItEasy;
 using NoteApp.Api.Entities;
 using NoteApp.Api.DTOs;
-using NoteApp.Api.Repositories;
 using NoteApp.Api.Services;
 using NoteApp.Api.Exceptions;
+using NoteApp.Api.Interfaces.IRepositories;
 namespace NoteApi.UnitTests.Services
 {
     public class NoteServiceTests

@@ -5,7 +5,8 @@ using Microsoft.IdentityModel.Tokens;
 using NoteApp.Api.Configuration;
 using NoteApp.Api.Data;
 using NoteApp.Api.Entities;
-using NoteApp.Api.Interfaces;
+using NoteApp.Api.Interfaces.IRepositories;
+using NoteApp.Api.Interfaces.IService;
 using NoteApp.Api.Middlewares;
 using NoteApp.Api.Repositories;
 using NoteApp.Api.Services;
@@ -38,7 +39,7 @@ builder.Services.AddAuthorization();
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
-var jwtOptions = builder.Configuration.GetSection("JwtBearer").Get<JwtOptions>() ?? throw new Exception("JwtOptions not configured");
+var jwtOptions = builder.Configuration.GetSection("JwtBearer").Get<JwtOptions>();
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme =JwtBearerDefaults.AuthenticationScheme;

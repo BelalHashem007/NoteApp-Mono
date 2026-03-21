@@ -2,7 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using NoteApp.Api.Entities;
 using NoteApp.Api.Entities.DTOs;
-using NoteApp.Api.Interfaces;
+using NoteApp.Api.Extensions;
+using NoteApp.Api.Interfaces.IService;
 using static Azure.Core.HttpHeader;
 
 namespace NoteApp.Api.Controllers
@@ -16,7 +17,9 @@ namespace NoteApp.Api.Controllers
         [Route("")]
         public async Task<ActionResult<List<NoteDto>>> GetNotes(Guid folderId)
         {
-            var notes = await service.GetNotes(folderId);
+            var userId = User.GetUserId();
+
+            var notes = await service.GetNotes(userId, folderId);
             var response = new { notes, folderId };
             return Ok(response);
         }
@@ -25,7 +28,9 @@ namespace NoteApp.Api.Controllers
         [Route("{id}")]
         public async Task<ActionResult<NoteDto>> GetNote(Guid folderId,Guid id)
         {
-            var note = await service.GetNote(id);
+            var userId = User.GetUserId();
+
+            var note = await service.GetNote(userId, folderId, id);
             var response = new { note, folderId };
             return Ok(response);
         }
@@ -34,7 +39,9 @@ namespace NoteApp.Api.Controllers
         [Route("")]
         public async Task<ActionResult> CreateNote(Guid folderId, CreateNoteDto dto)
         {
-            var note = await service.CreateNote(folderId, dto);
+            var userId = User.GetUserId();
+
+            var note = await service.CreateNote(userId, folderId, dto);
             var response = new { note, folderId };
             return CreatedAtAction(nameof(GetNote) , new { folderId, id = response.note.Id}, response);
         }
@@ -43,16 +50,20 @@ namespace NoteApp.Api.Controllers
         [Route("{id}")]
         public async Task<ActionResult<NoteDto>> UpdateNote(Guid folderId,Guid id,UpdateNoteDto dto)
         {
-            var note = await service.UpdateNote(id, dto);
+            var userId = User.GetUserId();
+
+            var note = await service.UpdateNote(userId, folderId, id, dto);
             var response = new { note, folderId };
             return Ok(response);
         }
 
         [HttpDelete]
         [Route("{id}")]
-        public async Task<ActionResult> DeleteNote(Guid id)
+        public async Task<ActionResult> DeleteNote(Guid folderId, Guid id)
         {
-            await service.DeleteNote(id);
+            var userId = User.GetUserId();
+
+            await service.DeleteNote(userId, folderId, id);
             return NoContent();
         }
     }

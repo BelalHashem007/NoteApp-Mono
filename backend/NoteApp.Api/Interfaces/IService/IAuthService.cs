@@ -1,6 +1,6 @@
 ﻿using NoteApp.Api.Entities.DTOs;
 
-namespace NoteApp.Api.Interfaces
+namespace NoteApp.Api.Interfaces.IService
 {
     public interface IAuthService
     {

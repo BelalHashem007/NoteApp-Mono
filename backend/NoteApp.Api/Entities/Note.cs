@@ -10,5 +10,7 @@
 
         public Guid FolderId { get; set; }
         public Folder Folder { get; set; }
+        public ApplicationUser User { get; set; }
+        public string UserId { get; set; }
     }
 }
