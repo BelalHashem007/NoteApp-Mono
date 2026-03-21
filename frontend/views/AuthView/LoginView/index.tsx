@@ -1,13 +1,17 @@
 import LoginForm from "../components/LoginForm"
 import IllustrationSide from "../components/IllustrationSide"
+import LoginHeader from "../components/LoginHeader"
 
 export default function LoginView() {
     return (
         <div className="min-h-screen w-full flex">
-            {/* LeftSide */}
             <IllustrationSide />
-            {/* RightSide */}
-            <LoginForm />
+            <div className="w-full flex lg:w-1/2 items-center justify-center p-6 sm:p-12">
+                <div className="w-full max-w-md">
+                    <LoginHeader/>
+                    <LoginForm />
+                </div>
+            </div>
         </div>
     )
 }

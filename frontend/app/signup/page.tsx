@@ -1,6 +1,6 @@
 import SignUpView from "@/views/AuthView/SignUpView"
 
-export default function page(){
+export default async function page(){
     return (
         <SignUpView/>
     )
