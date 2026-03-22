@@ -1,4 +1,5 @@
 "use server"
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import * as z from "zod";
 import type { $ZodIssue } from "zod/v4/core";
@@ -38,7 +39,7 @@ export async function createAccount(_prevState: unknown, formData: FormData): Pr
     const data = SignUpSchema.safeParse(Object.fromEntries(formData.entries()))
 
     if (!data.success) {
-        console.log( data.error?.issues )
+        console.log(data.error?.issues)
         return { validationErrors: data.error?.issues }
     }
     else {
@@ -54,16 +55,16 @@ export async function createAccount(_prevState: unknown, formData: FormData): Pr
             if (!result.ok) {
                 const body = await result.json()
                 console.log(body)
-                return { serverErrors: { message: body.errors ?? "Server error occurred." } }
+                return { serverErrors: { message: body.message ?? "Server error occurred." } }
             }
-            
+
             success = true;
 
         } catch (e) {
-            console.log(e)
+            console.error(e)
             return { serverErrors: { message: "Network error: check your connection." } };
         }
-        if(success)
+        if (success)
             redirect("/login")
         return {};
     }
@@ -78,7 +79,7 @@ export async function LoginUser(_prevState: unknown, formData: FormData): Promis
     const data = LoginSchema.safeParse(Object.fromEntries(formData.entries()))
 
     if (!data.success) {
-        console.log( data.error?.issues )
+        console.log(data.error?.issues)
         return { validationErrors: data.error?.issues }
     }
     else {
@@ -89,7 +90,8 @@ export async function LoginUser(_prevState: unknown, formData: FormData): Promis
                 body: JSON.stringify(data.data),
                 headers: {
                     "Content-Type": "application/json"
-                }
+                },
+                credentials: "include"
             })
 
             if (!result.ok) {
@@ -97,14 +99,16 @@ export async function LoginUser(_prevState: unknown, formData: FormData): Promis
                 console.log(body)
                 return { serverErrors: { message: body.errors ?? "Server error occurred." } }
             }
-            console.log(await result.json())
+            const body = await result.json()
+            console.log(body);
+            (await cookies()).set("accessToken", body.data.accessToken, { httpOnly: true, secure: false, maxAge: 30 * 60 })
             success = true;
 
         } catch (e) {
-            console.log(e)
+            console.error(e)
             return { serverErrors: { message: "Network error: check your connection." } };
         }
-        if(success)
+        if (success)
             redirect("/")
         return {};
     }
