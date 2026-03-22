@@ -2,39 +2,35 @@
 using NoteApp.Api.Entities;
 using NoteApp.Api.Entities.DTOs;
 using NoteApp.Api.Exceptions;
+using NoteApp.Api.Interfaces.IRepositories;
 using NoteApp.Api.Interfaces.IService;
 
 namespace NoteApp.Api.Services
 {
-    public class AuthService(UserManager<ApplicationUser> userManager, ITokenService tokenService) : IAuthService
+    public class AuthService(IAuthRepository authRepository, ITokenService tokenService) : IAuthService
     {
-        public async Task<string?> Login(LoginDto dto)
+        public async Task<ResponseViewModel<AuthViewModel>> Login(LoginViewModel dto)
         {
-            var user = await userManager.FindByEmailAsync(dto.Email);
-            if (user != null && await userManager.CheckPasswordAsync(user, dto.Password))
+            var user = await authRepository.GetApplicationUser(dto);
+            if (user != null)
             {
-                var userRoles = await userManager.GetRolesAsync(user);
-                var accessToken = tokenService.GenerateToken(user, userRoles);
-                return accessToken;
+               // var userRoles = await userManager.GetRolesAsync(user);
+                var accessToken = tokenService.GenerateToken(user,null);
+                return new ResponseViewModel<AuthViewModel>
+                {
+                    Success = true,
+                    Message = "Login Successful",
+                    Data = new AuthViewModel
+                    {
+                        Success = true,
+                        AccessToken = accessToken
+                    }
+                };
             }
             else
             {
-                return null;
+                throw new UnauthorizedException("Invalid credentials");
             }
-        }
-
-        public async Task Signup(SignupDto dto)
-        {
-            var user = new ApplicationUser
-            {
-                FullName = dto.FullName,
-                UserName = dto.Email[..(dto.Email.IndexOf('@'))],
-                Email = dto.Email
-            };
-
-            var result = await userManager.CreateAsync(user, dto.Password);
-            if (!result.Succeeded)
-                throw new ValidationException(result.ToString());
         }
     }
 }

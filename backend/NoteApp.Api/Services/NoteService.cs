@@ -6,11 +6,11 @@ using NoteApp.Api.Interfaces.IService;
 
 namespace NoteApp.Api.Services
 {
-    public class NoteService(INoteRepository noteRepo, IFolderRepository folderRepo) : INoteService
+    public class NoteService(IUnitOfWork unitOfWork) : INoteService
     {
         public async Task<List<NoteDto>> GetNotes(string userId, Guid folderId)
         {
-            var notes = await noteRepo.GetNotes(userId, folderId);
+            var notes = await unitOfWork.Notes.FindAll(x=> x.UserId == userId && x.FolderId == folderId);
             return [.. notes.Select(n => new NoteDto
             {
                 Id = n.Id,
@@ -23,7 +23,7 @@ namespace NoteApp.Api.Services
 
         public async Task<NoteDto> GetNote(string userId, Guid folderId, Guid id)
         {
-            var note = await noteRepo.GetNote(userId, folderId, id) ?? throw new NotFoundException("Note doesn`t exist");
+            var note = await unitOfWork.Notes.Find(x => x.UserId == userId && x.FolderId == folderId && x.Id == id) ?? throw new NotFoundException("Note doesn`t exist");
             return new NoteDto 
             {
                 Id = note.Id,
@@ -39,14 +39,15 @@ namespace NoteApp.Api.Services
             if (string.IsNullOrWhiteSpace(dto.Title))
                 throw new ValidationException("Note title is required");
 
-            var folder = await folderRepo.GetFolder(userId, folderId) ?? throw new NotFoundException("Folder doesn`t exist");
+            var folder = await unitOfWork.Folders.Find(x => x.UserId == userId && x.Id == folderId) ?? throw new NotFoundException("Folder doesn`t exist");
 
             var newNote = new Note();
             newNote.Title = dto.Title;
             newNote.Body = dto.Body;
             newNote.FolderId = folderId;
             newNote.UserId = userId;
-            await noteRepo.CreateNote(newNote);
+            await unitOfWork.Notes.Add(newNote);
+            await unitOfWork.Complete();
             return new NoteDto 
             { 
                 Id = newNote.Id,
@@ -59,7 +60,7 @@ namespace NoteApp.Api.Services
 
         public async Task<NoteDto> UpdateNote(string userId,Guid folderId, Guid id, UpdateNoteDto dto)
         {
-            var note = await noteRepo.GetNote(userId, folderId, id) ?? throw new NotFoundException("Note doesn`t exist");
+            var note = await unitOfWork.Notes.Find(x => x.UserId == userId && x.FolderId == folderId && x.Id == id) ?? throw new NotFoundException("Note doesn`t exist");
 
             if (dto.Body == null && dto.Title == null)
                 throw new ValidationException("Body and Title are empty!");
@@ -70,7 +71,8 @@ namespace NoteApp.Api.Services
             if (dto.Title != null)
                 note.Title = dto.Title;
 
-            await noteRepo.UpdateNote(note);
+            unitOfWork.Notes.Update(note);
+            await unitOfWork.Complete();
 
             return new NoteDto 
             {
@@ -84,8 +86,9 @@ namespace NoteApp.Api.Services
 
         public async Task DeleteNote(string userId, Guid folderId, Guid id)
         {
-            var noteToDelete = await noteRepo.GetNote(userId, folderId, id) ?? throw new NotFoundException("Note doesn`t exist");
-            await noteRepo.DeleteNote(userId, folderId, id);
+            var noteToDelete = await unitOfWork.Notes.Find(x => x.UserId == userId && x.FolderId == folderId && x.Id == id) ?? throw new NotFoundException("Note doesn`t exist");
+            unitOfWork.Notes.Delete(noteToDelete);
+            await unitOfWork.Complete();
         }
 
     }

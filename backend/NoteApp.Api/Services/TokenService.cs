@@ -21,8 +21,9 @@ namespace NoteApp.Api.Services
                     new(ClaimTypes.Email, user.Email)
                 };
 
-            foreach (var role in roles)
-                authClaim.Add(new Claim(ClaimTypes.Role, role));
+            if(roles != null)
+                foreach (var role in roles)
+                    authClaim.Add(new Claim(ClaimTypes.Role, role));
 
             var tokenHandler = new JwtSecurityTokenHandler();
             var jwtOptions = options.Value;

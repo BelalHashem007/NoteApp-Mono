@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using NoteApp.Api.Entities.DTOs;
 using NoteApp.Api.Exceptions;
+using System.Text.Json;
 
 namespace NoteApp.Api.Middlewares
 {
-    public class ExceptionHandlerMiddleware(RequestDelegate _next, IProblemDetailsService _problemDetailsService, ILogger<ExceptionHandlerMiddleware> logger)
+    public class ExceptionHandlerMiddleware(RequestDelegate _next, ILogger<ExceptionHandlerMiddleware> logger)
     {
         public async Task InvokeAsync(HttpContext context)
         {
@@ -20,40 +22,42 @@ namespace NoteApp.Api.Middlewares
 
         public async Task HandleException(HttpContext context, Exception e)
         {
-            var statusCode = e switch
+            var response = new ResponseViewModel
             {
-                ValidationException => StatusCodes.Status400BadRequest,
-                NotFoundException => StatusCodes.Status404NotFound,
-                UnauthorizedException => StatusCodes.Status401Unauthorized,
-                _ => StatusCodes.Status500InternalServerError
+                Success = false,
+                Message = "An unexpected error occurred",
+                Error = new ErrorViewModel
+                {
+                    Code = "SERVER_ERROR"
+                }
             };
 
-            var problemDetails = new ProblemDetails
+            switch(e)
             {
-                Status = statusCode,
-                Title = GetTitle(statusCode),
-                Detail = e.Message,
-                Instance = context.Request.Path
-            };
+                case ValidationException:
+                    context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                    response.Message = e.Message;
+                    response.Error.Code = "INPUT_VALIDATION_ERROR";
+                    break;
 
-            context.Response.StatusCode = statusCode;
+                case UnauthorizedException:
+                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    response.Message = e.Message;
+                    response.Error.Code = "UNAUTHORIZED";
+                    break;
 
-            await _problemDetailsService.WriteAsync(new ProblemDetailsContext
-            {
-                HttpContext = context,
-                ProblemDetails = problemDetails
-            });
-        }
+                case NotFoundException:
+                    context.Response.StatusCode = StatusCodes.Status404NotFound;
+                    response.Message = e.Message;
+                    response.Error.Code = "NOT_FOUND";
+                    break;
 
-        private string GetTitle(int statusCode)
-        {
-            return statusCode switch
-            {
-                400 => "Bad Request",
-                401 => "Unauthorized",
-                404 => "Not Found",
-                _ => "Server Error"
-            };
+                default:
+                    context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                    break;
+            }
+
+            await context.Response.WriteAsJsonAsync(response);
         }
     }
 }

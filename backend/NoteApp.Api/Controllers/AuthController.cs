@@ -1,16 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using NoteApp.Api.Configuration;
-using NoteApp.Api.Data;
-using NoteApp.Api.Entities;
+﻿using Microsoft.AspNetCore.Mvc;
 using NoteApp.Api.Entities.DTOs;
-using NoteApp.Api.Exceptions;
 using NoteApp.Api.Interfaces.IService;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 
 namespace NoteApp.Api.Controllers
 {
@@ -20,21 +10,12 @@ namespace NoteApp.Api.Controllers
     {
         [HttpPost]
         [Route("login")]
-        public async Task<ActionResult> Login(LoginDto dto)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType<ResponseViewModel>(StatusCodes.Status401Unauthorized)]
+        public async Task<ActionResult<ResponseViewModel<AuthViewModel>>> Login(LoginViewModel dto)
         {
             var result = await authService.Login(dto);
-            if (result == null)
-                return Unauthorized();
-            else
-                return Ok(result);
-        }
-
-        [HttpPost]
-        [Route("signup")]
-        public async Task<ActionResult> Signup(SignupDto dto)
-        {
-            await authService.Signup(dto);
-            return Ok();
+            return Ok(result);
         }
     }
 }
