@@ -52,6 +52,25 @@ builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
+//Cors
+builder.Services.AddCors((options) =>
+{
+    options.AddPolicy("DevCors", (corsBuilder) =>
+    {
+        corsBuilder.WithOrigins("http://localhost:4200", "http://localhost:3000", "http://localhost:8000")
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials();
+    });
+    options.AddPolicy("ProdCors", (corsBuilder) =>
+    {
+        corsBuilder.WithOrigins("https://myProductionSite.com")
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials();
+    });
+});
+
 //Identity & Authentication & Authorization
 builder.Services.AddAuthorization();
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
@@ -75,6 +94,25 @@ builder.Services.AddAuthentication(options =>
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SigningKey)),
             ValidateLifetime = true,
         };
+
+        options.Events = new JwtBearerEvents
+        {
+            //read token from cookie or header
+            OnMessageReceived = context =>
+            {
+                var token = context.Request.Cookies["accessToken"];
+                if (string.IsNullOrWhiteSpace(token))
+                {
+                    var authHeader = context.Request.Headers["Authorization"].ToString();
+                    if (authHeader.StartsWith("Bearer "))
+                    {
+                        token = authHeader.Substring("Bearer ".Length);
+                    }
+                }
+                context.Token = token;
+                return Task.CompletedTask;
+            }
+        };
     });
 
 var app = builder.Build();
@@ -85,11 +123,15 @@ app.UseMiddleware<ExceptionHandlerMiddleware>();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    app.UseCors("DevCors");
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-app.UseHttpsRedirection();
+else
+{
+    app.UseCors("ProdCors");
+    app.UseHttpsRedirection();
+}
 
 app.UseAuthentication();
 app.UseAuthorization();

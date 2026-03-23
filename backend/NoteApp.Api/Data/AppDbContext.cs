@@ -36,7 +36,7 @@ namespace NoteApp.Api.Data
 
             //folder constraints
             modelBuilder.Entity<Folder>()
-                .Property(f => f.Name)
+                .Property(f => f.FolderName)
                 .HasMaxLength(50)
                 .IsRequired();
 

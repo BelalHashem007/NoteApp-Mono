@@ -32,5 +32,32 @@ namespace NoteApp.Api.Services
                 throw new UnauthorizedException("Invalid credentials");
             }
         }
+
+        public async Task<ResponseViewModel<AuthViewModel>> Register(RegisterViewModel dto)
+        {
+            var user = new ApplicationUser
+            {
+                Email = dto.Email,
+                FullName = dto.FullName,
+                UserName = dto.Email.Substring(0 ,dto.Email.IndexOf("@"))
+            };
+
+            var result = await authRepository.CreateApplicationUser(user, dto.Password);
+            if (!result.Succeeded)
+                throw new Exception("Failed to create user in the database");
+
+            var accessToken = tokenService.GenerateToken(user, null);
+            return new ResponseViewModel<AuthViewModel>
+            {
+                Success = true,
+                Message = "Register Successful",
+                Data = new AuthViewModel
+                {
+                    Success = true,
+                    AccessToken = accessToken
+                }
+            };
+
+        }
     }
 }

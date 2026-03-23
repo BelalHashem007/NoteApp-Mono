@@ -15,46 +15,42 @@ namespace NoteApp.Api.Controllers
     {
         [HttpGet]
         [Route("")]
-        public async Task<ActionResult<List<NoteDto>>> GetNotes(Guid folderId)
+        public async Task<ActionResult<ResponseViewModel<IEnumerable<NoteViewModel>>>> GetNotes(Guid folderId)
         {
             var userId = User.GetUserId();
 
-            var notes = await service.GetNotes(userId, folderId);
-            var response = new { notes, folderId };
-            return Ok(response);
+            var result = await service.GetNotes(userId, folderId);
+            return Ok(result);
         }
 
         [HttpGet]
         [Route("{id}")]
-        public async Task<ActionResult<NoteDto>> GetNote(Guid folderId,Guid id)
+        public async Task<ActionResult<ResponseViewModel<NoteViewModel>>> GetNote(Guid folderId,Guid id)
         {
             var userId = User.GetUserId();
 
-            var note = await service.GetNote(userId, folderId, id);
-            var response = new { note, folderId };
-            return Ok(response);
+            var result = await service.GetNote(userId, folderId, id);
+            return Ok(result);
         }
 
         [HttpPost]
         [Route("")]
-        public async Task<ActionResult> CreateNote(Guid folderId, CreateNoteDto dto)
+        public async Task<ActionResult> CreateNote(Guid folderId, CreateNoteViewModel dto)
         {
             var userId = User.GetUserId();
 
-            var note = await service.CreateNote(userId, folderId, dto);
-            var response = new { note, folderId };
-            return CreatedAtAction(nameof(GetNote) , new { folderId, id = response.note.Id}, response);
+            var result = await service.CreateNote(userId, folderId, dto);
+            return CreatedAtAction(nameof(GetNote) , new { folderId, id = result.Data?.Id}, result);
         }
 
         [HttpPut]
         [Route("{id}")]
-        public async Task<ActionResult<NoteDto>> UpdateNote(Guid folderId,Guid id,UpdateNoteDto dto)
+        public async Task<ActionResult<ResponseViewModel<NoteViewModel>>> UpdateNote(Guid folderId,Guid id,UpdateNoteViewModel dto)
         {
             var userId = User.GetUserId();
 
-            var note = await service.UpdateNote(userId, folderId, id, dto);
-            var response = new { note, folderId };
-            return Ok(response);
+            var result = await service.UpdateNote(userId, folderId, id, dto);
+            return Ok(result);
         }
 
         [HttpDelete]

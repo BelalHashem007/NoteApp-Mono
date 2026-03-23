@@ -1,6 +1,7 @@
 ﻿using NoteApp.Api.Entities;
 using NoteApp.Api.Entities.DTOs;
 using NoteApp.Api.Exceptions;
+using NoteApp.Api.Helpers;
 using NoteApp.Api.Interfaces.IRepositories;
 using NoteApp.Api.Interfaces.IService;
 
@@ -8,33 +9,35 @@ namespace NoteApp.Api.Services
 {
     public class NoteService(IUnitOfWork unitOfWork) : INoteService
     {
-        public async Task<List<NoteDto>> GetNotes(string userId, Guid folderId)
+        public async Task<ResponseViewModel<IEnumerable<NoteViewModel>>> GetNotes(string userId, Guid folderId)
         {
             var notes = await unitOfWork.Notes.FindAll(x=> x.UserId == userId && x.FolderId == folderId);
-            return [.. notes.Select(n => new NoteDto
+            IList<NoteViewModel> noteViews = [];
+            foreach (var note in notes)
             {
-                Id = n.Id,
-                Body = n.Body,
-                CreatedAt = n.CreatedAt,
-                Title = n.Title,
-                UpdatedAt = n.UpdatedAt
-            })];
-        }
+                noteViews.Add(ObjectMapperHelper.Map<Note, NoteViewModel>(note));
+            }
 
-        public async Task<NoteDto> GetNote(string userId, Guid folderId, Guid id)
-        {
-            var note = await unitOfWork.Notes.Find(x => x.UserId == userId && x.FolderId == folderId && x.Id == id) ?? throw new NotFoundException("Note doesn`t exist");
-            return new NoteDto 
+            return new ResponseViewModel<IEnumerable<NoteViewModel>>
             {
-                Id = note.Id,
-                Body= note.Body,
-                UpdatedAt= note.CreatedAt,
-                Title= note.Title,
-                CreatedAt = note.UpdatedAt
+                Success = true,
+                Message = "Retrieved Notes successfully",
+                Data = noteViews
             };
         }
 
-        public async Task<NoteDto> CreateNote(string userId, Guid folderId, CreateNoteDto dto)
+        public async Task<ResponseViewModel<NoteViewModel>> GetNote(string userId, Guid folderId, Guid id)
+        {
+            var note = await unitOfWork.Notes.Find(x => x.UserId == userId && x.FolderId == folderId && x.Id == id) ?? throw new NotFoundException("Note doesn`t exist");
+            return new ResponseViewModel<NoteViewModel>
+            {
+                Success = true,
+                Message = "Retrieved Note successfully",
+                Data = ObjectMapperHelper.Map<Note, NoteViewModel>(note)
+            };
+        }
+
+        public async Task<ResponseViewModel<NoteViewModel>> CreateNote(string userId, Guid folderId, CreateNoteViewModel dto)
         {
             if (string.IsNullOrWhiteSpace(dto.Title))
                 throw new ValidationException("Note title is required");
@@ -42,23 +45,24 @@ namespace NoteApp.Api.Services
             var folder = await unitOfWork.Folders.Find(x => x.UserId == userId && x.Id == folderId) ?? throw new NotFoundException("Folder doesn`t exist");
 
             var newNote = new Note();
+
             newNote.Title = dto.Title;
             newNote.Body = dto.Body;
             newNote.FolderId = folderId;
             newNote.UserId = userId;
+
             await unitOfWork.Notes.Add(newNote);
             await unitOfWork.Complete();
-            return new NoteDto 
-            { 
-                Id = newNote.Id,
-                Body = newNote.Body,
-                CreatedAt= newNote.CreatedAt,
-                Title = newNote.Title,
-                UpdatedAt = newNote.UpdatedAt
+
+            return new ResponseViewModel<NoteViewModel>
+            {
+                Success = true,
+                Message = "Created Note successfully",
+                Data = ObjectMapperHelper.Map<Note, NoteViewModel>(newNote)
             };
         }
 
-        public async Task<NoteDto> UpdateNote(string userId,Guid folderId, Guid id, UpdateNoteDto dto)
+        public async Task<ResponseViewModel<NoteViewModel>> UpdateNote(string userId,Guid folderId, Guid id, UpdateNoteViewModel dto)
         {
             var note = await unitOfWork.Notes.Find(x => x.UserId == userId && x.FolderId == folderId && x.Id == id) ?? throw new NotFoundException("Note doesn`t exist");
 
@@ -74,13 +78,11 @@ namespace NoteApp.Api.Services
             unitOfWork.Notes.Update(note);
             await unitOfWork.Complete();
 
-            return new NoteDto 
+            return new ResponseViewModel<NoteViewModel>
             {
-                Id = note.Id,
-                Body = note.Body,
-                UpdatedAt= note.UpdatedAt,
-                CreatedAt = note.CreatedAt,
-                Title = note.Title
+                Success = true,
+                Message = "Updated Note successfully",
+                Data = ObjectMapperHelper.Map<Note, NoteViewModel>(note)
             };
         }
 

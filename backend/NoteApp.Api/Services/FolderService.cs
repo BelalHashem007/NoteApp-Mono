@@ -1,6 +1,7 @@
 ﻿using NoteApp.Api.Entities;
 using NoteApp.Api.Entities.DTOs;
 using NoteApp.Api.Exceptions;
+using NoteApp.Api.Helpers;
 using NoteApp.Api.Interfaces.IRepositories;
 using NoteApp.Api.Interfaces.IService;
 
@@ -8,15 +9,69 @@ namespace NoteApp.Api.Services
 {
     public class FolderService(IUnitOfWork unitOfWork) : IFolderService
     {
-        public async Task<Folder> CreateFolder(string userId, CreateFolderDto dto)
+        public async Task<ResponseViewModel<IEnumerable<FolderViewModel>>> GetFolders(string userId)
+        {
+            var folders = await unitOfWork.Folders.FindAll(x => x.UserId == userId);
+            IList<FolderViewModel> folderViews = [];
+
+            foreach (var folder in folders)
+                folderViews.Add(ObjectMapperHelper.Map<Folder, FolderViewModel>(folder));
+
+            return new ResponseViewModel<IEnumerable<FolderViewModel>>
+            {
+                Success = true,
+                Message = "Retrieved Folders successfully",
+                Data = folderViews
+            };
+        }
+
+        public async Task<ResponseViewModel<FolderViewModel>> GetFolder(string userId, Guid id)
+        {
+            var folder = await unitOfWork.Folders.Find(x => x.UserId == userId && x.Id == id) ?? throw new NotFoundException("Folder doesn`t exist");
+            return new ResponseViewModel<FolderViewModel>
+            {
+                Success = true,
+                Message = "Retrieved Folder successfully",
+                Data = ObjectMapperHelper.Map<Folder, FolderViewModel>(folder)
+            };
+        }
+
+        public async Task<ResponseViewModel<FolderViewModel>> CreateFolder(string userId, CreateFolderViewModel dto)
         {
             if (string.IsNullOrWhiteSpace(dto.FolderName))
                 throw new ValidationException("FolderName is required");
 
-            var folder = new Folder { Name = dto.FolderName, UserId = userId };
+            var folder = new Folder { FolderName = dto.FolderName, UserId = userId };
+
             await unitOfWork.Folders.Add(folder);
             await unitOfWork.Complete();
-            return folder;
+
+            return new ResponseViewModel<FolderViewModel>
+            {
+                Success = true,
+                Message = "Created Folder successfully",
+                Data = ObjectMapperHelper.Map<Folder, FolderViewModel>(folder)
+            };
+        }
+
+        public async Task<ResponseViewModel<FolderViewModel>> UpdateFolder(string userId, Guid id, UpdateFolderViewModel dto)
+        {
+            var folder = await unitOfWork.Folders.Find(x => x.UserId == userId && x.Id == id) ?? throw new NotFoundException("Folder doesn`t exist");
+
+            if (string.IsNullOrWhiteSpace(dto.FolderName))
+                throw new ValidationException("FolderName is required");
+
+            folder.FolderName = dto.FolderName;
+            unitOfWork.Folders.Update(folder);
+
+            await unitOfWork.Complete();
+
+            return new ResponseViewModel<FolderViewModel>
+            {
+                Success = true,
+                Message = "Upated Folder successfully",
+                Data = ObjectMapperHelper.Map<Folder, FolderViewModel>(folder)
+            };
         }
 
         public async Task DeleteFolder(string userId, Guid id)
@@ -26,28 +81,5 @@ namespace NoteApp.Api.Services
             await unitOfWork.Complete();
         }
 
-        public async Task<Folder> GetFolder(string userId,Guid id)
-        {
-            var folder = await unitOfWork.Folders.Find(x => x.UserId == userId && x.Id == id) ?? throw new NotFoundException("Folder doesn`t exist");
-            return folder;
-        }
-
-        public async Task<IEnumerable<Folder>> GetFolders(string userId)
-        {
-           return await unitOfWork.Folders.FindAll(x => x.UserId == userId);
-        }
-
-        public async Task<Folder> UpdateFolder(string userId, Guid id, UpdateFolderDto dto)
-        {
-            var folder = await unitOfWork.Folders.Find(x => x.UserId == userId && x.Id == id) ?? throw new NotFoundException("Folder doesn`t exist");
-
-            if (string.IsNullOrWhiteSpace(dto.FolderName))
-                throw new ValidationException("FolderName is required");
-
-            folder.Name = dto.FolderName;
-            unitOfWork.Folders.Update(folder);
-            await unitOfWork.Complete();
-            return folder;
-        }
     }
 }

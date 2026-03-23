@@ -14,42 +14,42 @@ namespace NoteApp.Api.Controllers
     {
         [HttpGet]
         [Route("")]
-        public async Task<ActionResult<List<Folder>>> GetFolders()
+        public async Task<ActionResult<ResponseViewModel<IEnumerable<FolderViewModel>>>> GetFolders()
         {
             var userId = User.GetUserId();
 
-            var folders = await service.GetFolders(userId);
-            return Ok(folders);
+            var result = await service.GetFolders(userId);
+            return Ok(result);
         }
 
         [HttpGet]
         [Route("{id}")]
-        public async Task<ActionResult<Folder>> GetFolder(Guid id)
+        public async Task<ActionResult<ResponseViewModel<FolderViewModel>>> GetFolder(Guid id)
         {
             var userId = User.GetUserId();
 
-            var folder = await service.GetFolder(userId, id);
-            return Ok(folder);
+            var result = await service.GetFolder(userId, id);
+            return Ok(result);
         }
 
         [HttpPost]
         [Route("")]
-        public async Task<ActionResult> CreateFolder(CreateFolderDto dto)
+        public async Task<ActionResult> CreateFolder(CreateFolderViewModel dto)
         {
             var userId = User.GetUserId();
 
-            var folder = await service.CreateFolder(userId, dto);
-            return Ok(folder);
+            var result = await service.CreateFolder(userId, dto);
+            return CreatedAtAction(nameof(GetFolder), new { id = result.Data?.Id }, result);
         }
 
         [HttpPut]
         [Route("{id}")]
-        public async Task<ActionResult<Folder>> UpdateFolder(Guid id,UpdateFolderDto dto)
+        public async Task<ActionResult<ResponseViewModel<FolderViewModel>>> UpdateFolder(Guid id,UpdateFolderViewModel dto)
         {
             var userId = User.GetUserId();
 
-            var folder = await service.UpdateFolder(userId, id, dto);
-            return Ok(folder);
+            var result = await service.UpdateFolder(userId, id, dto);
+            return Ok(result);
         }
 
         [HttpDelete]

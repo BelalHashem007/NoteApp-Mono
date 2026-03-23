@@ -7,6 +7,12 @@ namespace NoteApp.Api.Repositories
 {
     public class AuthRepository(UserManager<ApplicationUser> _userManager) : IAuthRepository
     {
+        public async Task<IdentityResult> CreateApplicationUser(ApplicationUser user, string password)
+        {
+            var result = await _userManager.CreateAsync(user, password);
+            return result;
+        }
+
         public async Task<ApplicationUser?> GetApplicationUser(LoginViewModel dto)
         {
             var user = await _userManager.FindByEmailAsync(dto.Email);
@@ -14,5 +20,7 @@ namespace NoteApp.Api.Repositories
                 return user;
             else return null;
         }
+
+
     }
 }
