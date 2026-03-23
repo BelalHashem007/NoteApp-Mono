@@ -38,8 +38,10 @@ namespace NoteApp.Api.Services
 
         public async Task<ResponseViewModel<FolderViewModel>> CreateFolder(string userId, CreateFolderViewModel dto)
         {
-            if (string.IsNullOrWhiteSpace(dto.FolderName))
-                throw new ValidationException("FolderName is required");
+            var validator = new CreateFolderViewModelValidator();
+            var result = validator.Validate(dto);
+            if (!result.IsValid)
+                throw new ValidationException(result.ToString());
 
             var folder = new Folder { FolderName = dto.FolderName, UserId = userId };
 
@@ -56,10 +58,12 @@ namespace NoteApp.Api.Services
 
         public async Task<ResponseViewModel<FolderViewModel>> UpdateFolder(string userId, Guid id, UpdateFolderViewModel dto)
         {
-            var folder = await unitOfWork.Folders.Find(x => x.UserId == userId && x.Id == id) ?? throw new NotFoundException("Folder doesn`t exist");
+            var validator = new UpdateFolderViewModelValidator();
+            var result = validator.Validate(dto);
+            if (!result.IsValid)
+                throw new ValidationException(result.ToString());
 
-            if (string.IsNullOrWhiteSpace(dto.FolderName))
-                throw new ValidationException("FolderName is required");
+            var folder = await unitOfWork.Folders.Find(x => x.UserId == userId && x.Id == id) ?? throw new NotFoundException("Folder doesn`t exist");
 
             folder.FolderName = dto.FolderName;
             unitOfWork.Folders.Update(folder);

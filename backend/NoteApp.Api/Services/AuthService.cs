@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using NoteApp.Api.Entities;
+﻿using NoteApp.Api.Entities;
 using NoteApp.Api.Entities.DTOs;
 using NoteApp.Api.Exceptions;
 using NoteApp.Api.Interfaces.IRepositories;
@@ -11,6 +10,11 @@ namespace NoteApp.Api.Services
     {
         public async Task<ResponseViewModel<AuthViewModel>> Login(LoginViewModel dto)
         {
+            var validator = new LoginViewModelValidator();
+            var result = validator.Validate(dto);
+            if (!result.IsValid)
+                throw new ValidationException(result.ToString());
+
             var user = await authRepository.GetApplicationUser(dto);
             if (user != null)
             {
@@ -35,6 +39,11 @@ namespace NoteApp.Api.Services
 
         public async Task<ResponseViewModel<AuthViewModel>> Register(RegisterViewModel dto)
         {
+            var validator = new RegisterViewModelValidator();
+            var validationResult = validator.Validate(dto);
+            if (!validationResult.IsValid)
+                throw new ValidationException(validationResult.ToString());
+
             var user = new ApplicationUser
             {
                 Email = dto.Email,
@@ -42,8 +51,8 @@ namespace NoteApp.Api.Services
                 UserName = dto.Email.Substring(0 ,dto.Email.IndexOf("@"))
             };
 
-            var result = await authRepository.CreateApplicationUser(user, dto.Password);
-            if (!result.Succeeded)
+            var identityResult = await authRepository.CreateApplicationUser(user, dto.Password);
+            if (!identityResult.Succeeded)
                 throw new Exception("Failed to create user in the database");
 
             var accessToken = tokenService.GenerateToken(user, null);

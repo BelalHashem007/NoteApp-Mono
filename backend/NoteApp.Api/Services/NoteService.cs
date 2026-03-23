@@ -39,10 +39,15 @@ namespace NoteApp.Api.Services
 
         public async Task<ResponseViewModel<NoteViewModel>> CreateNote(string userId, Guid folderId, CreateNoteViewModel dto)
         {
-            if (string.IsNullOrWhiteSpace(dto.Title))
-                throw new ValidationException("Note title is required");
+            var validator = new CreateNoteViewModelValidator();
+            var result = validator.Validate(dto);
 
-            var folder = await unitOfWork.Folders.Find(x => x.UserId == userId && x.Id == folderId) ?? throw new NotFoundException("Folder doesn`t exist");
+            if (!result.IsValid)
+                throw new Exceptions.ValidationException(result.ToString());
+
+            var folder = await unitOfWork.Folders
+                .Find(x => x.UserId == userId && x.Id == folderId) 
+                ?? throw new NotFoundException("Folder doesn`t exist");
 
             var newNote = new Note();
 
@@ -64,10 +69,13 @@ namespace NoteApp.Api.Services
 
         public async Task<ResponseViewModel<NoteViewModel>> UpdateNote(string userId,Guid folderId, Guid id, UpdateNoteViewModel dto)
         {
-            var note = await unitOfWork.Notes.Find(x => x.UserId == userId && x.FolderId == folderId && x.Id == id) ?? throw new NotFoundException("Note doesn`t exist");
+            var validator = new UpdateNoteViewModelValidator();
+            var result = validator.Validate(dto);
 
-            if (dto.Body == null && dto.Title == null)
-                throw new ValidationException("Body and Title are empty!");
+            if (!result.IsValid)
+                throw new ValidationException(result.ToString());
+
+            var note = await unitOfWork.Notes.Find(x => x.UserId == userId && x.FolderId == folderId && x.Id == id) ?? throw new NotFoundException("Note doesn`t exist");
 
             if (dto.Body != null)
                 note.Body = dto.Body;
