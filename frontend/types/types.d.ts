@@ -8,6 +8,5 @@ interface Note {
 
 interface Folder {
     id: string;
-    name: string;
-    icon: string;
+    folderName: string;
 }
