@@ -4,6 +4,7 @@ namespace NoteApp.Api.Interfaces.IService
 {
     public interface ITokenService
     {
-        public string GenerateToken(ApplicationUser user, IList<string>? roles);
+        public string GenerateJwtToken(ApplicationUser user, IList<string>? roles);
+        public RefreshToken GenerateRefreshToken();
     }
 }

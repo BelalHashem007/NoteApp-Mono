@@ -1,13 +1,18 @@
 ﻿using FluentValidation;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace NoteApp.Api.Entities.DTOs
 {
     public class AuthViewModel
     {
-        public DateTime ExpiresOn { get; set; }
+        //public DateTime ExpiresOn { get; set; }
         public required ApplicationUserViewModel User { get; set; }
         public string? AccessToken { get; set; }
+
+        [JsonIgnore]
+        public string? RefreshToken { get; set; }
+        public DateTime RefreshTokenExpiration { get; set; }
     }
 
     public class LoginViewModel

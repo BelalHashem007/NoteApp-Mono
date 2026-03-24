@@ -1,19 +1,18 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using NoteApp.Api.Configuration;
 using NoteApp.Api.Entities;
-using NoteApp.Api.Entities.DTOs;
 using NoteApp.Api.Interfaces.IService;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Security.Cryptography;
 
 namespace NoteApp.Api.Services
 {
     public class TokenService(IOptions<JwtOptions> options) : ITokenService
     {
-        public string GenerateToken(ApplicationUser user, IList<string>? roles)
+        public string GenerateJwtToken(ApplicationUser user, IList<string>? roles)
         {
             var authClaim = new List<Claim>
                 {
@@ -39,6 +38,22 @@ namespace NoteApp.Api.Services
             var securityToken = tokenHandler.CreateToken(tokenDescriptor);
             var accessToken = tokenHandler.WriteToken(securityToken);
             return accessToken;
+        }
+
+        public RefreshToken GenerateRefreshToken()
+        {
+            var randomNumber = new byte[32];
+
+            var generator = RandomNumberGenerator.Create();
+
+            generator.GetBytes(randomNumber);
+
+            return new RefreshToken
+            {
+                Token = Convert.ToBase64String(randomNumber),
+                CreatedOn = DateTime.UtcNow,
+                ExpiresOn = DateTime.UtcNow.AddDays(10)
+            };
         }
     }
 }

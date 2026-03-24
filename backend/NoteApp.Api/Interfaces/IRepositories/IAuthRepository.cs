@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using NoteApp.Api.Entities;
 using NoteApp.Api.Entities.DTOs;
+using System.Linq.Expressions;
 
 namespace NoteApp.Api.Interfaces.IRepositories
 {
@@ -12,5 +13,7 @@ namespace NoteApp.Api.Interfaces.IRepositories
         public Task<bool> FindUserByUserName(string userName);
         Task<IdentityResult> AddDefaultRole(ApplicationUser user, string role);
         public Task<IList<string>> GetUserRoles(ApplicationUser user);
+        public Task UpdateUser(ApplicationUser user);
+        public Task<ApplicationUser?> FindUser(Expression<Func<ApplicationUser, bool>> expression);
     }
 }

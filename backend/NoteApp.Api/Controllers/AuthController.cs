@@ -1,14 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using NoteApp.Api.Configuration;
 using NoteApp.Api.Entities.DTOs;
+using NoteApp.Api.Exceptions;
 using NoteApp.Api.Interfaces.IService;
 
 namespace NoteApp.Api.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class AuthController(IAuthService authService, IOptions<JwtOptions> options, IWebHostEnvironment env) : ControllerBase
+    public class AuthController(IAuthService authService, IWebHostEnvironment env) : ControllerBase
     {
         [HttpPost]
         [Route("login")]
@@ -17,14 +16,8 @@ namespace NoteApp.Api.Controllers
         public async Task<ActionResult<ResponseViewModel<AuthViewModel>>> Login(LoginViewModel dto)
         {
             var result = await authService.Login(dto);
-            if (result.Data?.AccessToken != null)
-                Response.Cookies.Append("accessToken", result.Data.AccessToken, new CookieOptions
-                {
-                    MaxAge = TimeSpan.FromMinutes(options.Value.LifeTime),
-                    HttpOnly = true,
-                    Secure = !env.IsDevelopment(),
-                    SameSite = env.IsDevelopment() ? SameSiteMode.Lax : SameSiteMode.Strict,
-                });
+            if (result.Data != null && !string.IsNullOrWhiteSpace(result.Data.RefreshToken))
+                SetRefreshTokenToCookie(result.Data.RefreshToken, result.Data.RefreshTokenExpiration);
             return Ok(result);
         }
 
@@ -33,15 +26,32 @@ namespace NoteApp.Api.Controllers
         public async Task<ActionResult<ResponseViewModel<AuthViewModel>>> Register(RegisterViewModel dto)
         {
             var result = await authService.Register(dto);
-            if (result.Data?.AccessToken != null)
-                Response.Cookies.Append("accessToken", result.Data.AccessToken, new CookieOptions
-                {
-                    MaxAge = TimeSpan.FromMinutes(options.Value.LifeTime),
-                    HttpOnly = true,
-                    Secure = !env.IsDevelopment(),
-                    SameSite = env.IsDevelopment() ? SameSiteMode.Lax : SameSiteMode.Strict,
-                });
+            if (result.Data != null && !string.IsNullOrWhiteSpace(result.Data.RefreshToken))
+                SetRefreshTokenToCookie(result.Data.RefreshToken, result.Data.RefreshTokenExpiration);
             return Ok(result);
+        }
+
+        [HttpGet]
+        [Route("GetToken")]
+        public async Task<ActionResult<ResponseViewModel<AuthViewModel>>> GetToken()
+        {
+            var refreshToken = Request.Cookies["refreshToken"];
+            if (refreshToken == null)
+                throw new ValidationException("Missing refreshToken in cookies");
+
+            var result = await authService.RefreshToken(refreshToken);
+            if (result.Data != null && !string.IsNullOrWhiteSpace(result.Data.RefreshToken))
+                SetRefreshTokenToCookie(result.Data.RefreshToken, result.Data.RefreshTokenExpiration);
+            return Ok(result);
+        }
+
+        private void SetRefreshTokenToCookie(string refreshToken, DateTime refreshTokenExpiration)
+        {
+            Response.Cookies.Append("refreshToken", refreshToken, new CookieOptions
+            {
+                Expires = refreshTokenExpiration.ToLocalTime(),
+                HttpOnly = true,
+            });
         }
     }
 }

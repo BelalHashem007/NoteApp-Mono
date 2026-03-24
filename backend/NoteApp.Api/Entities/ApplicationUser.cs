@@ -8,5 +8,6 @@ namespace NoteApp.Api.Entities
 
         public List<Folder> Folders { get; set; }
         public List<Note> Notes { get; set; }
+        public List<RefreshToken> RefreshTokens { get; set; }
     }
 }

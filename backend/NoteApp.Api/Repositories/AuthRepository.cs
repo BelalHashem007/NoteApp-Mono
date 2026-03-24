@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using NoteApp.Api.Entities;
 using NoteApp.Api.Entities.DTOs;
 using NoteApp.Api.Interfaces.IRepositories;
+using System.Linq.Expressions;
 
 namespace NoteApp.Api.Repositories
 {
@@ -45,7 +47,17 @@ namespace NoteApp.Api.Repositories
 
         public async Task<IList<string>> GetUserRoles(ApplicationUser user)
         {
-            return await _userManager.GetRolesAsync(user);
+            return (await _userManager.GetRolesAsync(user)).ToList();
+        }
+
+        public async Task UpdateUser(ApplicationUser user)
+        {
+            await _userManager.UpdateAsync(user);
+        }
+
+        public async Task<ApplicationUser?> FindUser(Expression<Func<ApplicationUser, bool>> expression)
+        {
+            return await _userManager.Users.SingleOrDefaultAsync(expression);
         }
     }
 }
