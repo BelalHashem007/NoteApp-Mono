@@ -21,6 +21,31 @@ namespace NoteApp.Api.Repositories
             else return null;
         }
 
+        public async Task<bool> FindUserByEmail(string email)
+        {
+            if (await _userManager.FindByEmailAsync(email) is not null)
+                return true;
 
+            return false;
+        }
+
+        public async Task<bool> FindUserByUserName(string userName)
+        {
+            if (await _userManager.FindByNameAsync(userName) is not null)
+                return true;
+
+            return false;
+        }
+
+        public async Task<IdentityResult> AddDefaultRole(ApplicationUser user, string role)
+        {
+            var result = await _userManager.AddToRoleAsync(user, role);
+            return result;
+        }
+
+        public async Task<IList<string>> GetUserRoles(ApplicationUser user)
+        {
+            return await _userManager.GetRolesAsync(user);
+        }
     }
 }

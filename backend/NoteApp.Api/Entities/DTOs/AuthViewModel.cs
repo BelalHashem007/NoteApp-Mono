@@ -5,7 +5,8 @@ namespace NoteApp.Api.Entities.DTOs
 {
     public class AuthViewModel
     {
-        public bool Success { get; set; }
+        public DateTime ExpiresOn { get; set; }
+        public required ApplicationUserViewModel User { get; set; }
         public string? AccessToken { get; set; }
     }
 

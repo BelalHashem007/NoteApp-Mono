@@ -52,6 +52,12 @@ namespace NoteApp.Api.Middlewares
                     response.Error.Code = "NOT_FOUND";
                     break;
 
+                case UserAlreadyExistsException:
+                    context.Response.StatusCode = StatusCodes.Status409Conflict;
+                    response.Message = e.Message;
+                    response.Error.Code = "CONFLICT";
+                    break;
+
                 default:
                     context.Response.StatusCode = StatusCodes.Status500InternalServerError;
                     break;
