@@ -5,7 +5,7 @@ const protectedRoutes = ['/dashboard']
 const publicRoutes = ['/login', '/signup', '/']
 
 export const proxy = auth((req) => {
-    const isLoggedIn = !!req.auth;
+    const isLoggedIn = !!req.auth && !req.auth.error;
     const path = req.nextUrl.pathname
     const isProtectedRoute = protectedRoutes.includes(path)
     const isPublicRoute = publicRoutes.includes(path)

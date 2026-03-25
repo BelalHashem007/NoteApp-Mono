@@ -2,6 +2,7 @@ import LoginForm from "../components/LoginForm"
 import IllustrationSide from "../components/IllustrationSide"
 import LoginHeader from "../components/LoginHeader"
 
+
 export default function LoginView() {
     return (
         <div className="min-h-screen w-full flex">

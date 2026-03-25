@@ -1,11 +1,13 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import { refreshAccessToken } from "./actions/authActions";
+import { jwtDecode } from "jwt-decode";
 
 interface AuthCredentials {
-  email?: string;
-  password?: string;
-  fullname?: string;
-  isSignUp?: boolean;
+    email?: string;
+    password?: string;
+    fullname?: string;
+    isSignUp?: boolean;
 }
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
@@ -13,29 +15,40 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         Credentials({
             name: "My Backend",
             credentials: {
-                fullname: { label: "fullname", type: "text" },
                 email: { label: "Email", type: "email" },
                 password: { label: "Password", type: "password" },
             },
             authorize: async (credentials) => {
                 const { email, fullname, password, isSignUp } = credentials as AuthCredentials
 
-                const endpoint = isSignUp ? 
-                "http://localhost:5262/auth/register" : "http://localhost:5262/auth/login"
+                const endpoint = isSignUp ?
+                    "http://localhost:5001/api/auth/register" : "http://localhost:5001/api/auth/login"
 
-            const result = await fetch(endpoint, {
+                const result = await fetch(endpoint, {
                     method: "POST",
-                    body: JSON.stringify({email, password, fullname}),
+                    body: JSON.stringify({ email, password, fullname }),
                     headers: {
                         "Content-Type": "application/json"
                     },
                 })
-                
+
                 const body = await result.json()
                 console.log(body);
-                const user = body.data
-                if (result.ok && user)
-                    return user;
+                const data = body.data
+                if (result.ok && data) {
+                    const setCookieHeader = result.headers.getSetCookie?.()?.[0] ?? "";
+                    const rawToken = setCookieHeader.includes("=")
+                        ? setCookieHeader.substring(setCookieHeader.indexOf("=") + 1, setCookieHeader.indexOf(";"))
+                        : "";
+                    return {
+                        accessToken: data.accessToken,
+                        email: data.user.email,
+                        id: data.user.id,
+                        name: data.user.fullName,
+                        refreshToken: decodeURIComponent(rawToken),
+                        accessTokenExpirationDate: data.accessTokenExpirationDate,
+                    };
+                }
 
                 return null;
             },
@@ -46,17 +59,30 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
     session: {
         strategy: "jwt",
-        maxAge: 30*60
+        maxAge: 10 * 24 * 60 * 60
     },
     callbacks: {
         jwt: async ({ token, user }) => {
             if (user) {
-                token.accessToken = user.accessToken
+                token.accessToken = user.accessToken;
+                token.refreshToken = user.refreshToken;
+                token.accessTokenExpires = user.accessTokenExpirationDate;
             }
-            return token;
+            console.log("expirationDate: ",new Date(token.accessTokenExpires?.toString() ?? "").getTime())
+            console.log("Date now: ",Date.now())
+            if (token.accessTokenExpires && Date.now() < new Date(token.accessTokenExpires.toString()).getTime() - 10000) {
+                console.log("test")
+                return token;
+            }
+
+            if (!token.refreshToken) throw new Error("Missing Refresh Token");
+            console.log("going to refresh token")
+            return await refreshAccessToken(token);
         },
         session: ({ session, token }) => {
-            session.accessToken = token.accessToken as string;
+            session.accessToken = token.accessToken ?? undefined;
+            session.refreshToken = token.refreshToken ?? undefined;
+            session.error = token.error;
             return session;
         }
     }

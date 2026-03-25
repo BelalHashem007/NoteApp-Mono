@@ -10,7 +10,7 @@ export default async function UserProfile() {
                     AJ
                 </div>
                 <div className="flex-1 min-w-0">
-                    <div className="truncate">{session?.user?.email ?? "Alex Johnson"}</div>
+                    <div className="truncate">{session?.user?.name ?? "Alex Johnson"}</div>
                     <div className="text-xs text-muted-foreground">Pro Plan</div>
                 </div>
             </div>
