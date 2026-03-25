@@ -1,7 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using NoteApp.Api.Entities.DTOs;
+﻿using NoteApp.Api.Entities.DTOs;
 using NoteApp.Api.Exceptions;
-using System.Text.Json;
 
 namespace NoteApp.Api.Middlewares
 {

@@ -7,7 +7,7 @@ namespace NoteApp.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AuthController(IAuthService authService, IWebHostEnvironment env) : ControllerBase
+    public class AuthController(IAuthService authService, ILogger<AuthController> logger) : ControllerBase
     {
         [HttpPost]
         [Route("login")]
@@ -44,6 +44,7 @@ namespace NoteApp.Api.Controllers
                 Data = result
             };
 
+            logger.LogInformation("User {Email} Created account with id {UserId}", result?.User.Email, result?.User.Id);
             return Ok(response);
         }
 

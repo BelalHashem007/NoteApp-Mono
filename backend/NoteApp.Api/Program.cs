@@ -1,3 +1,5 @@
+using Hangfire;
+using Serilog;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +12,7 @@ using NoteApp.Api.Entities.DTOs;
 using NoteApp.Api.Helpers;
 using NoteApp.Api.Interfaces.IRepositories;
 using NoteApp.Api.Interfaces.IService;
+using NoteApp.Api.Jobs;
 using NoteApp.Api.Middlewares;
 using NoteApp.Api.Repositories;
 using NoteApp.Api.Services;
@@ -17,8 +20,18 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 
+//logger(serilog) configuration
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.File("logs/log.txt",
+        rollingInterval: RollingInterval.Day,
+        fileSizeLimitBytes: 20_000_000,
+        rollOnFileSizeLimit: true,
+        retainedFileCountLimit:20)
+    .CreateLogger();
+
+// Add services to the container.
 builder.Services.AddControllers()
     .ConfigureApiBehaviorOptions(options =>
     {
@@ -37,6 +50,7 @@ builder.Services.AddControllers()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddMemoryCache();
+builder.Services.AddSerilog();
 
 //DbContext
 builder.Services.AddDbContext<AppDbContext>(opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
@@ -44,7 +58,19 @@ builder.Services.AddDbContext<AppDbContext>(opt => opt.UseSqlServer(builder.Conf
 //Configuration
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("JwtBearer"));
 
-//Services
+//hangfire configuration
+builder.Services.AddHangfire(config =>
+{
+    config
+    .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+    .UseSimpleAssemblyNameTypeSerializer()
+    .UseRecommendedSerializerSettings()
+    .UseSqlServerStorage(builder.Configuration.GetConnectionString("HangFireConnection"));
+});
+
+builder.Services.AddHangfireServer();
+
+//Services and Repositories
 builder.Services.AddScoped<INoteService, NoteService>();
 builder.Services.AddScoped<IFolderService, FolderService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
@@ -133,6 +159,11 @@ else
     app.UseCors("ProdCors");
     app.UseHttpsRedirection();
 }
+
+app.UseHangfireDashboard();
+
+//jobs
+RecurringJob.AddOrUpdate<RefreshTokenCleaning>("cleanup-refreshTokens", job => job.Execute(), Cron.Daily());
 
 app.UseAuthentication();
 app.UseAuthorization();
