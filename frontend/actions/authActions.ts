@@ -1,16 +1,18 @@
 "use server"
-import type { $ZodIssue } from "zod/v4/core";
+import { $ZodIssue } from "zod/v4/core";
 import { SignUpSchema, LoginSchema } from "@/lib/zod";
 import { signIn, signOut } from "@/auth";
 import { AuthError } from "next-auth";
 import { JWT } from "next-auth/jwt";
 
-type AuthenticationErrors = {
+
+export type ApiError = {
     validationErrors?: $ZodIssue[],
-    serverErrors?: { message: string }
+    serverErrors?: { message: string },
+    status?:"running"|"failed"|"success"
 }
 
-export async function createAccount(_prevState: unknown, formData: FormData): Promise<AuthenticationErrors | undefined> {
+export async function createAccount(_prevState: unknown, formData: FormData): Promise<ApiError | undefined> {
     await new Promise(resolve => setTimeout(() => {
         resolve("test")
     }, 2000));
@@ -36,7 +38,7 @@ export async function createAccount(_prevState: unknown, formData: FormData): Pr
     }
 }
 
-export async function LoginUser(_prevState: unknown, formData: FormData): Promise<AuthenticationErrors | undefined> {
+export async function LoginUser(_prevState: unknown, formData: FormData): Promise<ApiError | undefined> {
     await new Promise(resolve => setTimeout(() => {
         resolve("test")
     }, 2000));

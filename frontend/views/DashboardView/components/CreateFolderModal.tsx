@@ -1,13 +1,31 @@
 "use client"
 import { Folder, X } from "lucide-react";
-import { useState } from "react";
+import { createFolder } from "@/actions/folderActions";
+import { useTransition,useState } from "react";
+import { TailSpin } from "react-loader-spinner";
+import { ApiError } from "@/actions/authActions";
 
 interface Props {
     onClose: () => void
 }
 
 export default function CreateFolderModal({ onClose }: Props) {
-    const [folderName, setFolderName] = useState("");
+    const [isPending, startTransition] = useTransition();
+    const [error, setError] = useState<ApiError | null>(null);
+
+    async function handleCreation(formData:FormData){
+        setError(null); 
+
+        startTransition(async () => {
+            const result = await createFolder(undefined, formData);
+
+            if (result?.serverErrors || result?.validationErrors) {
+                setError(result)
+            } else {
+                onClose();
+            }
+        });
+    }
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onClose}>
@@ -32,7 +50,7 @@ export default function CreateFolderModal({ onClose }: Props) {
                 </div>
 
                 {/* Content */}
-                <form >
+                <form action={handleCreation}>
                     <div className="p-6">
                         <label htmlFor="folderName" className="block text-sm mb-2 text-muted-foreground">
                             Folder Name
@@ -40,15 +58,18 @@ export default function CreateFolderModal({ onClose }: Props) {
                         <input
                             id="folderName"
                             type="text"
+                            name="folderName"
                             placeholder="Enter folder name..."
-                            value={folderName}
-                            onChange={(e) => setFolderName(e.target.value)}
                             className="w-full h-11 bg-background border-border px-3"
                             maxLength={50}
                             autoFocus
+                            required
                         />
+                        {error?.validationErrors?.map((err, i) =>
+                            err.path[0] === "folderName" &&
+                            <div key={i} className="text-red-500 text-sm mt-2">{err.message}</div>
+                        )}
                     </div>
-
                     {/* Footer */}
                     <div className="flex items-center justify-end gap-3 p-6 border-t border-border">
                         <button
@@ -59,15 +80,18 @@ export default function CreateFolderModal({ onClose }: Props) {
                             Cancel
                         </button>
                         <button
+                            disabled={isPending}
                             type="submit"
                             className="bg-primary hover:bg-primary/90 text-primary-foreground h-10 px-6 gap-2 flex items-center justify-center rounded-md"
-                            disabled={!folderName.trim()}
                         >
-                            <Folder className="w-4 h-4" />
-                            Create Folder
+                            
+                            {isPending ? <TailSpin width={"30"} height={30} color="#ffffff"/> : <><Folder className="w-4 h-4" /> Create Folder</>}
                         </button>
                     </div>
                 </form>
+                {error?.serverErrors &&
+                    <div className="text-red-500 text-sm">{error.serverErrors.message}</div>
+                }
             </div>
         </div>
     );

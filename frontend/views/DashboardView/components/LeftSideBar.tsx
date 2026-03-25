@@ -20,7 +20,7 @@ export default async function LeftSideBar() {
     const folders = (await res.json()).data as Folder[]
 
     return (
-        <div className="w-60 bg-muted border-r border-border flex flex-col">
+        <div className="w-60 bg-muted border-r border-border flex flex-col max-h-screen">
 
             <UserProfile />
 

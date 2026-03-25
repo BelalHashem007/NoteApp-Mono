@@ -7,7 +7,7 @@ import { LoginUser } from "@/actions/authActions"
 
 export default function LoginForm() {
     const [state, formAction, isPending] = useActionState(LoginUser, null);
-
+    console.log(state)
     return (
         <>
             <form action={formAction} className="space-y-6">

@@ -1,7 +1,7 @@
-import { auth } from "@/auth";
+import { requireAuth } from "@/helper/requireAuth";
 
 export default async function UserProfile() {
-    const session =  await auth();
+    const session =  await requireAuth();
     console.log(session)
     return (
         <div className="p-4 border-b border-border">
