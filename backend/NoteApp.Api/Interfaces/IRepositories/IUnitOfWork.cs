@@ -7,6 +7,6 @@ namespace NoteApp.Api.Interfaces.IRepositories
         IBaseRepository<Folder> Folders { get; }
         IBaseRepository<Note> Notes { get; }
 
-        Task<int> Complete();
+        Task<int> Complete(CancellationToken ct = default);
     }
 }

@@ -10,9 +10,9 @@ namespace NoteApp.Api.Repositories
 
         public IBaseRepository<Note> Notes => notes;
 
-        public async Task<int> Complete()
+        public async Task<int> Complete(CancellationToken ct = default)
         {
-            return await context.SaveChangesAsync();
+            return await context.SaveChangesAsync(ct);
         }
 
         public void Dispose()

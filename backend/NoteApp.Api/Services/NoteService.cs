@@ -9,44 +9,34 @@ namespace NoteApp.Api.Services
 {
     public class NoteService(IUnitOfWork unitOfWork) : INoteService
     {
-        public async Task<ResponseViewModel<IEnumerable<NoteViewModel>>> GetNotes(string userId, Guid folderId)
+        public async Task<IEnumerable<NoteViewModel>> GetNotes(string userId, Guid folderId, CancellationToken ct)
         {
-            var notes = await unitOfWork.Notes.FindAll(x=> x.UserId == userId && x.FolderId == folderId);
+            var notes = await unitOfWork.Notes.FindAll(x=> x.UserId == userId && x.FolderId == folderId, ct);
             IList<NoteViewModel> noteViews = [];
             foreach (var note in notes)
             {
                 noteViews.Add(ObjectMapperHelper.Map<Note, NoteViewModel>(note));
             }
 
-            return new ResponseViewModel<IEnumerable<NoteViewModel>>
-            {
-                Success = true,
-                Message = "Retrieved Notes successfully",
-                Data = noteViews
-            };
+            return noteViews;
         }
 
-        public async Task<ResponseViewModel<NoteViewModel>> GetNote(string userId, Guid folderId, Guid id)
+        public async Task<NoteViewModel> GetNote(string userId, Guid folderId, Guid id, CancellationToken ct)
         {
-            var note = await unitOfWork.Notes.Find(x => x.UserId == userId && x.FolderId == folderId && x.Id == id) ?? throw new NotFoundException("Note doesn`t exist");
-            return new ResponseViewModel<NoteViewModel>
-            {
-                Success = true,
-                Message = "Retrieved Note successfully",
-                Data = ObjectMapperHelper.Map<Note, NoteViewModel>(note)
-            };
+            var note = await unitOfWork.Notes.Find(x => x.UserId == userId && x.FolderId == folderId && x.Id == id,ct) ?? throw new NotFoundException("Note doesn`t exist");
+            return ObjectMapperHelper.Map<Note, NoteViewModel>(note);
         }
 
-        public async Task<ResponseViewModel<NoteViewModel>> CreateNote(string userId, Guid folderId, CreateNoteViewModel dto)
+        public async Task<NoteViewModel> CreateNote(string userId, Guid folderId, CreateNoteViewModel dto, CancellationToken ct )
         {
             var validator = new CreateNoteViewModelValidator();
             var result = validator.Validate(dto);
 
             if (!result.IsValid)
-                throw new Exceptions.ValidationException(result.ToString());
+                throw new ValidationException(result.ToString());
 
             var folder = await unitOfWork.Folders
-                .Find(x => x.UserId == userId && x.Id == folderId) 
+                .Find(x => x.UserId == userId && x.Id == folderId, ct) 
                 ?? throw new NotFoundException("Folder doesn`t exist");
 
             var newNote = new Note();
@@ -57,17 +47,12 @@ namespace NoteApp.Api.Services
             newNote.UserId = userId;
 
             await unitOfWork.Notes.Add(newNote);
-            await unitOfWork.Complete();
+            await unitOfWork.Complete(ct);
 
-            return new ResponseViewModel<NoteViewModel>
-            {
-                Success = true,
-                Message = "Created Note successfully",
-                Data = ObjectMapperHelper.Map<Note, NoteViewModel>(newNote)
-            };
+            return ObjectMapperHelper.Map<Note, NoteViewModel>(newNote);
         }
 
-        public async Task<ResponseViewModel<NoteViewModel>> UpdateNote(string userId,Guid folderId, Guid id, UpdateNoteViewModel dto)
+        public async Task<NoteViewModel> UpdateNote(string userId,Guid folderId, Guid id, UpdateNoteViewModel dto, CancellationToken ct )
         {
             var validator = new UpdateNoteViewModelValidator();
             var result = validator.Validate(dto);
@@ -75,7 +60,7 @@ namespace NoteApp.Api.Services
             if (!result.IsValid)
                 throw new ValidationException(result.ToString());
 
-            var note = await unitOfWork.Notes.Find(x => x.UserId == userId && x.FolderId == folderId && x.Id == id) ?? throw new NotFoundException("Note doesn`t exist");
+            var note = await unitOfWork.Notes.Find(x => x.UserId == userId && x.FolderId == folderId && x.Id == id, ct) ?? throw new NotFoundException("Note doesn`t exist");
 
             if (dto.Body != null)
                 note.Body = dto.Body;
@@ -84,21 +69,16 @@ namespace NoteApp.Api.Services
                 note.Title = dto.Title;
 
             unitOfWork.Notes.Update(note);
-            await unitOfWork.Complete();
+            await unitOfWork.Complete(ct);
 
-            return new ResponseViewModel<NoteViewModel>
-            {
-                Success = true,
-                Message = "Updated Note successfully",
-                Data = ObjectMapperHelper.Map<Note, NoteViewModel>(note)
-            };
+            return ObjectMapperHelper.Map<Note, NoteViewModel>(note);
         }
 
-        public async Task DeleteNote(string userId, Guid folderId, Guid id)
+        public async Task DeleteNote(string userId, Guid folderId, Guid id, CancellationToken ct)
         {
-            var noteToDelete = await unitOfWork.Notes.Find(x => x.UserId == userId && x.FolderId == folderId && x.Id == id) ?? throw new NotFoundException("Note doesn`t exist");
+            var noteToDelete = await unitOfWork.Notes.Find(x => x.UserId == userId && x.FolderId == folderId && x.Id == id, ct) ?? throw new NotFoundException("Note doesn`t exist");
             unitOfWork.Notes.Delete(noteToDelete);
-            await unitOfWork.Complete();
+            await unitOfWork.Complete(ct);
         }
 
     }

@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using System.ComponentModel.DataAnnotations;
 
 namespace NoteApp.Api.Entities.DTOs
 {
@@ -7,8 +6,6 @@ namespace NoteApp.Api.Entities.DTOs
     {
         public Guid Id { get; set; }
         public string FolderName { get; set; }
-
-        public string UserId { get; set; }
     }
 
     public class UpdateFolderViewModel

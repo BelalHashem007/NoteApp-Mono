@@ -6,10 +6,9 @@ namespace NoteApp.Api.Entities.DTOs
 {
     public class AuthViewModel
     {
-        //public DateTime ExpiresOn { get; set; }
         public required ApplicationUserViewModel User { get; set; }
         public string? AccessToken { get; set; }
-
+        public DateTime AccessTokenExpirationDate { get; set; }
         [JsonIgnore]
         public string? RefreshToken { get; set; }
         public DateTime RefreshTokenExpiration { get; set; }
@@ -71,5 +70,10 @@ namespace NoteApp.Api.Entities.DTOs
                 .MinimumLength(6)
                 .MaximumLength(50);
         }
+    }
+
+    public class RefreshTokenViewModel()
+    {
+        public string RefreshToken { get; set; }
     }
 }

@@ -6,7 +6,7 @@ using NoteApp.Api.Interfaces.IService;
 namespace NoteApp.Api.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class AuthController(IAuthService authService, IWebHostEnvironment env) : ControllerBase
     {
         [HttpPost]
@@ -16,9 +16,17 @@ namespace NoteApp.Api.Controllers
         public async Task<ActionResult<ResponseViewModel<AuthViewModel>>> Login(LoginViewModel dto)
         {
             var result = await authService.Login(dto);
-            if (result.Data != null && !string.IsNullOrWhiteSpace(result.Data.RefreshToken))
-                SetRefreshTokenToCookie(result.Data.RefreshToken, result.Data.RefreshTokenExpiration);
-            return Ok(result);
+            if (result != null && !string.IsNullOrWhiteSpace(result.RefreshToken))
+                SetRefreshTokenToCookie(result.RefreshToken, result.RefreshTokenExpiration);
+
+            var response = new ResponseViewModel<AuthViewModel>
+            {
+                Success = true,
+                Message = "Successful login",
+                Data = result
+            };
+
+            return Ok(response);
         }
 
         [HttpPost]
@@ -26,23 +34,39 @@ namespace NoteApp.Api.Controllers
         public async Task<ActionResult<ResponseViewModel<AuthViewModel>>> Register(RegisterViewModel dto)
         {
             var result = await authService.Register(dto);
-            if (result.Data != null && !string.IsNullOrWhiteSpace(result.Data.RefreshToken))
-                SetRefreshTokenToCookie(result.Data.RefreshToken, result.Data.RefreshTokenExpiration);
-            return Ok(result);
+            if (result != null && !string.IsNullOrWhiteSpace(result.RefreshToken))
+                SetRefreshTokenToCookie(result.RefreshToken, result.RefreshTokenExpiration);
+
+            var response = new ResponseViewModel<AuthViewModel>
+            {
+                Success = true,
+                Message = "Successful register",
+                Data = result
+            };
+
+            return Ok(response);
         }
 
-        [HttpGet]
-        [Route("GetToken")]
-        public async Task<ActionResult<ResponseViewModel<AuthViewModel>>> GetToken()
+        [HttpPost]
+        [Route("refresh")]
+        public async Task<ActionResult<ResponseViewModel<AuthViewModel>>> Refresh([FromBody] RefreshTokenViewModel? dto)
         {
-            var refreshToken = Request.Cookies["refreshToken"];
+            var refreshToken = Request.Cookies["refreshToken"] ?? dto?.RefreshToken;
             if (refreshToken == null)
-                throw new ValidationException("Missing refreshToken in cookies");
+                throw new ValidationException("Missing refreshToken");
 
             var result = await authService.RefreshToken(refreshToken);
-            if (result.Data != null && !string.IsNullOrWhiteSpace(result.Data.RefreshToken))
-                SetRefreshTokenToCookie(result.Data.RefreshToken, result.Data.RefreshTokenExpiration);
-            return Ok(result);
+            if (result != null && !string.IsNullOrWhiteSpace(result.RefreshToken))
+                SetRefreshTokenToCookie(result.RefreshToken, result.RefreshTokenExpiration);
+
+            var response = new ResponseViewModel<AuthViewModel>
+            {
+                Success = true,
+                Message = "Successful refresh",
+                Data = result
+            };
+
+            return Ok(response);
         }
 
         private void SetRefreshTokenToCookie(string refreshToken, DateTime refreshTokenExpiration)

@@ -44,9 +44,10 @@ namespace NoteApp.Api.Services
         {
             var randomNumber = new byte[32];
 
-            var generator = RandomNumberGenerator.Create();
-
-            generator.GetBytes(randomNumber);
+            using (var generator = RandomNumberGenerator.Create())
+            {
+                generator.GetBytes(randomNumber);
+            }
 
             return new RefreshToken
             {

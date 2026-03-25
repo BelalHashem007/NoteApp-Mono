@@ -9,34 +9,24 @@ namespace NoteApp.Api.Services
 {
     public class FolderService(IUnitOfWork unitOfWork) : IFolderService
     {
-        public async Task<ResponseViewModel<IEnumerable<FolderViewModel>>> GetFolders(string userId)
+        public async Task<IEnumerable<FolderViewModel>> GetFolders(string userId, CancellationToken ct)
         {
-            var folders = await unitOfWork.Folders.FindAll(x => x.UserId == userId);
-            IList<FolderViewModel> folderViews = [];
+            var folders = await unitOfWork.Folders.FindAll(x => x.UserId == userId, ct);
+            var folderViews = new List<FolderViewModel>();
 
             foreach (var folder in folders)
                 folderViews.Add(ObjectMapperHelper.Map<Folder, FolderViewModel>(folder));
 
-            return new ResponseViewModel<IEnumerable<FolderViewModel>>
-            {
-                Success = true,
-                Message = "Retrieved Folders successfully",
-                Data = folderViews
-            };
+            return folderViews;
         }
 
-        public async Task<ResponseViewModel<FolderViewModel>> GetFolder(string userId, Guid id)
+        public async Task<FolderViewModel> GetFolder(string userId, Guid id, CancellationToken ct)
         {
-            var folder = await unitOfWork.Folders.Find(x => x.UserId == userId && x.Id == id) ?? throw new NotFoundException("Folder doesn`t exist");
-            return new ResponseViewModel<FolderViewModel>
-            {
-                Success = true,
-                Message = "Retrieved Folder successfully",
-                Data = ObjectMapperHelper.Map<Folder, FolderViewModel>(folder)
-            };
+            var folder = await unitOfWork.Folders.Find(x => x.UserId == userId && x.Id == id, ct) ?? throw new NotFoundException("Folder doesn`t exist");
+            return ObjectMapperHelper.Map<Folder, FolderViewModel>(folder);
         }
 
-        public async Task<ResponseViewModel<FolderViewModel>> CreateFolder(string userId, CreateFolderViewModel dto)
+        public async Task<FolderViewModel> CreateFolder(string userId, CreateFolderViewModel dto, CancellationToken ct)
         {
             var validator = new CreateFolderViewModelValidator();
             var result = validator.Validate(dto);
@@ -46,43 +36,33 @@ namespace NoteApp.Api.Services
             var folder = new Folder { FolderName = dto.FolderName, UserId = userId };
 
             await unitOfWork.Folders.Add(folder);
-            await unitOfWork.Complete();
+            await unitOfWork.Complete(ct);
 
-            return new ResponseViewModel<FolderViewModel>
-            {
-                Success = true,
-                Message = "Created Folder successfully",
-                Data = ObjectMapperHelper.Map<Folder, FolderViewModel>(folder)
-            };
+            return ObjectMapperHelper.Map<Folder, FolderViewModel>(folder);
         }
 
-        public async Task<ResponseViewModel<FolderViewModel>> UpdateFolder(string userId, Guid id, UpdateFolderViewModel dto)
+        public async Task<FolderViewModel> UpdateFolder(string userId, Guid id, UpdateFolderViewModel dto, CancellationToken ct)
         {
             var validator = new UpdateFolderViewModelValidator();
             var result = validator.Validate(dto);
             if (!result.IsValid)
                 throw new ValidationException(result.ToString());
 
-            var folder = await unitOfWork.Folders.Find(x => x.UserId == userId && x.Id == id) ?? throw new NotFoundException("Folder doesn`t exist");
+            var folder = await unitOfWork.Folders.Find(x => x.UserId == userId && x.Id == id,ct) ?? throw new NotFoundException("Folder doesn`t exist");
 
             folder.FolderName = dto.FolderName;
             unitOfWork.Folders.Update(folder);
 
-            await unitOfWork.Complete();
+            await unitOfWork.Complete(ct);
 
-            return new ResponseViewModel<FolderViewModel>
-            {
-                Success = true,
-                Message = "Upated Folder successfully",
-                Data = ObjectMapperHelper.Map<Folder, FolderViewModel>(folder)
-            };
+            return ObjectMapperHelper.Map<Folder, FolderViewModel>(folder);
         }
 
-        public async Task DeleteFolder(string userId, Guid id)
+        public async Task DeleteFolder(string userId, Guid id, CancellationToken ct)
         {
-            var folderToDelete = await unitOfWork.Folders.Find(x => x.UserId == userId && x.Id == id) ?? throw new NotFoundException("No folder to delete");
+            var folderToDelete = await unitOfWork.Folders.Find(x => x.UserId == userId && x.Id == id, ct) ?? throw new NotFoundException("No folder to delete");
             unitOfWork.Folders.Delete(folderToDelete);
-            await unitOfWork.Complete();
+            await unitOfWork.Complete(ct);
         }
 
     }

@@ -4,13 +4,13 @@ namespace NoteApp.Api.Interfaces.IRepositories
 {
     public interface IBaseRepository<T> where T : class
     {
-        public Task<List<T>> GetAll();
-        public Task<T?> GetById(int id);
-        public Task<T?> GetById(Guid id);
-        public Task<T> Add(T entity);
-        public T Update(T entity);
-        public void Delete(T entity);
-        public Task<T?> Find(Expression<Func<T, bool>> criteria);
-        public Task<IEnumerable<T>> FindAll(Expression<Func<T, bool>> criteria);
+        public Task<List<T>> GetAll(CancellationToken ct = default);
+        public Task<T?> GetById(int id, CancellationToken ct = default);
+        public Task<T?> GetById(Guid id, CancellationToken ct = default);
+        public Task<T> Add(T entity, CancellationToken ct = default);
+        public T Update(T entity, CancellationToken ct = default);
+        public void Delete(T entity, CancellationToken ct = default );
+        public Task<T?> Find(Expression<Func<T, bool>> criteria, CancellationToken ct = default);
+        public Task<IEnumerable<T>> FindAll(Expression<Func<T, bool>> criteria, CancellationToken ct = default);
     }
 }

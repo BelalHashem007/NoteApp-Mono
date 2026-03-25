@@ -1,15 +1,21 @@
-﻿using NoteApp.Api.Entities;
+﻿using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
+using NoteApp.Api.Configuration;
+using NoteApp.Api.Entities;
 using NoteApp.Api.Entities.DTOs;
 using NoteApp.Api.Exceptions;
 using NoteApp.Api.Helpers;
 using NoteApp.Api.Interfaces.IRepositories;
 using NoteApp.Api.Interfaces.IService;
+using System.Collections.Concurrent;
 
 namespace NoteApp.Api.Services
 {
-    public class AuthService(IAuthRepository authRepository, ITokenService tokenService, ILogger<AuthService> logger) : IAuthService
+    public class AuthService(IAuthRepository authRepository,IOptions<JwtOptions> jwtOptions, ITokenService tokenService, ILogger<AuthService> logger, IMemoryCache _cache) : IAuthService
     {
-        public async Task<ResponseViewModel<AuthViewModel>> Login(LoginViewModel dto)
+        private static readonly ConcurrentDictionary<string, SemaphoreSlim> _locks = new();
+
+        public async Task<AuthViewModel> Login(LoginViewModel dto)
         {
             //Validation
             var validator = new LoginViewModelValidator();
@@ -37,6 +43,7 @@ namespace NoteApp.Api.Services
                 {
                     User = userViewModel,
                     AccessToken = accessToken,
+                    AccessTokenExpirationDate = DateTime.UtcNow.AddMinutes(jwtOptions.Value.LifeTime)
                 };
 
                 if (user.RefreshTokens.Any(t => t.IsActive))
@@ -54,12 +61,7 @@ namespace NoteApp.Api.Services
                     await authRepository.UpdateUser(user);
                 }
 
-                return new ResponseViewModel<AuthViewModel>
-                {
-                    Success = true,
-                    Message = "Login Successful",
-                    Data = authViewModel
-                };
+                return authViewModel;
             }
             else
             {
@@ -67,7 +69,7 @@ namespace NoteApp.Api.Services
             }
         }
 
-        public async Task<ResponseViewModel<AuthViewModel>> Register(RegisterViewModel dto)
+        public async Task<AuthViewModel> Register(RegisterViewModel dto)
         {
             // Validation and checking duplication
             var validator = new RegisterViewModelValidator();
@@ -118,57 +120,83 @@ namespace NoteApp.Api.Services
             {
                 User = userViewModel,
                 AccessToken = accessToken,
+                AccessTokenExpirationDate = DateTime.UtcNow.AddMinutes(jwtOptions.Value.LifeTime)
             };
 
             var refreshToken = tokenService.GenerateRefreshToken();
+
             authViewModel.RefreshToken = refreshToken.Token;
             authViewModel.RefreshTokenExpiration = refreshToken.ExpiresOn;
+
             user.RefreshTokens.Add(refreshToken);
             await authRepository.UpdateUser(user);
 
-            return new ResponseViewModel<AuthViewModel>
-            {
-                Success = true,
-                Message = "Register Successful",
-                Data = authViewModel
-            };
+            return authViewModel;
         }
 
-        public async Task<ResponseViewModel<AuthViewModel>> RefreshToken(string token)
+        public async Task<AuthViewModel> RefreshToken(string token)
         {
-            var user = await authRepository.FindUser(u => u.RefreshTokens.Any(t => t.Token == token));
-            if (user == null)
-                throw new NotFoundException("Invalid refresh token");
+            Console.WriteLine($"Request came with token {token}");
+            var cacheKey = token;
 
-            var refreshToken = user.RefreshTokens.FirstOrDefault(t => t.Token == token);
-
-            if (!refreshToken.IsActive)
-                throw new NotFoundException("Invalid refresh token");
-
-            var userRoles = await authRepository.GetUserRoles(user);
-            refreshToken.RevokedOn = DateTime.UtcNow;
-
-            var newRefreshToken = tokenService.GenerateRefreshToken();
-            var accessToken = tokenService.GenerateJwtToken(user, userRoles);
-
-            user.RefreshTokens.Add(newRefreshToken);
-
-            await authRepository.UpdateUser(user);
-
-            var userViewModel = ObjectMapperHelper.Map<ApplicationUser, ApplicationUserViewModel>(user);
-            userViewModel.Roles = userRoles;
-
-            return new ResponseViewModel<AuthViewModel>
+            if (_cache.TryGetValue(cacheKey, out AuthViewModel cached))
             {
-                Success = true,
-                Data = new AuthViewModel
+                Console.WriteLine($"Request hit the first cache");
+                return cached;
+            }
+
+            var semaphore = _locks.GetOrAdd(token, _ => new SemaphoreSlim(1, 1));
+
+            await semaphore.WaitAsync();
+
+            try
+            {
+                if (_cache.TryGetValue(cacheKey, out cached))
                 {
-                    User = userViewModel,
-                    AccessToken = accessToken,
-                    RefreshToken = newRefreshToken.Token,
-                    RefreshTokenExpiration = newRefreshToken.ExpiresOn
+                    Console.WriteLine($"Request hit the second cache");
+                    return cached;
                 }
-            };
+
+                var user = await authRepository.FindUser(u => u.RefreshTokens.Any(t => t.Token == token));
+                if (user == null)
+                    throw new NotFoundException("Invalid refresh token");
+
+                var refreshToken = user.RefreshTokens.FirstOrDefault(t => t.Token == token);
+
+                if (!refreshToken.IsActive)
+                    throw new NotFoundException("Invalid refresh token");
+
+                var userRoles = await authRepository.GetUserRoles(user);
+                refreshToken.RevokedOn = DateTime.UtcNow;
+
+                var newRefreshToken = tokenService.GenerateRefreshToken();
+                var accessToken = tokenService.GenerateJwtToken(user, userRoles);
+
+                user.RefreshTokens.Add(newRefreshToken);
+
+                await authRepository.UpdateUser(user);
+
+                var userViewModel = ObjectMapperHelper.Map<ApplicationUser, ApplicationUserViewModel>(user);
+                userViewModel.Roles = userRoles;
+
+                var result = new AuthViewModel
+                {
+                        User = userViewModel,
+                        AccessToken = accessToken,
+                        RefreshToken = newRefreshToken.Token,
+                        RefreshTokenExpiration = newRefreshToken.ExpiresOn,
+                        AccessTokenExpirationDate = DateTime.UtcNow.AddMinutes(jwtOptions.Value.LifeTime)
+                };
+
+                _cache.Set(cacheKey, result, TimeSpan.FromSeconds(10));
+
+                return result;
+            }
+            finally
+            {
+                semaphore.Release();
+                _locks.TryRemove(token, out _);
+            }
         }
     }
 }
