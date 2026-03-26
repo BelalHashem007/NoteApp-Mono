@@ -1,13 +1,14 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { refreshAccessToken } from "./actions/authActions";
-import { jwtDecode } from "jwt-decode";
+import { loginExternal } from "./actions/authActions";
 
 interface AuthCredentials {
     email?: string;
     password?: string;
     fullname?: string;
     isSignUp?: boolean;
+    isExternal?:boolean;
 }
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
@@ -16,10 +17,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             name: "My Backend",
             credentials: {
                 email: { label: "Email", type: "email" },
-                password: { label: "Password", type: "password" },
+                password: { label: "Password", type: "password" }
             },
-            authorize: async (credentials) => {
-                const { email, fullname, password, isSignUp } = credentials as AuthCredentials
+            authorize: async (credentials, req) => {
+                const { email, fullname, password, isSignUp, isExternal } = credentials as AuthCredentials
+                //external login e.g. google
+                if (isExternal)
+                    return await loginExternal(req);
 
                 const endpoint = isSignUp ?
                     "http://localhost:5001/api/auth/register" : "http://localhost:5001/api/auth/login"
@@ -33,7 +37,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 })
 
                 const body = await result.json()
-                console.log(body);
                 const data = body.data
                 if (result.ok && data) {
                     const setCookieHeader = result.headers.getSetCookie?.()?.[0] ?? "";
@@ -68,15 +71,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 token.refreshToken = user.refreshToken;
                 token.accessTokenExpires = user.accessTokenExpirationDate;
             }
-            console.log("expirationDate: ",new Date(token.accessTokenExpires?.toString() ?? "").getTime())
-            console.log("Date now: ",Date.now())
             if (token.accessTokenExpires && Date.now() < new Date(token.accessTokenExpires.toString()).getTime() - 10000) {
-                console.log("test")
                 return token;
             }
 
             if (!token.refreshToken) throw new Error("Missing Refresh Token");
-            console.log("going to refresh token")
             return await refreshAccessToken(token);
         },
         session: ({ session, token }) => {

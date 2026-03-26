@@ -1,7 +1,7 @@
 "use client"
 import { Folder } from "lucide-react"
 import { useState } from "react"
-import CreateFolderModal from "./CreateFolderModal";
+import FoldarModal from "./FolderModal";
 
 export default function CreateFolderButton() {
     const [showModal, setShowModal] = useState<boolean>(false);
@@ -18,7 +18,7 @@ export default function CreateFolderButton() {
                 <Folder className="w-4 h-4" />
                 Create Folder
             </button>
-            {showModal && <CreateFolderModal onClose={handleOnClose}/>}
+            {showModal && <FoldarModal onClose={handleOnClose} state="create"/>}
         </div>
 
     )

@@ -33,7 +33,15 @@ export const LoginSchema = z.object({
 
 // folder validation
 
-export const createFolderSchema = z.object({
+export const CreateFolderSchema = z.object({
     folderName: z.string().max(50).min(1),
+})
 
+export const UpdateFolderSchema = z.object({
+    folderName: z.string().max(50).min(1),
+    id: z.string().min(1),
+})
+
+export const DeleteFolderSchema = z.object({
+    id: z.string().min(1),
 })

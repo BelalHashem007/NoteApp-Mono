@@ -1,34 +1,30 @@
 import UserProfile from "./UserProfile";
-import FolderSearch from "./FolderSearch";
-import FolderList from "./FolderList";
-import { Folder, Settings, HelpCircle, LogOut } from "lucide-react";
+import { Settings, HelpCircle } from "lucide-react";
 import LogoutButton from "./LogoutButton";
-import { auth } from "@/auth";
 import CreateFolderButton from "./CreateFolderButton";
+import FoldersComponent from "./FoldersComponent";
 import { requireAuth } from "@/helper/requireAuth";
 
 
 export default async function LeftSideBar() {
     const session = await requireAuth();
     const res = await fetch("http://localhost:5001/api/folders", {
-        headers:{
+        headers: {
             "Authorization": `Bearer ${session?.accessToken}`
-        }
+        },
+        next: { tags: ['folders'] }
     });
-    console.log(session)
-    
+
     const folders = (await res.json()).data as Folder[]
 
     return (
-        <div className="w-60 bg-muted border-r border-border flex flex-col max-h-screen">
+        <div className="min-w-100 bg-muted border-r border-border flex flex-col max-h-screen">
 
             <UserProfile />
 
-            <FolderSearch />
+            <FoldersComponent folders={folders}/>
 
-            <FolderList folders={folders} />
-
-           <CreateFolderButton/>
+            <CreateFolderButton />
 
             <div className="px-3 pb-4 space-y-1">
                 <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-foreground/70 hover:bg-background hover:text-foreground transition-colors text-sm">
@@ -39,7 +35,7 @@ export default async function LeftSideBar() {
                     <HelpCircle className="w-4 h-4" />
                     Help Center
                 </button>
-                <LogoutButton/>
+                <LogoutButton />
             </div>
         </div>
     )

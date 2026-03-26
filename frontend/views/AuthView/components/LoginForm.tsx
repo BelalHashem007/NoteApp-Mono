@@ -50,6 +50,14 @@ export default function LoginForm() {
                     </Link>
                 </p>
             </div>
+
+            <div className="flex justify-center items-center">
+                <div className="border-t border-gray-400 grow"></div>
+                <div className="text-gray-400">Or</div>
+                <div className="border-t border-gray-400 grow"></div>
+            </div>
+
+            <Link href={"http://localhost:5001/api/auth/login/google?returnUrl=http://localhost:3000/auth/callback"}>Login with google</Link>
         </>
     )
 }

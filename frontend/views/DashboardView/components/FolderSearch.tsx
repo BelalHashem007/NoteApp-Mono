@@ -1,6 +1,6 @@
 import { Search } from "lucide-react"
 
-export default function FolderSearch(){
+export default function FolderSearch({query, setQuery}: {query:string, setQuery:(a:string)=>void}){
     return (
         <div className="p-4">
             <div className="relative">
@@ -8,7 +8,9 @@ export default function FolderSearch(){
                 <input
                     type="text"
                     placeholder="Find folder..."
-                    className="h-9 pl-9 bg-background border-2 border-border text-sm"
+                    value={query}
+                    onChange={(e)=> setQuery(e.target.value)}
+                    className="h-9 pl-9 bg-background border-2 border-border text-sm w-full"
                 />
             </div>
         </div>

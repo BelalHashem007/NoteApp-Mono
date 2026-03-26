@@ -2,11 +2,12 @@ import { auth } from "@/auth"
 import { NextResponse } from "next/server";
 
 const protectedRoutes = ['/dashboard']
-const publicRoutes = ['/login', '/signup', '/']
+const publicRoutes = ['/login', '/signup', '/', '/external-login']
 
 export const proxy = auth((req) => {
-    const isLoggedIn = !!req.auth && !req.auth.error;
+    
     const path = req.nextUrl.pathname
+    const isLoggedIn = !!req.auth && !req.auth.error;
     const isProtectedRoute = protectedRoutes.includes(path)
     const isPublicRoute = publicRoutes.includes(path)
 
@@ -17,7 +18,7 @@ export const proxy = auth((req) => {
     if (isPublicRoute && isLoggedIn && !path.startsWith("/dashboard")) {
         return NextResponse.redirect(new URL("/dashboard", req.nextUrl))
     }
-    
+
     return NextResponse.next();
 })
 

@@ -2,20 +2,17 @@
 import { $ZodIssue } from "zod/v4/core";
 import { SignUpSchema, LoginSchema } from "@/lib/zod";
 import { signIn, signOut } from "@/auth";
-import { AuthError } from "next-auth";
+import { AuthError, User } from "next-auth";
 import { JWT } from "next-auth/jwt";
 
 
 export type ApiError = {
     validationErrors?: $ZodIssue[],
     serverErrors?: { message: string },
-    status?:"running"|"failed"|"success"
+    status?: "running" | "failed" | "success"
 }
 
 export async function createAccount(_prevState: unknown, formData: FormData): Promise<ApiError | undefined> {
-    await new Promise(resolve => setTimeout(() => {
-        resolve("test")
-    }, 2000));
     const data = SignUpSchema.safeParse(Object.fromEntries(formData.entries()))
 
     if (!data.success) {
@@ -39,9 +36,6 @@ export async function createAccount(_prevState: unknown, formData: FormData): Pr
 }
 
 export async function LoginUser(_prevState: unknown, formData: FormData): Promise<ApiError | undefined> {
-    await new Promise(resolve => setTimeout(() => {
-        resolve("test")
-    }, 2000));
 
     const data = LoginSchema.safeParse(Object.fromEntries(formData.entries()))
 
@@ -72,7 +66,6 @@ export async function handleLogout() {
 export async function refreshAccessToken(token: JWT) {
 
     try {
-        console.log(`in refresh function access token is ${JSON.stringify(token.refreshToken)}`)
         const result = await fetch("http://localhost:5001/api/auth/refresh", {
             method: "POST",
             body: JSON.stringify({ refreshToken: token.refreshToken }),
@@ -88,7 +81,6 @@ export async function refreshAccessToken(token: JWT) {
             const rawToken = setCookieHeader.includes("=")
                 ? setCookieHeader.substring(setCookieHeader.indexOf("=") + 1, setCookieHeader.indexOf(";"))
                 : "";
-            console.log("Body from refresh",body)
             const accessTokenExpires = data?.accessTokenExpirationDate;
 
             return {
@@ -110,4 +102,44 @@ export async function refreshAccessToken(token: JWT) {
         return token;
     }
 
+}
+
+export async function loginExternal(req: Request): Promise<User | null> {
+    
+    const cookieHeader = req.headers.get("cookie");
+    if (!cookieHeader) return null;
+
+    const refreshToken = cookieHeader
+        .split(';')
+        .find(c => c.trim().startsWith('refreshToken='))
+        ?.split('=')[1];
+    if (!refreshToken) return null;
+
+    const response = await fetch("http://localhost:5001/api/auth/refresh", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ refreshToken })
+    });
+
+    if (!response.ok) return null;
+
+    const body = await response.json();
+    console.log(body)
+
+
+    const setCookieHeader = response.headers.getSetCookie?.()?.[0] ?? "";
+    const rawToken = setCookieHeader.includes("=")
+        ? setCookieHeader.substring(setCookieHeader.indexOf("=") + 1, setCookieHeader.indexOf(";"))
+        : "";
+    console.log(rawToken)
+    return {
+        id: body.data.user.id,
+        email: body.data.user.email,
+        name: body.data.user.fullName,
+        accessToken: body.data.accessToken,
+        refreshToken: decodeURIComponent(rawToken),
+        accessTokenExpirationDate: body.data.accessTokenExpirationDate
+    };
 }

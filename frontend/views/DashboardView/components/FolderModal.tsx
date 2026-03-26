@@ -1,23 +1,25 @@
 "use client"
-import { Folder, X } from "lucide-react";
-import { createFolder } from "@/actions/folderActions";
+import { Folder, X, Edit2 } from "lucide-react";
+import { createFolder, updateFolder } from "@/actions/folderActions";
 import { useTransition,useState } from "react";
 import { TailSpin } from "react-loader-spinner";
 import { ApiError } from "@/actions/authActions";
 
 interface Props {
-    onClose: () => void
+    onClose: () => void,
+    state: 'create'|'edit',
+    folder?: Folder
 }
 
-export default function CreateFolderModal({ onClose }: Props) {
+export default function FolderModal({ onClose, state, folder}: Props) {
     const [isPending, startTransition] = useTransition();
     const [error, setError] = useState<ApiError | null>(null);
 
-    async function handleCreation(formData:FormData){
+    async function handleAction(formData:FormData){
         setError(null); 
 
         startTransition(async () => {
-            const result = await createFolder(undefined, formData);
+            const result = state === "create" ? await createFolder(undefined, formData) : await updateFolder(undefined, formData);
 
             if (result?.serverErrors || result?.validationErrors) {
                 setError(result)
@@ -37,9 +39,12 @@ export default function CreateFolderModal({ onClose }: Props) {
                 <div className="flex items-center justify-between p-6 border-b border-border">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                        {   state === 'create' ? 
                             <Folder className="w-5 h-5 text-primary" />
+                            : <Edit2 className="w-5 h-5 text-primary" />
+                        }
                         </div>
-                        <h2 className="text-xl">Create New Folder</h2>
+                        <h2 className="text-xl">{state === 'create' ? "Create New Folder" : "Edit Folder"}</h2>
                     </div>
                     <button
                         onClick={onClose}
@@ -50,7 +55,10 @@ export default function CreateFolderModal({ onClose }: Props) {
                 </div>
 
                 {/* Content */}
-                <form action={handleCreation}>
+                <form action={handleAction}>
+
+                        <input hidden name="id" value={folder?.id} readOnly/>
+
                     <div className="p-6">
                         <label htmlFor="folderName" className="block text-sm mb-2 text-muted-foreground">
                             Folder Name
@@ -59,7 +67,7 @@ export default function CreateFolderModal({ onClose }: Props) {
                             id="folderName"
                             type="text"
                             name="folderName"
-                            placeholder="Enter folder name..."
+                            defaultValue={folder?.folderName ?? ''}
                             className="w-full h-11 bg-background border-border px-3"
                             maxLength={50}
                             autoFocus
@@ -75,17 +83,20 @@ export default function CreateFolderModal({ onClose }: Props) {
                         <button
                             type="button"
                             onClick={onClose}
-                            className="bg-muted hover:bg-muted/80 text-foreground h-10 px-6 rounded-md"
+                            className="bg-muted hover:bg-muted/80 text-foreground h-10 px-6 rounded-md
+                                        disabled:bg-[#e0e0e0] disabled:text-[#a1a1a1] disabled:opacity-70 disabled:border disabled:border-[#d1d1d1]"
+                            disabled={isPending}
                         >
                             Cancel
                         </button>
                         <button
                             disabled={isPending}
                             type="submit"
-                            className="bg-primary hover:bg-primary/90 text-primary-foreground h-10 px-6 gap-2 flex items-center justify-center rounded-md"
+                            className="bg-primary hover:bg-primary/90 text-primary-foreground h-10 px-6 gap-2 flex items-center justify-center rounded-md 
+                            "
                         >
                             
-                            {isPending ? <TailSpin width={"30"} height={30} color="#ffffff"/> : <><Folder className="w-4 h-4" /> Create Folder</>}
+                            {isPending ? <TailSpin width={"30"} height={30} color="#ffffff"/> : <><Folder className="w-4 h-4" /> {state === 'create' ? "Create Folder" : "Save Changes"}</>}
                         </button>
                     </div>
                 </form>
