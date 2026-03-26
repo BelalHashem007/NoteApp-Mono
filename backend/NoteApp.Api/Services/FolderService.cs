@@ -22,7 +22,7 @@ namespace NoteApp.Api.Services
 
         public async Task<FolderViewModel> GetFolder(string userId, Guid id, CancellationToken ct)
         {
-            var folder = await unitOfWork.Folders.Find(x => x.UserId == userId && x.Id == id, ct) ?? throw new NotFoundException("Folder doesn`t exist");
+            var folder = await unitOfWork.Folders.Find(x => x.UserId == userId && x.Id == id, ct) ?? throw new NotFoundException("Folder does not exist");
             return ObjectMapperHelper.Map<Folder, FolderViewModel>(folder);
         }
 
@@ -48,7 +48,7 @@ namespace NoteApp.Api.Services
             if (!result.IsValid)
                 throw new ValidationException(result.ToString());
 
-            var folder = await unitOfWork.Folders.Find(x => x.UserId == userId && x.Id == id,ct) ?? throw new NotFoundException("Folder doesn`t exist");
+            var folder = await unitOfWork.Folders.Find(x => x.UserId == userId && x.Id == id,ct) ?? throw new NotFoundException("Folder does not exist");
 
             folder.FolderName = dto.FolderName;
             unitOfWork.Folders.Update(folder);

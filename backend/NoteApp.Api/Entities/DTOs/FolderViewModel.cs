@@ -24,7 +24,7 @@ namespace NoteApp.Api.Entities.DTOs
 
     public class CreateFolderViewModel
     {
-        public string FolderName { get; set; }
+        public string FolderName { get; set; } = string.Empty;
     }
 
     public class CreateFolderViewModelValidator : AbstractValidator<CreateFolderViewModel>
