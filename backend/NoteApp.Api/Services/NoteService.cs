@@ -23,7 +23,8 @@ namespace NoteApp.Api.Services
 
         public async Task<NoteViewModel> GetNote(string userId, Guid folderId, Guid id, CancellationToken ct)
         {
-            var note = await unitOfWork.Notes.Find(x => x.UserId == userId && x.FolderId == folderId && x.Id == id,ct) ?? throw new NotFoundException("Note doesn`t exist");
+            var note = await unitOfWork.Notes.Find(
+                x => x.UserId == userId && x.FolderId == folderId && x.Id == id,ct) ?? throw new NotFoundException("Note does not exist");
             return ObjectMapperHelper.Map<Note, NoteViewModel>(note);
         }
 
@@ -37,7 +38,7 @@ namespace NoteApp.Api.Services
 
             var folder = await unitOfWork.Folders
                 .Find(x => x.UserId == userId && x.Id == folderId, ct) 
-                ?? throw new NotFoundException("Folder doesn`t exist");
+                ?? throw new NotFoundException("Folder does not exist");
 
             var newNote = new Note();
 
@@ -60,7 +61,7 @@ namespace NoteApp.Api.Services
             if (!result.IsValid)
                 throw new ValidationException(result.ToString());
 
-            var note = await unitOfWork.Notes.Find(x => x.UserId == userId && x.FolderId == folderId && x.Id == id, ct) ?? throw new NotFoundException("Note doesn`t exist");
+            var note = await unitOfWork.Notes.Find(x => x.UserId == userId && x.FolderId == folderId && x.Id == id, ct) ?? throw new NotFoundException("Note does not exist");
 
             if (dto.Body != null)
                 note.Body = dto.Body;
@@ -76,7 +77,7 @@ namespace NoteApp.Api.Services
 
         public async Task DeleteNote(string userId, Guid folderId, Guid id, CancellationToken ct)
         {
-            var noteToDelete = await unitOfWork.Notes.Find(x => x.UserId == userId && x.FolderId == folderId && x.Id == id, ct) ?? throw new NotFoundException("Note doesn`t exist");
+            var noteToDelete = await unitOfWork.Notes.Find(x => x.UserId == userId && x.FolderId == folderId && x.Id == id, ct) ?? throw new NotFoundException("Note does not exist");
             unitOfWork.Notes.Delete(noteToDelete);
             await unitOfWork.Complete(ct);
         }

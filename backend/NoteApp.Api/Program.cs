@@ -19,6 +19,8 @@ using NoteApp.Api.Services;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.RateLimiting;
+using NoteApp.Api.Infrastructure.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -81,6 +83,11 @@ builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
+//RateLimit
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddPolicy<string, GlobalRateLimiterPolicy>("GlobalRateLimiterPolicy");
+});
 //Cors
 builder.Services.AddCors((options) =>
 {
@@ -182,6 +189,8 @@ RecurringJob.AddOrUpdate<RefreshTokenCleaning>("cleanup-refreshTokens", job => j
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllers();
+app.UseRateLimiter();
+
+app.MapControllers().RequireRateLimiting("GlobalRateLimiterPolicy");
 
 app.Run();
