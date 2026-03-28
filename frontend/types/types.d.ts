@@ -2,9 +2,9 @@
 interface Note {
     id: string;
     title: string;
-    description: string;
-    editedTime: string;
-    thumbnail: string;
+    body: string;
+    createdAt: string;
+    updatedAt: string;
 }
 
 interface Folder {

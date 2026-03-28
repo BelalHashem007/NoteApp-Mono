@@ -64,7 +64,7 @@ export async function handleLogout() {
 
 
 export async function refreshAccessToken(token: JWT) {
-
+    console.log("iam in refreshaccesstoken");
     try {
         const result = await fetch("http://localhost:5001/api/auth/refresh", {
             method: "POST",
@@ -105,24 +105,18 @@ export async function refreshAccessToken(token: JWT) {
 }
 
 export async function loginExternal(req: Request): Promise<User | null> {
-    
+    console.log("test")
     const cookieHeader = req.headers.get("cookie");
     if (!cookieHeader) return null;
-
-    const refreshToken = cookieHeader
-        .split(';')
-        .find(c => c.trim().startsWith('refreshToken='))
-        ?.split('=')[1];
-    if (!refreshToken) return null;
 
     const response = await fetch("http://localhost:5001/api/auth/refresh", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ refreshToken })
+            "Cookie": cookieHeader ?? "",
+        }
     });
-
+    console.log(response)
     if (!response.ok) return null;
 
     const body = await response.json();

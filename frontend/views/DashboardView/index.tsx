@@ -1,11 +1,12 @@
-import LeftSideBar from "./components/LeftSideBar";
-import MainContent from "./components/MainContent";
+import NotesGrid from "./components/NotesGrid";
+import NotesHeader from "./components/NotesHeader";
 
-export default function DashboardView() {
+export default async function DashboardView({ notes }: { notes: Note[] }) {
     return (
-        <div className="min-h-screen w-full flex bg-background">
-            <LeftSideBar/>
-            <MainContent/>
+
+        <div className="flex-1 overflow-y-auto p-6">
+            <NotesHeader notes={notes}/>
+            <NotesGrid notes={notes} />
         </div>
     )
 }

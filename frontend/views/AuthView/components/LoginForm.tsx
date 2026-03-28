@@ -4,8 +4,12 @@ import FormInput from "./FormInput"
 import FormButton from "./FormButton"
 import { useActionState } from "react"
 import { LoginUser } from "@/actions/authActions"
+import GoogleLight from "@/public/google_light.svg"
+import Image from "next/image"
+import { useRouter } from "next/navigation"
 
 export default function LoginForm() {
+    const router = useRouter();
     const [state, formAction, isPending] = useActionState(LoginUser, null);
     console.log(state)
     return (
@@ -42,22 +46,26 @@ export default function LoginForm() {
                 <FormButton disabled={isPending}>Sign in</FormButton>
             </form>
 
-            <div className="mt-8 text-center">
-                <p className="text-sm text-muted-foreground">
-                    Don&apos;t have an account?{" "}
-                    <Link href={"/signup"} className="text-primary hover:text-primary/80 transition-colors font-medium">
-                        Create one now
-                    </Link>
-                </p>
-            </div>
+            <div className="flex flex-col gap-5">
+                <div className="mt-8 text-center">
+                    <p className="text-sm text-muted-foreground">
+                        Don&apos;t have an account?{" "}
+                        <Link href={"/signup"} className="text-primary hover:text-primary/80 transition-colors font-medium">
+                            Create one now
+                        </Link>
+                    </p>
+                </div>
+                
+                <div className="flex justify-center items-center">
+                    <div className="border-t border-gray-400 grow"></div>
+                    <div className="text-gray-400">Or</div>
+                    <div className="border-t border-gray-400 grow"></div>
+                </div>
 
-            <div className="flex justify-center items-center">
-                <div className="border-t border-gray-400 grow"></div>
-                <div className="text-gray-400">Or</div>
-                <div className="border-t border-gray-400 grow"></div>
+                <button className="w-full flex justify-center items-center" onClick={()=> router.push("http://localhost:5001/api/auth/login/google?returnUrl=http://localhost:3000/auth/callback")}>
+                    <Image src={GoogleLight} alt="Sign up with google" />
+                </button>
             </div>
-
-            <Link href={"http://localhost:5001/api/auth/login/google?returnUrl=http://localhost:3000/auth/callback"}>Login with google</Link>
         </>
     )
 }

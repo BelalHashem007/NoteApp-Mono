@@ -4,18 +4,16 @@ import LogoutButton from "./LogoutButton";
 import CreateFolderButton from "./CreateFolderButton";
 import FoldersComponent from "./FoldersComponent";
 import { requireAuth } from "@/helper/requireAuth";
+import {fetchWrapperServerSide} from "@/helper/fetchWrapper";
 
 
 export default async function LeftSideBar() {
     const session = await requireAuth();
-    const res = await fetch("http://localhost:5001/api/folders", {
-        headers: {
-            "Authorization": `Bearer ${session?.accessToken}`
-        },
-        next: { tags: ['folders'] }
-    });
+    const res = await fetchWrapperServerSide("http://localhost:5001/api/folders", {
+        next: {tags: ['folders']}
+    })
 
-    const folders = (await res.json()).data as Folder[]
+    const folders = (await res?.json()).data as Folder[]
 
     return (
         <div className="min-w-100 bg-muted border-r border-border flex flex-col max-h-screen">

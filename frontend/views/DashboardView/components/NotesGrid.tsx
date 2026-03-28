@@ -1,4 +1,5 @@
 import { MoreVertical, Plus } from "lucide-react"
+import { formatIso } from "@/helper/helperFuncs"
 
 export default function NotesGrid({ notes }: { notes: Note[] }) {
     return (
@@ -10,17 +11,16 @@ export default function NotesGrid({ notes }: { notes: Note[] }) {
                 >
                     <div
                         className="h-32 w-full"
-                        style={{ background: note.thumbnail }}
                     />
 
                     <div className="p-4">
                         <h3 className="mb-1 truncate">{note.title}</h3>
                         <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-                            {note.description}
+                            {note.body}
                         </p>
                         <div className="flex items-center justify-between">
                             <span className="text-xs text-muted-foreground">
-                                EDITED {note.editedTime}
+                                EDITED {formatIso(note.updatedAt)}
                             </span>
                             <button className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-muted rounded">
                                 <MoreVertical className="w-4 h-4 text-muted-foreground" />

@@ -3,6 +3,7 @@ import { X, Trash2, AlertTriangle } from "lucide-react";
 import { useTransition } from "react";
 import { deleteFolder } from "@/actions/folderActions";
 import { TailSpin } from "react-loader-spinner";
+import toast from "react-hot-toast";
 
 interface DeleteFolderModalProps {
   onClose: () => void;
@@ -19,6 +20,7 @@ export function DeleteFolderModal({ onClose, folder }: DeleteFolderModalProps) {
       await deleteFolder(formData);
 
       onClose();
+      toast.success("Folder Deleted Successfuly")
     });
   }
   return (

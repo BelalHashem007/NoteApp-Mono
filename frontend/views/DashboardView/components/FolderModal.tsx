@@ -4,6 +4,7 @@ import { createFolder, updateFolder } from "@/actions/folderActions";
 import { useTransition,useState } from "react";
 import { TailSpin } from "react-loader-spinner";
 import { ApiError } from "@/actions/authActions";
+import toast from "react-hot-toast";
 
 interface Props {
     onClose: () => void,
@@ -25,6 +26,8 @@ export default function FolderModal({ onClose, state, folder}: Props) {
                 setError(result)
             } else {
                 onClose();
+                if (state === 'create')
+                    toast.success("Folder Created Successfully")
             }
         });
     }

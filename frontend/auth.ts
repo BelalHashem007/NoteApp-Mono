@@ -22,6 +22,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             authorize: async (credentials, req) => {
                 const { email, fullname, password, isSignUp, isExternal } = credentials as AuthCredentials
                 //external login e.g. google
+                console.log(isExternal);
                 if (isExternal)
                     return await loginExternal(req);
 
