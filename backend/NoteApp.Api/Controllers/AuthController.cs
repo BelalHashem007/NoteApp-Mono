@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using NoteApp.Api.Entities;
 using NoteApp.Api.Entities.DTOs;
 using NoteApp.Api.Exceptions;
 using NoteApp.Api.Interfaces.IService;
@@ -7,7 +10,7 @@ namespace NoteApp.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AuthController(IAuthService authService, ILogger<AuthController> logger) : ControllerBase
+    public class AuthController(IAuthService authService, ILogger<AuthController> logger, SignInManager<ApplicationUser> signInManager) : ControllerBase
     {
         [HttpPost]
         [Route("login")]
@@ -68,6 +71,29 @@ namespace NoteApp.Api.Controllers
             };
 
             return Ok(response);
+        }
+
+        [HttpGet]
+        [Route("login/google")]
+        public IActionResult LoginGoogle([FromQuery] string returnUrl)
+        {
+            var redirectUrl = $"http://localhost:5001/api/auth/login/google/callback?returnUrl={returnUrl}";
+            var properties = signInManager.ConfigureExternalAuthenticationProperties(provider: "Google", redirectUrl);
+
+            return Challenge(properties,"Google");
+        }
+
+        [HttpGet]
+        [Route("login/google/callback")]
+        public async Task<IActionResult> LoginGoogleCallback([FromQuery] string returnUrl)
+        {
+            var info = await signInManager.GetExternalLoginInfoAsync();
+            var result = await authService.GoogleLogin(info);
+
+            if (result != null && !string.IsNullOrWhiteSpace(result.Token))
+                SetRefreshTokenToCookie(result.Token, result.ExpiresOn);
+
+            return Redirect(returnUrl);
         }
 
         private void SetRefreshTokenToCookie(string refreshToken, DateTime refreshTokenExpiration)

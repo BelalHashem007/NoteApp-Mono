@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using NoteApp.Api.Configuration;
 using NoteApp.Api.Entities;
@@ -8,10 +9,16 @@ using NoteApp.Api.Helpers;
 using NoteApp.Api.Interfaces.IRepositories;
 using NoteApp.Api.Interfaces.IService;
 using System.Collections.Concurrent;
+using System.Security.Claims;
 
 namespace NoteApp.Api.Services
 {
-    public class AuthService(IAuthRepository authRepository,IOptions<JwtOptions> jwtOptions, ITokenService tokenService, ILogger<AuthService> logger, IMemoryCache _cache) : IAuthService
+    public class AuthService(
+        IAuthRepository authRepository,
+        IOptions<JwtOptions> jwtOptions,
+        ITokenService tokenService,
+        ILogger<AuthService> logger,
+        IMemoryCache _cache) : IAuthService
     {
         private static readonly ConcurrentDictionary<string, SemaphoreSlim> _locks = new();
 
@@ -77,20 +84,15 @@ namespace NoteApp.Api.Services
             if (!validationResult.IsValid)
                 throw new ValidationException(validationResult.ToString());
 
-            if (await authRepository.FindUserByEmail(dto.Email))
+            if (await authRepository.UserExistByEmail(dto.Email))
                 throw new UserAlreadyExistsException("Email is already taken");
-
-            var username = dto.Email.Substring(0, dto.Email.IndexOf("@"));
-
-            if (await authRepository.FindUserByUserName(username))
-                throw new UserAlreadyExistsException("Username is already taken");
 
             // Creating user
             var user = new ApplicationUser
             {
                 Email = dto.Email,
                 FullName = dto.FullName,
-                UserName = username
+                UserName = dto.Email
             };
 
             var identityResult = await authRepository.CreateApplicationUser(user, dto.Password);
@@ -197,6 +199,60 @@ namespace NoteApp.Api.Services
                 semaphore.Release();
                 _locks.TryRemove(token, out _);
             }
+        }
+
+        public async Task<RefreshToken> GoogleLogin(ExternalLoginInfo? info)
+        {
+            if (info == null)
+                throw new ExternalLoginFailedException("Failed to extract ExternalLoginInfo");
+
+            logger.LogInformation("Retrieved ExternalLoginInfo");
+            var principal = info.Principal;
+            var email = principal.FindFirstValue(ClaimTypes.Email) ?? 
+                throw new ExternalLoginFailedException("Failed to extract email from ExternalLoginInfo");
+            var firstName = principal.FindFirstValue(ClaimTypes.GivenName);
+            var lastName = principal.FindFirstValue(ClaimTypes.Surname);
+
+            var user = await authRepository.FindLoginExternal(info.LoginProvider, info.ProviderKey);
+            logger.LogInformation("Email is {email}",email);
+
+            if (user == null)
+            {
+
+                user = await authRepository.FindUserByEmail(email);
+
+                if (user == null)
+                {
+                    //create new user
+                    user = new ApplicationUser
+                    {
+                        UserName = email,
+                        Email = email,
+                        FullName = $"{firstName ?? ""} {lastName ?? ""}".Trim(),
+                    };
+
+                    var accountRegisterationResult = await authRepository.CreateApplicationUser(user);
+                    if (!accountRegisterationResult.Succeeded)
+                        throw new ExternalLoginFailedException(string.Join(", ", accountRegisterationResult.Errors.Select(x => x.Description)));
+
+                    var roleResult = await authRepository.AddDefaultRole(user, UserRoles.User);
+                    if (!roleResult.Succeeded)
+                        logger.LogError($"Failed to create role `User` for user with email {user.Email}");
+                }
+
+                //add loginExternal to db
+                var providerInfo = new UserLoginInfo(info.LoginProvider, info.ProviderKey, info.ProviderDisplayName);
+                var loginExternalResult = await authRepository.AddLoginExternal(user, providerInfo);
+                if (!loginExternalResult.Succeeded && !loginExternalResult.Errors.Any(e => e.Description.Contains("already exists")))
+                     throw new ExternalLoginFailedException(string.Join(", ", loginExternalResult.Errors.Select(x => x.Description)));
+            }
+
+            //login
+            var refreshToken = tokenService.GenerateRefreshToken();
+            user.RefreshTokens.Add(refreshToken);
+            await authRepository.UpdateUser(user);
+
+            return refreshToken;
         }
     }
 }

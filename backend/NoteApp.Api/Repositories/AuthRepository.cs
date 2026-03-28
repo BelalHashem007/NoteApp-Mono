@@ -9,9 +9,12 @@ namespace NoteApp.Api.Repositories
 {
     public class AuthRepository(UserManager<ApplicationUser> _userManager) : IAuthRepository
     {
-        public async Task<IdentityResult> CreateApplicationUser(ApplicationUser user, string password)
+        public async Task<IdentityResult> CreateApplicationUser(ApplicationUser user, string? password = null)
         {
-            var result = await _userManager.CreateAsync(user, password);
+            var result = 
+                password != null ? 
+                await _userManager.CreateAsync(user, password) : 
+                await _userManager.CreateAsync(user);
             return result;
         }
 
@@ -23,12 +26,15 @@ namespace NoteApp.Api.Repositories
             else return null;
         }
 
-        public async Task<bool> FindUserByEmail(string email)
+        public async Task<bool> UserExistByEmail(string email)
         {
             if (await _userManager.FindByEmailAsync(email) is not null)
                 return true;
-
             return false;
+        }
+        public async Task<ApplicationUser?> FindUserByEmail(string email)
+        {
+            return await _userManager.FindByEmailAsync(email);
         }
 
         public async Task<bool> FindUserByUserName(string userName)
@@ -58,6 +64,16 @@ namespace NoteApp.Api.Repositories
         public async Task<ApplicationUser?> FindUser(Expression<Func<ApplicationUser, bool>> expression)
         {
             return await _userManager.Users.SingleOrDefaultAsync(expression);
+        }
+
+        public async Task<IdentityResult> AddLoginExternal(ApplicationUser user, UserLoginInfo info)
+        {
+              return await _userManager.AddLoginAsync(user, info);
+        }
+
+        public async Task<ApplicationUser?> FindLoginExternal(string loginProvider, string providerKey)
+        {
+            return await _userManager.FindByLoginAsync(loginProvider, providerKey);
         }
     }
 }

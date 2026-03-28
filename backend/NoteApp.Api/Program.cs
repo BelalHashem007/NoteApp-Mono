@@ -17,6 +17,8 @@ using NoteApp.Api.Middlewares;
 using NoteApp.Api.Repositories;
 using NoteApp.Api.Services;
 using System.Text;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -109,6 +111,17 @@ builder.Services.AddAuthentication(options =>
     options.DefaultAuthenticateScheme =JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
+    .AddCookie()
+    .AddGoogle(opt =>
+    {
+        opt.ClientId = 
+        builder.Configuration["Authentication:Google:ClientId"] ?? throw new ArgumentNullException("Google ClientId is null");
+        opt.ClientSecret = 
+        builder.Configuration["Authentication:Google:ClientSecret"] ?? throw new ArgumentNullException("Google ClientSecret is null");
+        opt.SignInScheme = IdentityConstants.ExternalScheme;
+
+        opt.Scope.Add("profile");
+    })
     .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
@@ -120,6 +133,7 @@ builder.Services.AddAuthentication(options =>
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SigningKey)),
             ValidateLifetime = true,
+            ClockSkew = TimeSpan.FromMinutes(1)
         };
 
         options.Events = new JwtBearerEvents
