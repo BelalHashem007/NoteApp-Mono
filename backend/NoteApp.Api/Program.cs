@@ -17,9 +17,6 @@ using NoteApp.Api.Middlewares;
 using NoteApp.Api.Repositories;
 using NoteApp.Api.Services;
 using System.Text;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.RateLimiting;
 using NoteApp.Api.Infrastructure.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -82,6 +79,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<AppDbContextDapper>();
 
 //RateLimit
 builder.Services.AddRateLimiter(options =>

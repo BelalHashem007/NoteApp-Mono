@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using NoteApp.Api.Entities.DTOs;
 using NoteApp.Api.Extensions;
 using NoteApp.Api.Interfaces.IService;
+using System.Security.Claims;
 
 namespace NoteApp.Api.Controllers
 {
@@ -90,5 +91,22 @@ namespace NoteApp.Api.Controllers
             return NoContent();
         }
 
+        [HttpGet]
+        [Route("{id}/GetAllItems")]
+        public async Task<IActionResult> GetAllFolderItems(Guid id)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var result = await service.GetAllFolderItems(userId, id);
+
+            var response = new ResponseViewModel<FoldersAndNotesViewModel>
+            {
+                Success = true,
+                Message = "Retrieved all the items successfully",
+                Data = result
+            };
+
+            return Ok(response);
+        }
     }
 }

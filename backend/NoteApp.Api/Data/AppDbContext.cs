@@ -36,6 +36,10 @@ namespace NoteApp.Api.Data
 
             //folder constraints
             modelBuilder.Entity<Folder>()
+                .Property(f => f.Id)
+                .HasDefaultValueSql("NEWSEQUENTIALID()");
+
+            modelBuilder.Entity<Folder>()
                 .Property(f => f.FolderName)
                 .HasMaxLength(50)
                 .IsRequired();
@@ -43,6 +47,12 @@ namespace NoteApp.Api.Data
             modelBuilder.Entity<Folder>()
                 .Property(f => f.CreatedAt)
                 .HasDefaultValueSql("GETUTCDATE()");
+
+            modelBuilder.Entity<Folder>()
+                .HasOne(e => e.ParentFolder)
+                .WithMany(e => e.Folders)
+                .HasForeignKey(e => e.ParentId)
+                .IsRequired(false);
 
             //users constraints
             modelBuilder.Entity<ApplicationUser>()

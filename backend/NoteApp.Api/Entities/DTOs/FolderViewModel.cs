@@ -6,6 +6,7 @@ namespace NoteApp.Api.Entities.DTOs
     {
         public Guid Id { get; set; }
         public string FolderName { get; set; }
+        public Guid? ParentId { get; set; }
     }
 
     public class UpdateFolderViewModel
@@ -25,6 +26,7 @@ namespace NoteApp.Api.Entities.DTOs
     public class CreateFolderViewModel
     {
         public string FolderName { get; set; } = string.Empty;
+        public Guid? ParentId { get; set; }
     }
 
     public class CreateFolderViewModelValidator : AbstractValidator<CreateFolderViewModel>

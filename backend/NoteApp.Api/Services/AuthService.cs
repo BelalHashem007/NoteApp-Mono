@@ -92,7 +92,8 @@ namespace NoteApp.Api.Services
             {
                 Email = dto.Email,
                 FullName = dto.FullName,
-                UserName = dto.Email
+                UserName = dto.Email,
+                RefreshTokens = []
             };
 
             var identityResult = await authRepository.CreateApplicationUser(user, dto.Password);

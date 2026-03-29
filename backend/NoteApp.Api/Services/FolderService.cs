@@ -1,4 +1,5 @@
-﻿using NoteApp.Api.Entities;
+﻿using NoteApp.Api.Data;
+using NoteApp.Api.Entities;
 using NoteApp.Api.Entities.DTOs;
 using NoteApp.Api.Exceptions;
 using NoteApp.Api.Helpers;
@@ -7,7 +8,7 @@ using NoteApp.Api.Interfaces.IService;
 
 namespace NoteApp.Api.Services
 {
-    public class FolderService(IUnitOfWork unitOfWork) : IFolderService
+    public class FolderService(IUnitOfWork unitOfWork, AppDbContextDapper dapper) : IFolderService
     {
         public async Task<IEnumerable<FolderViewModel>> GetFolders(string userId, CancellationToken ct)
         {
@@ -33,7 +34,12 @@ namespace NoteApp.Api.Services
             if (!result.IsValid)
                 throw new ValidationException(result.ToString());
 
-            var folder = new Folder { FolderName = dto.FolderName, UserId = userId };
+            if (dto.ParentId != null)
+            {
+                var parentFolder = await unitOfWork.Folders.GetById(dto.ParentId.Value) ?? throw new ValidationException("Parent folder does not exist");
+            }
+
+            var folder = new Folder { FolderName = dto.FolderName, UserId = userId, ParentId = dto.ParentId};
 
             await unitOfWork.Folders.Add(folder);
             await unitOfWork.Complete(ct);
@@ -65,5 +71,15 @@ namespace NoteApp.Api.Services
             await unitOfWork.Complete(ct);
         }
 
+        public async Task<FoldersAndNotesViewModel> GetAllFolderItems(string userId, Guid id)
+        {
+            var folder = await unitOfWork.Folders.GetById(id) ?? throw new NotFoundException("Folder does not exist");
+            var folders = new List<FolderViewModel>();
+            var notes = new List<NoteViewModel>();
+            await dapper.GetAllItemsInsideASingleFolder(id, userId, folders, notes);
+
+            var result = new FoldersAndNotesViewModel { Folders = folders, Notes = notes };
+            return result;
+        }
     }
 }
