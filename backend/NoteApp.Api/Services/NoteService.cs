@@ -9,9 +9,9 @@ namespace NoteApp.Api.Services
 {
     public class NoteService(IUnitOfWork unitOfWork) : INoteService
     {
-        public async Task<IEnumerable<NoteViewModel>> GetNotes(string userId, Guid folderId, CancellationToken ct)
+        public async Task<IEnumerable<NoteViewModel>> GetNotes(string userId, Guid folderId,string? searchQuery, CancellationToken ct)
         {
-            var notes = await unitOfWork.Notes.FindAll(x=> x.UserId == userId && x.FolderId == folderId, ct);
+            var notes = await unitOfWork.Notes.GetAllNotesWithSearch(x => x.FolderId == folderId && x.UserId == userId, searchQuery, ct);
             IList<NoteViewModel> noteViews = [];
             foreach (var note in notes)
             {

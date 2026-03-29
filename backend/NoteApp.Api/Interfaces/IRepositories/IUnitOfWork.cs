@@ -5,7 +5,7 @@ namespace NoteApp.Api.Interfaces.IRepositories
     public interface IUnitOfWork : IDisposable
     {
         IBaseRepository<Folder> Folders { get; }
-        IBaseRepository<Note> Notes { get; }
+        INoteRepository Notes { get; }
 
         Task<int> Complete(CancellationToken ct = default);
     }
