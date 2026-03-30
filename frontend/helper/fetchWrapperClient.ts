@@ -3,36 +3,34 @@
 import { useRouter } from "next/navigation";
 import { useAuthGuard } from "./useAuthGuard";
 import { useCallback } from "react";
+import { useSession } from "next-auth/react";
 
 export function useFetchWrapperClient() {
-  const session = useAuthGuard();
+  const {data:session, status} = useSession();
   const router = useRouter();
 
-  const fetchWrapper = useCallback(async (url: string, options?: RequestInit): Promise<Response | null> => {
-    if (!session?.accessToken) {
+  const fetchWrapper = useCallback(async (url: string, options?: RequestInit) => {
+    if (status !== 'loading' && !session?.accessToken) {
       router.push("/login?error=unauthorized");
-      return null;
+      throw new Error("Unauthorized"); 
     }
 
     try {
       const response = await fetch(url, {
         ...options,
         headers: {
-          "Authorization": `Bearer ${session.accessToken}`,
+          "Authorization": `Bearer ${session?.accessToken}`,
           "Content-Type": "application/json",
           ...options?.headers,
         },
       });
 
-      if (response.status === 401) {
-        router.push("/login?error=session_expired");
-        return null;
-      }
-
-      return response;
+      if (!response.ok) throw response;
+      return await response.json();    
     } catch (error) {
+      if (error instanceof Response) throw error; 
       router.push("/login?error=server_down");
-      return null;
+      throw error;
     }
   },[session, router]);
 

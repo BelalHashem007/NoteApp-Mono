@@ -2,25 +2,21 @@ import UserProfile from "./UserProfile";
 import { Settings, HelpCircle } from "lucide-react";
 import LogoutButton from "./LogoutButton";
 import CreateFolderButton from "./CreateFolderButton";
-import FoldersComponent from "./FoldersComponent";
-import { requireAuth } from "@/helper/requireAuth";
-import {fetchWrapperServerSide} from "@/helper/fetchWrapper";
+import FolderDataLayer from "./FolderDataLayer";
+import { Suspense } from "react";
+import FolderComponentSkeleton from "@/components/placeholders/FolderComponentSkeleton";
 
 
 export default async function LeftSideBar() {
-    const session = await requireAuth();
-    const res = await fetchWrapperServerSide("http://localhost:5001/api/folders", {
-        next: {tags: ['folders']}
-    })
-
-    const folders = (await res?.json()).data as Folder[]
 
     return (
         <div className="min-w-100 bg-muted border-r border-border flex flex-col max-h-screen">
 
             <UserProfile />
 
-            <FoldersComponent folders={folders}/>
+            <Suspense fallback={<FolderComponentSkeleton/>}>
+                <FolderDataLayer/>
+            </Suspense>
 
             <CreateFolderButton />
 

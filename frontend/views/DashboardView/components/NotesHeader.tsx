@@ -1,33 +1,39 @@
 'use client'
 
+import NotesHeaderSkeleton from "@/components/placeholders/NotesHeaderSkeleton";
+import { DelayedRender } from "@/helper/DelayedRender";
 import { useFetchWrapperClient } from "@/helper/fetchWrapperClient";
+import { useSession } from "next-auth/react";
 import { usePathname } from "next/navigation"
-import { useEffect, useState, useMemo } from "react";
+import { useMemo } from "react";
+import useSWR from "swr";
 
 export default function NotesHeader({ notes }: { notes: Note[] }) {
-    const [folder, setFolder] = useState<Folder | null>(null);
+    const { status } = useSession();
     const pathname = usePathname();
-    const folderId = useMemo(() => {
-        if (pathname.split("/").length > 1) {
-            const segments = pathname.split("/").filter(Boolean); // removes empty strings
-            return segments[1];
-        }
-    }, [pathname]);
-    const fetchClient = useFetchWrapperClient();
-    useEffect(() => {
-        const fetchData = async () => {
-            const response = await fetchClient(`http://localhost:5001/api/folders/${folderId}`)
-            if (response?.ok) {
-                const folderData = (await response.json()).data as Folder
-                setFolder(folderData);
-            }
-        }
 
-        if (pathname.split("/").length > 1) {
-            console.log("test")
-            fetchData();
-        }
-    }, [pathname, fetchClient, folderId])
+    const folderId = useMemo(() => {
+        const segments = pathname.split("/").filter(Boolean);
+        return segments.length > 1 ? segments[1] : null;
+    }, [pathname]);
+
+    const fetchClient = useFetchWrapperClient();
+
+    const shouldFetch = folderId && status !== 'loading';
+
+    const { data, isLoading } = useSWR(
+        shouldFetch ? `http://localhost:5001/api/folders/${folderId}` : null,
+        fetchClient
+    );
+
+    if (!folderId) return null;
+
+    if (isLoading) return (
+        <DelayedRender>
+            <NotesHeaderSkeleton />
+        </DelayedRender>
+    );
+    const folder = data ? data.data as Folder : null
 
     return (
         <>

@@ -1,14 +1,13 @@
 import { auth } from "@/auth"
 import { NextResponse } from "next/server";
 
-const protectedRoutes = ['/dashboard']
 const publicRoutes = ['/login', '/signup', '/', '/external-login']
 
 export const proxy = auth((req) => {
     
     const path = req.nextUrl.pathname
     const isLoggedIn = !!req.auth && !req.auth.error;
-    const isProtectedRoute = protectedRoutes.includes(path)
+    const isProtectedRoute = path.startsWith('/dashboard')
     const isPublicRoute = publicRoutes.includes(path)
     const isServerDown = req.nextUrl.searchParams.get('error') === 'server_down'
 
