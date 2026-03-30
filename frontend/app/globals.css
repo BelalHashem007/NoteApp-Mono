@@ -101,7 +101,7 @@
   body {
     @apply bg-background text-foreground;
   }
-   html {
+  html {
     font-size: var(--font-size);
     @apply font-sans;
   }
