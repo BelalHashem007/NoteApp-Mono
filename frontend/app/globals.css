@@ -4,6 +4,68 @@
 /*---break---*/
 @custom-variant dark (&:is(.dark *));
 
+/*TipTap global styles*/
+.tiptap {
+  flex: 1;
+  width: 100%;
+}
+.dropDownActive:hover {
+  background-color: var(--accent);
+}
+.dropDownActive {
+  background-color: beige;
+}
+.tiptap {
+  outline: none;
+}
+
+/* Target the Tiptap container */
+.tiptap {
+  outline: none; /* Removes the default focus ring */
+}
+
+/* Headings Hierarchy */
+.tiptap h1 {
+  @apply text-5xl font-extrabold mb-6 mt-8;
+}
+
+.tiptap h2 {
+  @apply text-4xl font-bold mb-5 mt-7;
+}
+
+.tiptap h3 {
+  @apply text-3xl font-bold mb-4 mt-6;
+}
+
+.tiptap h4 {
+  @apply text-2xl font-semibold mb-3 mt-5;
+}
+
+.tiptap h5 {
+  @apply text-xl font-semibold mb-2 mt-4;
+}
+
+.tiptap h6 {
+  @apply text-lg font-medium mb-2 mt-4;
+}
+
+/* Fix for Lists (Tailwind Reset) */
+.tiptap ul {
+  @apply list-disc pl-6 my-4;
+}
+
+.tiptap ol {
+  @apply list-decimal pl-6 my-4;
+}
+
+.tiptap li p {
+  @apply m-0; /* Prevents double spacing inside list items */
+}
+
+.editorWrapper {
+  border: 1 solid rgb(226, 232, 240);
+}
+
 :root {
   --font-size: 16px;
   --card: oklch(1 0 0);
@@ -107,26 +169,38 @@
   }
 
   h1 {
-    font-size: var(--text-2xl);
-    font-weight: var(--font-weight-medium);
+    font-size: var(--text-5xl);
+    font-weight: var(--font-weight-bold);
     line-height: 1.5;
   }
 
   h2 {
-    font-size: var(--text-xl);
-    font-weight: var(--font-weight-medium);
+    font-size: var(--text-4xl);
+    font-weight: var(--font-weight-bold);
     line-height: 1.5;
   }
 
   h3 {
-    font-size: var(--text-lg);
-    font-weight: var(--font-weight-medium);
+    font-size: var(--text-3xl);
+    font-weight: var(--font-weight-bold);
     line-height: 1.5;
   }
 
   h4 {
+    font-size: var(--text-2xl);
+    font-weight: var(--font-weight-bold);
+    line-height: 1.5;
+  }
+
+  h5 {
+    font-size: var(--text-xl);
+    font-weight: var(--font-weight-bold);
+    line-height: 1.5;
+  }
+
+  h6 {
     font-size: var(--text-base);
-    font-weight: var(--font-weight-medium);
+    font-weight: var(--font-weight-bold);
     line-height: 1.5;
   }
 
