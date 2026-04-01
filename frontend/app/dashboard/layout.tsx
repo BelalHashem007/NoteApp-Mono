@@ -1,6 +1,5 @@
 import LeftSideBar from "@/views/DashboardView/components/LeftSideBar";
 import TopBar from "@/views/DashboardView/components/TopBar";
-import AuthProvider from "@/views/AuthView/components/AuthProvider";
 
 export default function layout({
   children,
@@ -12,7 +11,7 @@ export default function layout({
       <LeftSideBar />
       <div className="flex-1 flex flex-col relative">
         <TopBar />
-        <AuthProvider>{children}</AuthProvider>
+        {children}
       </div>
     </div>
   );

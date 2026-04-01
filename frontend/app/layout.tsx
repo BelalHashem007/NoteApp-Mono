@@ -2,10 +2,11 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
-import 'react-loading-skeleton/dist/skeleton.css';
+import "react-loading-skeleton/dist/skeleton.css";
 import { cn } from "@/lib/utils";
+import Providers from "./providers";
 
-const inter = Inter({subsets:['latin'],variable:'--font-sans'});
+const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,12 +29,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" data-theme='cerberus' className={cn("font-sans", inter.variable)}>
+    <html
+      lang="en"
+      data-theme="cerberus"
+      className={cn("font-sans", inter.variable)}
+    >
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
-        <Toaster toastOptions={{duration: 3000}}/>
+        <Providers>{children}</Providers>
+        <Toaster toastOptions={{ duration: 3000 }} />
       </body>
     </html>
   );

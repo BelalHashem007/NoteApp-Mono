@@ -1,24 +1,31 @@
-'use client'
-import { Edit2 } from "lucide-react"
-import { useState } from "react"
+"use client";
+import { useState } from "react";
 import FolderModal from "./FolderModal";
+import { createPortal } from "react-dom";
 
-export default function EditFolderButton({folder}:{folder:Folder}) {
-    const [showModal, setShowModal] = useState<boolean>(false);
+export default function EditFolderButton({
+  folder,
+}: {
+  folder: Folder | FolderWithNotes;
+}) {
+  const [showModal, setShowModal] = useState<boolean>(false);
 
-    function onClose(){
-        setShowModal(false)
-    }
-    return (
-        <>
-            <button
-                className="w-7 h-7 rounded hover:bg-muted flex items-center justify-center transition-colors"
-                title="Edit folder"
-                onClick={()=> setShowModal(true)}
-            >
-                <Edit2 className="w-3.5 h-3.5" />
-            </button>
-            {showModal && <FolderModal onClose={onClose} state="edit" folder={folder}/>}
-        </>
-    )
+  function onClose() {
+    setShowModal(false);
+  }
+  return (
+    <>
+      <button
+        className=" w-full h-full text-start hover:bg-white p-2 hover:cursor-pointer"
+        onClick={() => setShowModal(true)}
+      >
+        Rename
+      </button>
+      {showModal &&
+        createPortal(
+          <FolderModal onClose={onClose} state="edit" folder={folder} />,
+          document.body,
+        )}
+    </>
+  );
 }
