@@ -13,6 +13,7 @@ export function toolBarStateSelector(ctx: EditorStateSnapshot<Editor | null>) {
     isCode: ctx.editor.isActive("code") ?? false,
     canCode: ctx.editor.can().chain().toggleCode().run() ?? false,
     canClearMarks: ctx.editor.can().chain().unsetAllMarks().run() ?? false,
+    isUnderline: ctx.editor.isActive("underline") ?? false,
 
     // Block types
     isParagraph: ctx.editor.isActive("paragraph") ?? false,

@@ -9,7 +9,20 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toolBarStateSelector } from "@/helper/toolBarState";
-import { ChevronDown, List, ListOrdered } from "lucide-react";
+import {
+  ChevronDown,
+  List,
+  ListOrdered,
+  Redo,
+  Undo,
+  Bold,
+  Italic,
+  Strikethrough,
+  TextQuote,
+  Code,
+  Minus,
+  Underline,
+} from "lucide-react";
 
 type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
 type DropDownState =
@@ -52,6 +65,29 @@ export default function ToolBar({ editor }: { editor: Editor | null }) {
   };
   return (
     <div className="bg-[rgb(248,250,252)] border-b p-3 flex items-center gap-5">
+      {/* History */}
+      <div className="flex gap-2">
+        <button
+          onClick={() => editor.chain().focus().undo().run()}
+          disabled={!editorState?.canUndo}
+          className="disabled:text-gray-400 disabled:hover:cursor-not-allowed disabled:cursor-not-allowed *:pointer-events-none rounded-lg p-2 enabled:hover:bg-gray-300"
+          title="Undo "
+        >
+          <Undo className="size-5" />
+        </button>
+        <button
+          title="Redo"
+          onClick={() => editor.chain().focus().redo().run()}
+          disabled={!editorState?.canRedo}
+          className="disabled:text-gray-400 disabled:hover:cursor-not-allowed disabled:cursor-not-allowed *:pointer-events-none rounded-lg p-2 enabled:hover:bg-gray-300"
+        >
+          <Redo className="size-5" />
+        </button>
+      </div>
+
+      {/*Seperator*/}
+      <div className="h-full w-px bg-gray-300"></div>
+
       {/*Headers List*/}
       <div>
         <DropdownMenu open={open} onOpenChange={setOpen}>
@@ -143,23 +179,88 @@ export default function ToolBar({ editor }: { editor: Editor | null }) {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+
       {/*Seperator*/}
-      <div className="h-full w-0.5 bg-gray-300"></div>
+      <div className="h-full w-px bg-gray-300"></div>
+
       {/*Lists*/}
       <div className="flex gap-3">
         <button
           onClick={() => editor.chain().focus().toggleBulletList().run()}
-          className={`${editorState?.isBulletList && "bg-gray-500 shadow text-white"} p-1`}
+          className={`${editorState?.isBulletList ? "bg-gray-500 shadow text-white" : "hover:bg-gray-300"} rounded-lg p-2`}
           title="Bullet List"
         >
-          <List />
+          <List className="pointer-events-none" />
         </button>
         <button
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
-          className={`${editorState?.isOrderedList && "bg-gray-500 shadow text-white"} p-1`}
+          className={`${editorState?.isOrderedList ? "bg-gray-500 shadow text-white" : "hover:bg-gray-300"} rounded-lg p-2`}
           title="Ordered List"
         >
-          <ListOrdered />
+          <ListOrdered className="pointer-events-none" />
+        </button>
+      </div>
+
+      {/*Seperator*/}
+      <div className="h-full w-px bg-gray-300"></div>
+
+      {/* Text Formatting */}
+      <div className="flex gap-3">
+        <button
+          onClick={() => editor.chain().focus().toggleBold().run()}
+          className={`${editorState?.isBold ? "bg-gray-500 shadow text-white" : "hover:bg-gray-300"} rounded-lg p-2`}
+          title="Bold"
+        >
+          <Bold />
+        </button>
+        <button
+          onClick={() => editor.chain().focus().toggleItalic().run()}
+          className={`${editorState?.isItalic ? "bg-gray-500 shadow text-white" : "hover:bg-gray-300"} rounded-lg p-2`}
+          title="Italic"
+        >
+          <Italic />
+        </button>
+        <button
+          onClick={() => editor.chain().focus().toggleUnderline().run()}
+          className={`${editorState?.isUnderline ? "bg-gray-500 shadow text-white" : "hover:bg-gray-300"} rounded-lg p-2`}
+          title="Underline"
+        >
+          <Underline />
+        </button>
+        <button
+          onClick={() => editor.chain().focus().toggleStrike().run()}
+          className={`${editorState?.isStrike ? "bg-gray-500 shadow text-white" : "hover:bg-gray-300"} rounded-lg p-2`}
+          title="Strikethrough"
+        >
+          <Strikethrough />
+        </button>
+        <button
+          onClick={() => editor.chain().focus().toggleBlockquote().run()}
+          className={`${editorState?.isBlockquote ? "bg-gray-500 shadow text-white" : "hover:bg-gray-300"}  rounded-lg p-2`}
+          title="Blockquote"
+        >
+          <TextQuote />
+        </button>
+        <button
+          onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+          className={`${editorState?.isCodeBlock ? "bg-gray-500 shadow text-white" : "hover:bg-gray-300"}  rounded-lg p-2`}
+          title="Code Block"
+        >
+          <Code />
+        </button>
+      </div>
+
+      {/*Seperator*/}
+      <div className="h-full w-px bg-gray-300"></div>
+
+      {/* HorizontalLine */}
+      <div>
+        <button
+          onClick={() => editor.chain().focus().setHorizontalRule().run()}
+          className={`hover:bg-gray-300 rounded-lg p-2`}
+          title="Horizontal Line"
+        >
+          <Minus />
         </button>
       </div>
     </div>
