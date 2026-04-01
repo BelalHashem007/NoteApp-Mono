@@ -7,10 +7,12 @@
         public string? Body { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
+        public string Slug { get; set; }
 
         public Guid FolderId { get; set; }
         public Folder Folder { get; set; }
         public ApplicationUser User { get; set; }
         public string UserId { get; set; }
+        public List<Attachment> Attachments { get; set; }
     }
 }

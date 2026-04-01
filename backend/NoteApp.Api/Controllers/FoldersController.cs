@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NoteApp.Api.Entities;
 using NoteApp.Api.Entities.DTOs;
 using NoteApp.Api.Extensions;
 using NoteApp.Api.Interfaces.IService;
@@ -92,14 +93,14 @@ namespace NoteApp.Api.Controllers
         }
 
         [HttpGet]
-        [Route("{id}/GetAllItems")]
-        public async Task<IActionResult> GetAllFolderItems(Guid id)
+        [Route("GetAllItems")]
+        public async Task<ActionResult<ResponseViewModel<List<FoldersAndNotesViewModel>>>> GetAllFolderItems()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            var result = await service.GetAllFolderItems(userId, id);
+            var result = await service.GetAllFolderItems(userId);
 
-            var response = new ResponseViewModel<FoldersAndNotesViewModel>
+            var response = new ResponseViewModel<List<FoldersAndNotesViewModel>>
             {
                 Success = true,
                 Message = "Retrieved all the items successfully",

@@ -47,6 +47,14 @@ namespace NoteApp.Api.Services
             newNote.FolderId = folderId;
             newNote.UserId = userId;
 
+            //creating slug
+            string str = dto.Title.ToLowerInvariant();
+            str = System.Text.RegularExpressions.Regex.Replace(str, @"[^a-z0-9\s-]", "");
+            str = System.Text.RegularExpressions.Regex.Replace(str, @"\s+", " ").Trim();
+            str = str.Replace(" ", "-");
+            var suffix = Guid.NewGuid().ToString().Substring(0, 5).Replace(" ","");
+            newNote.Slug = str +"-"+ suffix;
+
             await unitOfWork.Notes.Add(newNote);
             await unitOfWork.Complete(ct);
 
@@ -82,5 +90,56 @@ namespace NoteApp.Api.Services
             await unitOfWork.Complete(ct);
         }
 
+        public async Task<string> UploadImage(string userId, Guid noteId,IFormFile file, CancellationToken ct)
+        {
+            if (string.IsNullOrEmpty(userId))
+                throw new ValidationException("Invalid user id");
+            //check existance
+            if (file == null || file.Length == 0)
+            {
+                throw new ValidationException("File does not exist");
+            }
+
+            //check extension
+            var extensions = new List<string>() { ".jpg", ".jpeg", ".png", ".gif", ".svg", ".webp"};
+            var fileExtension = Path.GetExtension(file.FileName);
+            if (!extensions.Contains(fileExtension))
+                throw new ValidationException("Invalid file extensions. Acceptable ones are: " + string.Join(",", extensions));
+
+            //max size
+            var size = file.Length;
+            if (size > 10 * 1024 * 1024)
+                throw new ValidationException("Invalid file size. Max allowed file size is 10MB");
+
+            //save to file
+            var fileName = Guid.NewGuid().ToString() + fileExtension;
+            var path = Path.Combine(Directory.GetCurrentDirectory(), $"wwwroot/{userId}/{noteId.ToString()}");
+
+            if (!Directory.Exists(path))
+                Directory.CreateDirectory(path);
+
+            using (var stream = new FileStream(Path.Combine(path, fileName), FileMode.Create))
+            {
+                await file.CopyToAsync(stream, ct);
+            }
+
+            //save to db
+            var attachment = new Attachment()
+            {
+                UserId = userId,
+                NoteId = noteId,
+                OriginalName = file.FileName,
+                CreatedAt = DateTime.Now,
+                FileSize = size,
+                StoragePath = path,
+                MimeType = file.ContentType,
+            };
+
+            await unitOfWork.Attachments.Add(attachment);
+            await unitOfWork.Complete();
+
+            var url = $"http://localhost:5001/{userId}/{noteId}/{fileName}";
+            return url;
+        }
     }
 }

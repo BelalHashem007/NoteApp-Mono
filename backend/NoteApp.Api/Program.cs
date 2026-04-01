@@ -78,6 +78,7 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<INoteRepository, NoteRepository>();
+builder.Services.AddScoped<IFolderRepository, FolderRepository>();
 builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<AppDbContextDapper>();
@@ -187,7 +188,7 @@ RecurringJob.AddOrUpdate<RefreshTokenCleaning>("cleanup-refreshTokens", job => j
 
 app.UseAuthentication();
 app.UseAuthorization();
-
+app.UseStaticFiles();
 app.UseRateLimiter();
 
 app.MapControllers().RequireRateLimiting("GlobalRateLimiterPolicy");

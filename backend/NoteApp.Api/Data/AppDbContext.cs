@@ -34,6 +34,16 @@ namespace NoteApp.Api.Data
                 .HasMaxLength(50)
                 .IsRequired();
 
+            modelBuilder.Entity<Note>()
+                .Property(n => n.Slug)
+                .HasMaxLength(70)
+                .IsRequired();
+
+            modelBuilder.Entity<Note>()
+                .HasIndex(n => n.Slug)
+                .IsUnique();
+                
+
             //folder constraints
             modelBuilder.Entity<Folder>()
                 .Property(f => f.Id)
@@ -58,9 +68,33 @@ namespace NoteApp.Api.Data
             modelBuilder.Entity<ApplicationUser>()
                 .Property(x => x.FullName)
                 .HasMaxLength(50);
+
+            //attachment constrains
+            modelBuilder.Entity<Note>()
+                .HasMany(n => n.Attachments)
+                .WithOne(a => a.Note)
+                .HasForeignKey(a => a.NoteId)
+                .IsRequired(true);
+
+            modelBuilder.Entity<Attachment>()
+                .Property(a => a.CreatedAt)
+                .HasDefaultValueSql("GETUTCDATE()");
+
+            modelBuilder.Entity<Attachment>()
+                .Property(a => a.MimeType)
+                .HasMaxLength(50);
+
+            modelBuilder.Entity<Attachment>()
+                .Property(a => a.OriginalName)
+                .HasMaxLength(256);
+
+            modelBuilder.Entity<Attachment>()
+                .Property(a => a.Id)
+                .HasDefaultValueSql("NEWSEQUENTIALID()");
         }
 
         public DbSet<Note> Notes { get; set; }
         public DbSet<Folder> Folders { get; set; }
+        public DbSet<Attachment> Attachments { get; set; }
     }
 }

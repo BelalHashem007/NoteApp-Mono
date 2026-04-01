@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using NoteApp.Api.Entities.DTOs;
 using NoteApp.Api.Extensions;
 using NoteApp.Api.Interfaces.IService;
+using System.Security.Claims;
 
 namespace NoteApp.Api.Controllers
 {
@@ -86,6 +87,22 @@ namespace NoteApp.Api.Controllers
 
             await service.DeleteNote(userId, folderId, id, ct);
             return NoContent();
+        }
+
+        [HttpPost]
+        [Route("{id}/upload-image")]
+        public async Task<IActionResult> UploadImage(Guid id,IFormFile file, CancellationToken ct)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "";
+            var url = await service.UploadImage(userId, id, file, ct);
+            var response = new ResponseViewModel<AttachmentViewModel>()
+            {
+                Success = true,
+                Message = "Image uploaded successfully",
+                Data = new AttachmentViewModel { Url = url }
+            };
+
+            return Ok(response);
         }
     }
 }

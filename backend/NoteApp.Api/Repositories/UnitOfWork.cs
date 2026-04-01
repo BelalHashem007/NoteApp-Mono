@@ -4,9 +4,11 @@ using NoteApp.Api.Interfaces.IRepositories;
 
 namespace NoteApp.Api.Repositories
 {
-    public class UnitOfWork(IBaseRepository<Folder> folders, INoteRepository notes, AppDbContext context) : IUnitOfWork
+    public class UnitOfWork(IFolderRepository folders, INoteRepository notes, IBaseRepository<Attachment> attachments, AppDbContext context) : IUnitOfWork
     {
-        public IBaseRepository<Folder> Folders => folders;
+        public IFolderRepository Folders => folders;
+
+        public IBaseRepository<Attachment> Attachments => attachments;
 
         public INoteRepository Notes => notes;
 

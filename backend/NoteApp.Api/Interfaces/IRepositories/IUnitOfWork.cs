@@ -4,7 +4,8 @@ namespace NoteApp.Api.Interfaces.IRepositories
 {
     public interface IUnitOfWork : IDisposable
     {
-        IBaseRepository<Folder> Folders { get; }
+        IFolderRepository Folders { get; }
+        IBaseRepository<Attachment> Attachments { get; }
         INoteRepository Notes { get; }
 
         Task<int> Complete(CancellationToken ct = default);

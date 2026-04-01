@@ -11,6 +11,12 @@ namespace NoteApp.Api.Entities.DTOs
         public DateTime UpdatedAt { get; set; }
     }
 
+    public class NoteWithoutBodyViewModel
+    {
+        public Guid Id { get; set; }
+        public string Title { get; set; }
+    }
+
     public class UpdateNoteViewModel
     {
         public string? Title { get; set; }
