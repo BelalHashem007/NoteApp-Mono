@@ -1,10 +1,16 @@
 "use client";
-import { X, Trash2, AlertTriangle } from "lucide-react";
+import { Trash2, AlertTriangle } from "lucide-react";
 import { useTransition } from "react";
 import { deleteFolder } from "@/actions/actions";
 import { TailSpin } from "react-loader-spinner";
 import toast from "react-hot-toast";
-import { useEffect } from "react";
+import {
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface DeleteFolderModalProps {
   onClose: () => void;
@@ -13,17 +19,6 @@ interface DeleteFolderModalProps {
 
 export function DeleteFolderModal({ onClose, folder }: DeleteFolderModalProps) {
   const [isPending, startTransition] = useTransition();
-
-  useEffect(() => {
-    const handleClickOutside = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
-    };
-
-    window.addEventListener("keydown", handleClickOutside);
-    return () => {
-      window.removeEventListener("keydown", handleClickOutside);
-    };
-  }, [onClose]);
 
   async function handleAction(formData: FormData) {
     startTransition(async () => {
@@ -34,60 +29,48 @@ export function DeleteFolderModal({ onClose, folder }: DeleteFolderModalProps) {
     });
   }
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-      onClick={onClose}
-    >
-      <div
-        className="bg-card border border-border rounded-2xl shadow-2xl w-full max-w-md mx-4"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-border">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-destructive/10 flex items-center justify-center">
-              <AlertTriangle className="w-5 h-5 text-destructive" />
-            </div>
-            <h2 className="text-xl">Delete Folder</h2>
+    <DialogContent className="sm:max-w-md">
+      {/* Header */}
+      <DialogHeader>
+        <DialogTitle className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-destructive/10 flex items-center justify-center rel">
+            <AlertTriangle className="w-5 h-5 text-destructive" />
           </div>
-          <button
-            onClick={onClose}
-            className="w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center transition-colors"
-          >
-            <X className="w-5 h-5 text-muted-foreground" />
-          </button>
-        </div>
+          <span className="text-xl">Delete Folder</span>
+        </DialogTitle>
+      </DialogHeader>
+      {/* Content */}
+      <div className="flex flex-col gap-1">
+        <p className="text-foreground/80 mb-4">
+          Are you sure you want to delete the folder{" "}
+          <span className="font-medium text-foreground">
+            &quot;{folder.folderName}&quot;
+          </span>
+          ?
+        </p>
+        <p className="text-sm text-muted-foreground">
+          This action cannot be undone. All the notes inside will also be{" "}
+          <em>
+            <strong>deleted</strong>
+          </em>
+        </p>
+      </div>
 
-        {/* Content */}
-        <div className="p-6">
-          <p className="text-foreground/80 mb-4">
-            Are you sure you want to delete the folder{" "}
-            <span className="font-medium text-foreground">
-              &quot;{folder.folderName}&quot;
-            </span>
-            ?
-          </p>
-          <p className="text-sm text-muted-foreground">
-            This action cannot be undone. All the notes inside will also be{" "}
-            <em>
-              <strong>deleted</strong>
-            </em>
-          </p>
-        </div>
-
-        {/* Footer */}
+      {/* Footer */}
+      <DialogFooter>
         <form action={handleAction}>
           <input hidden name="id" value={folder?.id} readOnly />
-          <div className="flex items-center justify-end gap-3 p-6 border-t border-border">
-            <button
-              disabled={isPending}
-              type="button"
-              onClick={onClose}
-              className="bg-muted hover:bg-muted/80 text-foreground h-10 px-6 rounded-md
+          <div className="flex items-center justify-end gap-3">
+            <DialogClose asChild>
+              <button
+                disabled={isPending}
+                type="button"
+                className="bg-muted hover:bg-muted/80 text-foreground h-10 px-6 rounded-md
                         disabled:bg-[#e0e0e0] disabled:text-[#a1a1a1] disabled:opacity-70 disabled:border disabled:border-[#d1d1d1]"
-            >
-              Cancel
-            </button>
+              >
+                Cancel
+              </button>
+            </DialogClose>
             <button
               disabled={isPending}
               type="submit"
@@ -103,7 +86,7 @@ export function DeleteFolderModal({ onClose, folder }: DeleteFolderModalProps) {
             </button>
           </div>
         </form>
-      </div>
-    </div>
+      </DialogFooter>
+    </DialogContent>
   );
 }

@@ -197,3 +197,24 @@ export async function createNote(
     return { serverErrors: { message: "Something went wrong!" } };
   }
 }
+
+export async function updateNoteBody(bodyToUpdate: string, noteId?: string) {
+  if (!noteId) throw new Error("no note id is given!!");
+  //check user
+  const session = await requireAuth();
+
+  if (!session.user) throw new Error("Unauthorized");
+  console.log(session.accessToken);
+
+  const response = await fetch(`http://localhost:5001/api/notes/${noteId}`, {
+    method: "PUT",
+    body: JSON.stringify({
+      body: bodyToUpdate,
+    }),
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+  });
+  return response.json();
+}

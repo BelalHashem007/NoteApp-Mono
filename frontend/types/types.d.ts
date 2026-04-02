@@ -2,6 +2,7 @@ interface Note {
   id: string;
   title: string;
   body: string;
+  slug: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -22,4 +23,17 @@ type FolderWithNotes = {
 type NoteWithoutBody = {
   id: string;
   title: string;
+  slug: string;
+};
+
+type ApiResponse<TData> = {
+  success: boolean;
+  messsage: string;
+  error?: ApiError;
+  data?: TData;
+};
+
+type ApiError = {
+  code: string;
+  errors: string;
 };

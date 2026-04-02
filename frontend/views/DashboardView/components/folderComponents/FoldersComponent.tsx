@@ -9,6 +9,7 @@ import {
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import CreationAndEditModal from "../modals/CreationAndEditModal";
+import { Dialog } from "@/components/ui/dialog";
 
 export default function FoldersComponent({
   folders,
@@ -22,20 +23,17 @@ export default function FoldersComponent({
   );
 
   return (
-    <ContextMenu>
-      <div className="h-full flex flex-col">
-        <ContextMenuTrigger className="grow">
-          <FolderSearch query={query} setQuery={setQuery} />
+    <div className="h-full w-full flex flex-col">
+      <FolderSearch query={query} setQuery={setQuery} />
 
-          <FolderList folders={filteredFolders} />
-        </ContextMenuTrigger>
-        <ContextMenuContent>
-          <ContextMenuItem onSelect={() => setShowModal(true)}>
-            New Folder...
-          </ContextMenuItem>
-        </ContextMenuContent>
-      </div>
-      {showModal && (
+      <FolderList folders={filteredFolders} level={0} />
+
+      <Dialog
+        open={showModal}
+        onOpenChange={(open) => {
+          if (!open) setShowModal(false);
+        }}
+      >
         <CreationAndEditModal
           onClose={() => {
             setShowModal(false);
@@ -43,7 +41,15 @@ export default function FoldersComponent({
           state="create"
           modalType="folder"
         />
-      )}
-    </ContextMenu>
+      </Dialog>
+      <ContextMenu>
+        <ContextMenuTrigger className="grow"></ContextMenuTrigger>
+        <ContextMenuContent>
+          <ContextMenuItem onSelect={() => setShowModal(true)}>
+            New Folder...
+          </ContextMenuItem>
+        </ContextMenuContent>
+      </ContextMenu>
+    </div>
   );
 }

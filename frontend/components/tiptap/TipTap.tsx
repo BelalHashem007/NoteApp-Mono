@@ -12,12 +12,45 @@ import { uploadImage } from "@/helper/uploadImage";
 import { useSession } from "next-auth/react";
 import { useRef, useEffect } from "react";
 import { Editor } from "@tiptap/react";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
+import { updateNoteBody } from "@/actions/actions";
+import { useDebouncedCallback } from "use-debounce";
 
 const lowlight = createLowlight(all);
 
-const Tiptap = () => {
-  const { data: session, status } = useSession();
+const Tiptap = ({ note }: { note?: Note }) => {
+  const { data: session } = useSession();
   const sessionRef = useRef(session);
+
+  const queryClient = useQueryClient();
+  const mutation = useMutation({
+    mutationFn: (noteToUpdate: { body: string; id?: string }) => {
+      return updateNoteBody(noteToUpdate.body, noteToUpdate.id);
+    },
+    onMutate: async (noteToUpdate, context) => {
+      await context.client.cancelQueries({ queryKey: ["note", note?.slug] });
+
+      const previousNote = context.client.getQueryData(["note", note?.slug]);
+
+      context.client.setQueryData(
+        ["note", note?.slug],
+        (old: ApiResponse<Note>) => {
+          return { ...old, data: { ...old.data, body: noteToUpdate.body } };
+        },
+      );
+
+      return { previousNote };
+    },
+    onError: (err, noteToUpdate, onMutateResult, context) => {
+      context.client.setQueryData(
+        ["note", note?.slug],
+        onMutateResult?.previousNote,
+      );
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["note", note?.slug] });
+    },
+  });
 
   useEffect(() => {
     sessionRef.current = session;
@@ -32,10 +65,15 @@ const Tiptap = () => {
       return;
     }
 
-    uploadImage(file, editor, currentSession, pos);
+    uploadImage(file, editor, currentSession, note?.id, pos);
   };
 
   const editor = useEditor({
+    content: JSON.parse(note?.body ?? "{}"),
+    onUpdate: ({ editor }) => {
+      console.log("Editor is updating....");
+      debounced(editor.getJSON());
+    },
     extensions: [
       StarterKit.configure({
         codeBlock: false,
@@ -73,18 +111,29 @@ const Tiptap = () => {
         },
       }),
     ],
-    content: "<p>Hello World! 🌎️</p>",
     // Don't render immediately on the server to avoid SSR issues
     immediatelyRender: false,
   });
 
-  if (status === "loading" || !session) {
-    return <div>Loading editor...</div>;
-  }
+  const debounced = useDebouncedCallback(
+    (json) => {
+      console.log("iam saving....");
+      mutation.mutate({
+        body: JSON.stringify(json),
+        id: note?.id,
+      });
+    },
+    2000,
+    { maxWait: 5000 },
+  );
+
+  useEffect(() => {
+    return () => debounced.flush();
+  }, [debounced]);
 
   return (
     <div className="flex flex-col grow editorWrapper m-5">
-      <ToolBar editor={editor} />
+      <ToolBar editor={editor} note={note} />
       <EditorContent editor={editor} className="flex grow pt-5 px-5" />
     </div>
   );

@@ -6,7 +6,6 @@ import {
   ChevronRight,
   ChevronDown,
 } from "lucide-react";
-import { createPortal } from "react-dom";
 import { DeleteFolderModal } from "../modals/DeleteFolderModal";
 import CreationAndEditModal from "../modals/CreationAndEditModal";
 import {
@@ -15,11 +14,14 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
+import { Dialog } from "@/components/ui/dialog";
 
 export default function FolderList({
   folders,
+  level = 0,
 }: {
   folders: FolderWithNotes[];
+  level: number;
 }) {
   // const pathName = usePathname();
   // const [selectedFolder, setSelectedFolder] = useState<string>(pathName.split("/").length > 1 ? pathName.split("/")[2] : "")
@@ -34,14 +36,15 @@ export default function FolderList({
   >(null);
 
   return (
-    <div className="flex-1 overflow-y-auto pl-2">
+    <div className="overflow-y-auto">
       {folders.map((f) => {
         return (
           <div key={f.id}>
             <ContextMenu>
               <ContextMenuTrigger asChild>
                 <button
-                  className="flex gap-2 hover:bg-gray-200 w-full"
+                  className=" flex gap-2 hover:bg-gray-200 w-full"
+                  style={{ paddingLeft: 8 + level * 8 }}
                   onClick={() =>
                     setOpenFolders(
                       openFolders.includes(f.id)
@@ -114,9 +117,9 @@ export default function FolderList({
               </ContextMenuContent>
             </ContextMenu>
             {openFolders.includes(f.id) && (
-              <div className="pl-2">
-                <FolderList folders={f.subFolders} />
-                <NoteList notes={f.notes} />
+              <div>
+                <FolderList folders={f.subFolders} level={level + 1} />
+                <NoteList notes={f.notes} level={level + 1} />
               </div>
             )}
           </div>
@@ -124,32 +127,24 @@ export default function FolderList({
       })}
 
       {/* modals */}
-      {activeAction?.type === "delete" &&
-        createPortal(
-          <DeleteFolderModal
-            folder={activeAction.folder}
-            onClose={() => {
-              setActiveAction(null);
-            }}
-          />,
-          document.body,
-        )}
-
-      {activeAction?.type === "createFolder" &&
-        createPortal(
+      <Dialog
+        open={!!activeAction}
+        onOpenChange={(open) => {
+          if (!open) setActiveAction(null);
+        }}
+      >
+        {activeAction?.type === "createFolder" && (
           <CreationAndEditModal
             onClose={() => {
               setActiveAction(null);
             }}
             state="create"
             modalType="folder"
-            parentId={activeAction.parentId}
-          />,
-          document.body,
+            parentId={activeAction?.parentId}
+          />
         )}
 
-      {activeAction?.type === "createNote" &&
-        createPortal(
+        {activeAction?.type === "createNote" && (
           <CreationAndEditModal
             onClose={() => {
               setActiveAction(null);
@@ -157,12 +152,10 @@ export default function FolderList({
             state="create"
             folder={activeAction.folder}
             modalType="note"
-          />,
-          document.body,
+          />
         )}
 
-      {activeAction?.type === "rename" &&
-        createPortal(
+        {activeAction?.type === "rename" && (
           <CreationAndEditModal
             onClose={() => {
               setActiveAction(null);
@@ -170,9 +163,18 @@ export default function FolderList({
             state="edit"
             folder={activeAction.folder}
             modalType="folder"
-          />,
-          document.body,
+          />
         )}
+
+        {activeAction?.type === "delete" && (
+          <DeleteFolderModal
+            folder={activeAction.folder}
+            onClose={() => {
+              setActiveAction(null);
+            }}
+          />
+        )}
+      </Dialog>
     </div>
   );
 }

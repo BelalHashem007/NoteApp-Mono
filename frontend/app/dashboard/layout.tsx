@@ -3,8 +3,10 @@ import TopBar from "@/views/DashboardView/components/TopBar";
 
 export default function layout({
   children,
+  editor,
 }: Readonly<{
   children: React.ReactNode;
+  editor: React.ReactNode;
 }>) {
   return (
     <div className="min-h-screen w-full flex bg-background">
@@ -12,6 +14,7 @@ export default function layout({
       <div className="flex-1 flex flex-col relative">
         <TopBar />
         {children}
+        {editor}
       </div>
     </div>
   );

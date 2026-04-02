@@ -8,6 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toolBarStateSelector } from "@/helper/toolBarState";
 import {
   ChevronDown,
@@ -22,7 +23,9 @@ import {
   Code,
   Minus,
   Underline,
+  Save,
 } from "lucide-react";
+import { updateNoteBody } from "@/actions/actions";
 
 type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
 type DropDownState =
@@ -34,7 +37,13 @@ type DropDownState =
   | "Heading 5"
   | "Heading 6";
 
-export default function ToolBar({ editor }: { editor: Editor | null }) {
+export default function ToolBar({
+  editor,
+  note,
+}: {
+  editor: Editor | null;
+  note?: Note;
+}) {
   const [open, setOpen] = useState<boolean>(false);
   const editorState = useEditorState({
     editor,
@@ -263,6 +272,22 @@ export default function ToolBar({ editor }: { editor: Editor | null }) {
           <Minus />
         </button>
       </div>
+
+      {/* Save Button
+      <div>
+        <button
+          className=" rounded-lg p-2 hover:bg-gray-300"
+          title="Save Note"
+          onClick={() =>
+            mutation.mutate({
+              body: JSON.stringify(editor.getJSON()),
+              id: note?.id,
+            })
+          }
+        >
+          <Save />
+        </button>
+      </div> */}
     </div>
   );
 }

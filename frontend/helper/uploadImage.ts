@@ -6,11 +6,15 @@ export async function uploadImage(
   file: File,
   editor: Editor,
   session: Session | null,
+  noteId?: string,
   pos?: number,
 ) {
   if (!session?.accessToken) {
     console.error("No session yet");
     return;
+  }
+  if (!noteId) {
+    throw new Error("no note id is given");
   }
   //show ghost image
   const tempUrl = URL.createObjectURL(file);
@@ -30,7 +34,7 @@ export async function uploadImage(
   formData.append("file", file);
   try {
     const reponse = await fetch(
-      "http://localhost:5001/api/folders/7C06CDD4-74D5-4D81-B5B0-08DE8CFF5A9E/notes/6A74765B-E22A-F111-9400-FC7774D3AB11/upload-image",
+      `http://localhost:5001/api/notes/${noteId}/upload-image`,
       {
         method: "POST",
         headers: {
