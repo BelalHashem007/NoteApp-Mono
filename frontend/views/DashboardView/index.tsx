@@ -1,5 +1,5 @@
-import NotesGrid from "./components/NotesGrid";
-import NotesHeader from "./components/NotesHeader";
+import NotesGrid from "./components/noteComponent/NotesGrid";
+import NotesHeader from "./components/noteComponent/NotesHeader";
 
 export default async function DashboardView({ notes }: { notes: Note[] }) {
   return (

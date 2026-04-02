@@ -1,17 +1,29 @@
 "use client";
 import { X, Trash2, AlertTriangle } from "lucide-react";
 import { useTransition } from "react";
-import { deleteFolder } from "@/actions/folderActions";
+import { deleteFolder } from "@/actions/actions";
 import { TailSpin } from "react-loader-spinner";
 import toast from "react-hot-toast";
+import { useEffect } from "react";
 
 interface DeleteFolderModalProps {
   onClose: () => void;
-  folder: Folder;
+  folder: Folder | FolderWithNotes;
 }
 
 export function DeleteFolderModal({ onClose, folder }: DeleteFolderModalProps) {
   const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    const handleClickOutside = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+
+    window.addEventListener("keydown", handleClickOutside);
+    return () => {
+      window.removeEventListener("keydown", handleClickOutside);
+    };
+  }, [onClose]);
 
   async function handleAction(formData: FormData) {
     startTransition(async () => {

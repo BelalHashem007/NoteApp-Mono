@@ -1,8 +1,8 @@
 import UserProfile from "./UserProfile";
 import { Settings, HelpCircle, Search, FolderOpen } from "lucide-react";
 import LogoutButton from "./LogoutButton";
-import CreateFolderButton from "./CreateFolderButton";
-import FolderDataLayer from "./FolderDataLayer";
+import CreateFolderButton from "./modals/CreateFolderButton";
+import FolderDataLayer from "./folderComponents/FolderDataLayer";
 import { Suspense } from "react";
 import FolderComponentSkeleton from "@/components/placeholders/FolderComponentSkeleton";
 

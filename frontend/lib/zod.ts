@@ -2,46 +2,57 @@ import * as z from "zod";
 
 //Authentication validation
 
-export const SignUpSchema = z.object({
+export const SignUpSchema = z
+  .object({
     fullname: z.string().min(2, "Name must be at least 2 characters"),
     email: z.email("Invalid email address"),
     password: z
-        .string()
-        .min(6, "Password must be at least 6 characters")
-        .regex(/[a-z]/, "Must contain at least one lowercase letter")
-        .regex(/[A-Z]/, "Must contain at least one uppercase letter")
-        .regex(/[0-9]/, "Must contain at least one number")
-        .regex(/[^a-zA-Z0-9]/, "Must contain at least one special character (@, #, etc.)"),
+      .string()
+      .min(6, "Password must be at least 6 characters")
+      .regex(/[a-z]/, "Must contain at least one lowercase letter")
+      .regex(/[A-Z]/, "Must contain at least one uppercase letter")
+      .regex(/[0-9]/, "Must contain at least one number")
+      .regex(
+        /[^a-zA-Z0-9]/,
+        "Must contain at least one special character (@, #, etc.)",
+      ),
     confirmPassword: z.string(),
-})
-    .refine((data) => data.password === data.confirmPassword, {
-        message: "Passwords do not match",
-        path: ["confirmPassword"]
-    });
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
 
 export const LoginSchema = z.object({
-    email: z.email("Invalid email address"),
-    password: z
-        .string()
-        .min(6, "Password must be at least 6 characters")
-        .regex(/[a-z]/, "Must contain at least one lowercase letter")
-        .regex(/[A-Z]/, "Must contain at least one uppercase letter")
-        .regex(/[0-9]/, "Must contain at least one number")
-        .regex(/[^a-zA-Z0-9]/, "Must contain at least one special character (@, #, etc.)"),
-})
-
+  email: z.email("Invalid email address"),
+  password: z
+    .string()
+    .min(6, "Password must be at least 6 characters")
+    .regex(/[a-z]/, "Must contain at least one lowercase letter")
+    .regex(/[A-Z]/, "Must contain at least one uppercase letter")
+    .regex(/[0-9]/, "Must contain at least one number")
+    .regex(
+      /[^a-zA-Z0-9]/,
+      "Must contain at least one special character (@, #, etc.)",
+    ),
+});
 
 // folder validation
 
 export const CreateFolderSchema = z.object({
-    folderName: z.string().max(50).min(1),
-})
+  folderName: z.string().max(50).min(1),
+});
 
 export const UpdateFolderSchema = z.object({
-    folderName: z.string().max(50).min(1),
-    id: z.string().min(1),
-})
+  folderName: z.string().max(50).min(1),
+  folderId: z.string().min(1),
+});
 
 export const DeleteFolderSchema = z.object({
-    id: z.string().min(1),
-})
+  id: z.string().min(1),
+});
+
+// note validation
+export const CreateNoteSchema = z.object({
+  title: z.string().max(50).min(1),
+});
