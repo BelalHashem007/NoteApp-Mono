@@ -1,71 +1,100 @@
-"use client"
-import Link from "next/link"
-import FormInput from "./FormInput"
-import FormButton from "./FormButton"
-import { useActionState } from "react"
-import { LoginUser } from "@/actions/authActions"
-import GoogleLight from "@/public/google_light.svg"
-import Image from "next/image"
-import { useRouter } from "next/navigation"
+"use client";
+import Link from "next/link";
+import FormInput from "./FormInput";
+import FormButton from "./FormButton";
+import { useActionState } from "react";
+import { LoginUser } from "@/actions/authActions";
+import GoogleLight from "@/public/google_light.svg";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 export default function LoginForm() {
-    const router = useRouter();
-    const [state, formAction, isPending] = useActionState(LoginUser, null);
-    console.log(state)
-    return (
-        <>
-            <form action={formAction} className="space-y-6">
-                <div className="space-y-2">
-                    <label htmlFor="email" className="text-sm">Email Address</label>
-                    <FormInput type="email" id="email" name="email" />
-                    {state?.validationErrors?.map((err, i) =>
-                        err.path[0] === "email" &&
-                        <div key={i} className="text-red-500 text-sm">{err.message}</div>
-                    )}
-                </div>
+  const router = useRouter();
+  const [state, formAction, isPending] = useActionState(LoginUser, null);
 
-                <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                        <label htmlFor="password" className="text-sm">Password</label>
-                        <button
-                            type="button"
-                            className="text-sm text-primary hover:text-primary/80 transition-colors"
-                        >
-                            Forgot?
-                        </button>
-                    </div>
-                    <FormInput type="password" id="password" name="password" />
-                    {state?.validationErrors?.map((err, i) =>
-                        err.path[0] === "password" &&
-                        <div key={i} className="text-red-500 text-sm">{err.message}</div>
-                    )}
+  return (
+    <>
+      <form action={formAction} className="space-y-6">
+        <div className="space-y-2">
+          <label htmlFor="email" className="text-sm">
+            Email Address
+          </label>
+          <FormInput
+            type="email"
+            id="email"
+            name="email"
+            defaultValue={state?.enteredValues?.email}
+          />
+          {state?.validationErrors?.map(
+            (err, i) =>
+              err.path[0] === "email" && (
+                <div key={i} className="text-red-500 text-sm">
+                  {err.message}
                 </div>
-                {state?.serverErrors &&
-                    <div className="text-red-500 text-sm">{state.serverErrors.message}</div>
-                }
-                <FormButton disabled={isPending}>Sign in</FormButton>
-            </form>
+              ),
+          )}
+        </div>
 
-            <div className="flex flex-col gap-5">
-                <div className="mt-8 text-center">
-                    <p className="text-sm text-muted-foreground">
-                        Don&apos;t have an account?{" "}
-                        <Link href={"/signup"} className="text-primary hover:text-primary/80 transition-colors font-medium">
-                            Create one now
-                        </Link>
-                    </p>
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <label htmlFor="password" className="text-sm">
+              Password
+            </label>
+            <button
+              type="button"
+              className="text-sm text-primary hover:text-primary/80 transition-colors"
+            >
+              Forgot?
+            </button>
+          </div>
+          <FormInput type="password" id="password" name="password" />
+          {state?.validationErrors?.map(
+            (err, i) =>
+              err.path[0] === "password" && (
+                <div key={i} className="text-red-500 text-sm">
+                  {err.message}
                 </div>
-                
-                <div className="flex justify-center items-center">
-                    <div className="border-t border-gray-400 grow"></div>
-                    <div className="text-gray-400">Or</div>
-                    <div className="border-t border-gray-400 grow"></div>
-                </div>
+              ),
+          )}
+        </div>
+        {state?.serverErrors && (
+          <div className="text-red-500 text-sm">
+            {state.serverErrors.message}
+          </div>
+        )}
+        <FormButton disabled={isPending}>Sign in</FormButton>
+      </form>
 
-                <button className="w-full flex justify-center items-center" onClick={()=> router.push("http://localhost:5001/api/auth/login/google?returnUrl=http://localhost:3000/auth/callback")}>
-                    <Image src={GoogleLight} alt="Sign up with google" />
-                </button>
-            </div>
-        </>
-    )
+      <div className="flex flex-col gap-5">
+        <div className="mt-8 text-center">
+          <p className="text-sm text-muted-foreground">
+            Don&apos;t have an account?{" "}
+            <Link
+              href={"/signup"}
+              className="text-primary hover:text-primary/80 transition-colors font-medium"
+            >
+              Create one now
+            </Link>
+          </p>
+        </div>
+
+        <div className="flex justify-center items-center">
+          <div className="border-t border-gray-400 grow"></div>
+          <div className="text-gray-400">Or</div>
+          <div className="border-t border-gray-400 grow"></div>
+        </div>
+
+        <button
+          className="w-full flex justify-center items-center"
+          onClick={() =>
+            router.push(
+              "http://localhost:5001/api/auth/login/google?returnUrl=http://localhost:3000/auth/callback",
+            )
+          }
+        >
+          <Image src={GoogleLight} alt="Sign up with google" />
+        </button>
+      </div>
+    </>
+  );
 }

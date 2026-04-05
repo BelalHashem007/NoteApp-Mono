@@ -23,10 +23,8 @@ export default function FolderList({
   folders: FolderWithNotes[];
   level: number;
 }) {
-  // const pathName = usePathname();
-  // const [selectedFolder, setSelectedFolder] = useState<string>(pathName.split("/").length > 1 ? pathName.split("/")[2] : "")
-  // const router = useRouter();
   const [openFolders, setOpenFolders] = useState<string[]>([]);
+
   const [activeAction, setActiveAction] = useState<
     | null
     | { type: "createNote"; folder: FolderWithNotes }
@@ -43,7 +41,7 @@ export default function FolderList({
             <ContextMenu>
               <ContextMenuTrigger asChild>
                 <button
-                  className=" flex gap-2 hover:bg-gray-200 w-full"
+                  className=" flex gap-2 hover:bg-gray-200 w-full items-center truncate"
                   style={{ paddingLeft: 8 + level * 8 }}
                   onClick={() =>
                     setOpenFolders(
@@ -60,13 +58,13 @@ export default function FolderList({
                 >
                   {openFolders.includes(f.id) ? (
                     <>
-                      <ChevronDown />
-                      <FolderOpen fill="yellow" />
+                      <ChevronDown className="w-3 h-3" />
+                      <FolderOpen className="w-4 h-4 shrink-0 text-accent" />
                     </>
                   ) : (
                     <>
-                      <ChevronRight />
-                      <FolderClosed fill="yellow" />
+                      <ChevronRight className="w-3 h-3" />
+                      <FolderClosed className="w-4 h-4 shrink-0 text-accent" />
                     </>
                   )}{" "}
                   {f.folderName}

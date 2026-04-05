@@ -1,4 +1,4 @@
-import { fetchWrapperServerSide } from "@/helper/fetchWrapper";
+import { fetchWrapperServerSide } from "@/lib/fetchWrapper";
 import FoldersComponent from "./FoldersComponent";
 
 export default async function FolderDataLayer() {

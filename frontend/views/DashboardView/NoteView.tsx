@@ -1,10 +1,14 @@
 "use client";
 import Tiptap from "@/components/tiptap/TipTap";
 import { useQuery } from "@tanstack/react-query";
-import { useFetchWrapperClient } from "@/helper/fetchWrapperClient";
+import { useFetchWrapperClient } from "@/lib/fetchWrapperClient";
+import NoteTappedNavigation from "./components/noteComponent/NoteTappedNavigation";
+import { useEffect } from "react";
+import { useTapsContext } from "@/app/dashboard/providers";
 
 export default function NoteView({ slug }: { slug: string }) {
   const fetchClient = useFetchWrapperClient();
+  const { openedNotes, setOpenedNotes } = useTapsContext();
 
   const { data, isPending, error, isError } = useQuery({
     queryKey: ["note", slug],
@@ -16,9 +20,22 @@ export default function NoteView({ slug }: { slug: string }) {
     },
   });
 
-  if (isPending) return <div>Loading Editor...</div>;
+  if (isPending)
+    return (
+      <div>
+        <NoteTappedNavigation /> Loading Editor...
+      </div>
+    );
 
-  if (isError) console.error(error);
+  if (isError) {
+    console.error(error);
+    return <div>Failed to load note data</div>;
+  }
 
-  return <Tiptap note={data?.data} />;
+  return (
+    <div>
+      <NoteTappedNavigation note={data.data} />
+      <Tiptap note={data?.data} />
+    </div>
+  );
 }

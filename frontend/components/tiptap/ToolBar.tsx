@@ -8,8 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toolBarStateSelector } from "@/helper/toolBarState";
+import { toolBarStateSelector } from "@/lib/toolBarState";
 import {
   ChevronDown,
   List,
@@ -25,7 +24,6 @@ import {
   Underline,
   Save,
 } from "lucide-react";
-import { updateNoteBody } from "@/actions/actions";
 
 type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
 type DropDownState =

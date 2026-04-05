@@ -1,45 +1,57 @@
-import UserProfile from "./UserProfile";
-import { Settings, HelpCircle, Search, FolderOpen } from "lucide-react";
+import { Settings, Files, User } from "lucide-react";
 import LogoutButton from "./LogoutButton";
-import CreateFolderButton from "./modals/CreateFolderButton";
 import FolderDataLayer from "./folderComponents/FolderDataLayer";
 import { Suspense } from "react";
 import FolderComponentSkeleton from "@/components/placeholders/FolderComponentSkeleton";
 
 export default async function LeftSideBar() {
   return (
-    <div className="min-w-100 bg-muted border-r border-border flex flex-col max-h-screen ">
-      {/* <UserProfile /> */}
-
-      {/* <CreateFolderButton />
-
-      <div className="px-3 pb-4 space-y-1">
-        <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-foreground/70 hover:bg-background hover:text-foreground transition-colors text-sm">
-          <Settings className="w-4 h-4" />
-          Settings
+    <div className="min-w-100 bg-muted border-r border-border flex max-h-screen ">
+      <div className="w-12 bg-card border-r border-border flex flex-col items-center py-3">
+        <button
+          className={`w-10 h-10 flex items-center justify-center rounded-lg transition-colors mb-1 ${
+            true
+              ? "bg-primary/10 text-primary"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+          title="Explorer"
+        >
+          <Files className="w-5 h-5" />
         </button>
-        <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-foreground/70 hover:bg-background hover:text-foreground transition-colors text-sm">
-          <HelpCircle className="w-4 h-4" />
-          Help Center
-        </button>
-        <LogoutButton />
-      </div> */}
+        <div className="flex-1" />
 
-      {/* File Explorer + Search */}
-      <div className="p-4">
-        <button className="flex gap-2 text-lg items-center p-4 pl-8 w-full border-l-6 border-[#2563EB] bg-[#EFF6FF] text-[#2563EB]">
-          <FolderOpen /> Explorer
+        <button
+          className={`w-10 h-10 flex items-center justify-center rounded-lg transition-colors mb-1 ${
+            false
+              ? "bg-primary/10 text-primary"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+          title="Account"
+        >
+          <User className="w-5 h-5" />
         </button>
-        <button className="flex gap-2 text-lg items-center p-4 pl-8">
-          <Search /> Search
+        <button
+          className={`w-10 h-10 flex items-center justify-center rounded-lg transition-colors ${
+            false
+              ? "bg-primary/10 text-primary"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+          title="Settings"
+        >
+          <Settings className="w-5 h-5" />
         </button>
       </div>
-      <hr />
 
-      {/* Folders and notes */}
-      <Suspense fallback={<FolderComponentSkeleton />}>
-        <FolderDataLayer />
-      </Suspense>
+      <div className="pb-4 space-y-1 grow">
+        <LogoutButton />
+        <div className="h-9 px-4 flex items-center justify-between text-foreground/70 text-xs font-semibold uppercase tracking-wider">
+          <span>Explorer</span>
+        </div>
+        {/* Folders and notes */}
+        <Suspense fallback={<FolderComponentSkeleton />}>
+          <FolderDataLayer />
+        </Suspense>
+      </div>
     </div>
   );
 }

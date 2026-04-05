@@ -8,7 +8,7 @@ import CodeBlockLowLight from "@tiptap/extension-code-block-lowlight";
 import { all, createLowlight } from "lowlight";
 import Image from "@tiptap/extension-image";
 import FileHandler from "@tiptap/extension-file-handler";
-import { uploadImage } from "@/helper/uploadImage";
+import { uploadImage } from "@/lib/utils";
 import { useSession } from "next-auth/react";
 import { useRef, useEffect } from "react";
 import { Editor } from "@tiptap/react";

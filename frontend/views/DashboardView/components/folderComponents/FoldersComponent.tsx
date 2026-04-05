@@ -1,5 +1,4 @@
 "use client";
-import FolderSearch from "./FolderSearch";
 import FolderList from "./FolderList";
 import { useState } from "react";
 import {
@@ -24,7 +23,7 @@ export default function FoldersComponent({
 
   return (
     <div className="h-full w-full flex flex-col">
-      <FolderSearch query={query} setQuery={setQuery} />
+      {/* <FolderSearch query={query} setQuery={setQuery} /> */}
 
       <FolderList folders={filteredFolders} level={0} />
 

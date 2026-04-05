@@ -5,16 +5,17 @@ import { signIn, signOut } from "@/auth";
 import { AuthError, User } from "next-auth";
 import { JWT } from "next-auth/jwt";
 
-export type ApiError = {
+export type ActionError = {
   validationErrors?: $ZodIssue[];
   serverErrors?: { message: string };
   status?: "running" | "failed" | "success";
+  enteredValues?: { email: string };
 };
 
 export async function createAccount(
   _prevState: unknown,
   formData: FormData,
-): Promise<ApiError | undefined> {
+): Promise<ActionError | undefined> {
   const data = SignUpSchema.safeParse(Object.fromEntries(formData.entries()));
 
   if (!data.success) {
@@ -39,12 +40,15 @@ export async function createAccount(
 export async function LoginUser(
   _prevState: unknown,
   formData: FormData,
-): Promise<ApiError | undefined> {
+): Promise<ActionError | undefined> {
   const data = LoginSchema.safeParse(Object.fromEntries(formData.entries()));
 
   if (!data.success) {
     console.log(data.error?.issues);
-    return { validationErrors: data.error?.issues };
+    return {
+      validationErrors: data.error?.issues,
+      enteredValues: { email: formData.get("email")?.toString() ?? "" },
+    };
   } else {
     try {
       await signIn("credentials", {

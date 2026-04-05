@@ -4,8 +4,8 @@ import {
   UpdateFolderSchema,
   CreateNoteSchema,
 } from "@/lib/zod";
-import { ApiError } from "./authActions";
-import { requireAuth } from "@/helper/requireAuth";
+import { ActionError } from "./authActions";
+import { requireAuth } from "@/lib/utils";
 import { updateTag } from "next/cache";
 
 //-----------------------------------------------------------------------
@@ -15,7 +15,7 @@ import { updateTag } from "next/cache";
 export async function createFolder(
   _prevState: unknown,
   formData: FormData,
-): Promise<ApiError | undefined> {
+): Promise<ActionError | undefined> {
   //validate input
   const data = Object.fromEntries(formData.entries());
   console.log(data);
@@ -64,7 +64,7 @@ export async function createFolder(
 export async function updateFolder(
   _prevState: unknown,
   formData: FormData,
-): Promise<ApiError | undefined> {
+): Promise<ActionError | undefined> {
   //validate input
   console.log(Object.fromEntries(formData.entries()));
   const validationResult = UpdateFolderSchema.safeParse(
@@ -144,7 +144,7 @@ export async function deleteFolder(formData: FormData) {
 export async function createNote(
   _prevState: unknown,
   formData: FormData,
-): Promise<ApiError | undefined> {
+): Promise<ActionError | undefined> {
   //validate input
   const data = Object.fromEntries(formData.entries());
   console.log(data);

@@ -1,21 +1,17 @@
 import LeftSideBar from "@/views/DashboardView/components/LeftSideBar";
-import TopBar from "@/views/DashboardView/components/TopBar";
+import { TapProvider } from "./providers";
 
 export default function layout({
   children,
-  editor,
 }: Readonly<{
   children: React.ReactNode;
-  editor: React.ReactNode;
 }>) {
   return (
-    <div className="min-h-screen w-full flex bg-background">
-      <LeftSideBar />
-      <div className="flex-1 flex flex-col relative">
-        <TopBar />
-        {children}
-        {editor}
+    <TapProvider>
+      <div className="min-h-screen w-full flex bg-background">
+        <LeftSideBar />
+        <div className="flex-1 flex flex-col relative">{children}</div>
       </div>
-    </div>
+    </TapProvider>
   );
 }
