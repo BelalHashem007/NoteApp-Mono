@@ -6,7 +6,7 @@ import {
   useState,
   useEffect,
 } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 type OpenedNote = {
   slug: string;
@@ -30,7 +30,9 @@ export const useTapsContext = (): TapsContextType => {
 
 export function TapProvider({ children }: { children: React.ReactNode }) {
   const [openedNotes, setOpenedNotes] = useState<OpenedNote[]>([]);
+  const [isInitialized, setIsInitialized] = useState<boolean>(false);
   const router = useRouter();
+  const path = usePathname();
 
   useEffect(() => {
     const updateState = () => {
@@ -38,11 +40,19 @@ export function TapProvider({ children }: { children: React.ReactNode }) {
       const parsed = openNotes ? JSON.parse(openNotes) : [];
       if (parsed.length > 0) {
         setOpenedNotes(parsed);
-        router.replace(`/dashboard/note/${parsed[0].slug}`);
+        if (path.split("/").length < 3)
+          router.replace(`/dashboard/note/${parsed[0].slug}`);
       }
+      setIsInitialized(true);
     };
     updateState();
-  }, [router]);
+  }, [router, path]);
+
+  useEffect(() => {
+    if (isInitialized) {
+      localStorage.setItem("openNotes", JSON.stringify(openedNotes));
+    }
+  }, [openedNotes, isInitialized]);
 
   return (
     <OpenedNotesContext value={{ openedNotes, setOpenedNotes }}>

@@ -3,6 +3,7 @@ import {
   CreateFolderSchema,
   UpdateFolderSchema,
   CreateNoteSchema,
+  UpdateNoteTitleSchema,
 } from "@/lib/zod";
 import { ActionError } from "./authActions";
 import { requireAuth } from "@/lib/utils";
@@ -61,18 +62,13 @@ export async function createFolder(
   }
 }
 
-export async function updateFolder(
-  _prevState: unknown,
-  formData: FormData,
-): Promise<ActionError | undefined> {
+export async function updateFolder(newFolder: Folder) {
   //validate input
-  console.log(Object.fromEntries(formData.entries()));
-  const validationResult = UpdateFolderSchema.safeParse(
-    Object.fromEntries(formData.entries()),
-  );
+  console.log(newFolder);
+  const validationResult = UpdateFolderSchema.safeParse(newFolder);
   if (!validationResult.success) {
     console.log(validationResult.error?.issues);
-    return { validationErrors: validationResult.error?.issues };
+    throw new Error(validationResult.error?.issues.toString());
   }
 
   //check user
@@ -85,12 +81,12 @@ export async function updateFolder(
   //update
   try {
     const response = await fetch(
-      `http://localhost:5001/api/Folders/${validationResult.data.folderId}`,
+      `http://localhost:5001/api/Folders/${validationResult.data.id}`,
       {
         method: "PUT",
         body: JSON.stringify({
           folderName: validationResult.data.folderName,
-          id: validationResult.data.folderId,
+          id: validationResult.data.id,
         }),
         headers: {
           "Content-Type": "application/json",
@@ -100,13 +96,12 @@ export async function updateFolder(
     );
     const body = await response.json();
     console.log(body);
-    if (!response.ok) return { serverErrors: { message: body.message } };
+    if (!response.ok) throw new Error(body.message);
 
-    updateTag("folders");
-    return { status: "success" };
+    return Promise.resolve();
   } catch (error) {
     console.error("Failed to update folder", error);
-    return { serverErrors: { message: "Something went wrong!" } };
+    throw new Error("Something went wrong!");
   }
 }
 
@@ -217,4 +212,46 @@ export async function updateNoteBody(bodyToUpdate: string, noteId?: string) {
     },
   });
   return response.json();
+}
+
+export async function updateNoteTitle(updatedNote: NoteWithoutBody) {
+  //validate input
+  console.log(updatedNote);
+  const validationResult = UpdateNoteTitleSchema.safeParse(updatedNote);
+  if (!validationResult.success) {
+    console.log(validationResult.error?.issues);
+    throw new Error(validationResult.error?.issues.toString());
+  }
+
+  //check user
+  const session = await requireAuth();
+
+  if (!session.user) throw new Error("Unauthorized");
+
+  console.log(validationResult.data);
+  console.log(session.accessToken);
+  //update
+  try {
+    const response = await fetch(
+      `http://localhost:5001/api/notes/${updatedNote.id}`,
+      {
+        method: "PUT",
+        body: JSON.stringify({
+          title: validationResult.data.title,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+      },
+    );
+    const body = await response.json();
+    console.log(body);
+    if (!response.ok) throw new Error(body.message);
+
+    return Promise.resolve();
+  } catch (error) {
+    console.error("Failed to update folder", error);
+    throw new Error("Something went wrong!");
+  }
 }

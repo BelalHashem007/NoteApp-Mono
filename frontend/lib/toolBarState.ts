@@ -29,6 +29,7 @@ export function toolBarStateSelector(ctx: EditorStateSnapshot<Editor | null>) {
     isOrderedList: ctx.editor.isActive("orderedList") ?? false,
     isCodeBlock: ctx.editor.isActive("codeBlock") ?? false,
     isBlockquote: ctx.editor.isActive("blockquote") ?? false,
+    isTaskList: ctx.editor.isActive("taskItem") ?? false,
 
     // History
     canUndo: ctx.editor.can().chain().undo().run() ?? false,

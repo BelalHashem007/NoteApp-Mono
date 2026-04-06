@@ -5,6 +5,7 @@ import {
   QueryClientProvider,
 } from "@tanstack/react-query";
 import { SessionProvider } from "next-auth/react";
+import { Toaster } from "react-hot-toast";
 
 function makeQueryClient() {
   return new QueryClient({
@@ -34,6 +35,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   return (
     <SessionProvider>
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+      <Toaster toastOptions={{ duration: 5000 }} />
     </SessionProvider>
   );
 }

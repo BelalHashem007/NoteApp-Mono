@@ -3,12 +3,9 @@ import Tiptap from "@/components/tiptap/TipTap";
 import { useQuery } from "@tanstack/react-query";
 import { useFetchWrapperClient } from "@/lib/fetchWrapperClient";
 import NoteTappedNavigation from "./components/noteComponent/NoteTappedNavigation";
-import { useEffect } from "react";
-import { useTapsContext } from "@/app/dashboard/providers";
 
 export default function NoteView({ slug }: { slug: string }) {
   const fetchClient = useFetchWrapperClient();
-  const { openedNotes, setOpenedNotes } = useTapsContext();
 
   const { data, isPending, error, isError } = useQuery({
     queryKey: ["note", slug],
@@ -33,7 +30,7 @@ export default function NoteView({ slug }: { slug: string }) {
   }
 
   return (
-    <div>
+    <div className="flex flex-col min-h-0 overflow-hidden">
       <NoteTappedNavigation note={data.data} />
       <Tiptap note={data?.data} />
     </div>

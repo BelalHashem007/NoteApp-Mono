@@ -15,6 +15,8 @@ import { Editor } from "@tiptap/react";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { updateNoteBody } from "@/actions/actions";
 import { useDebouncedCallback } from "use-debounce";
+import { TaskList } from "@tiptap/extension-list";
+import { TaskItem } from "@tiptap/extension-list";
 
 const lowlight = createLowlight(all);
 
@@ -79,6 +81,10 @@ const Tiptap = ({ note }: { note?: Note }) => {
         codeBlock: false,
         underline: false,
       }),
+      TaskList,
+      TaskItem.configure({
+        nested: true,
+      }),
       Underline,
       CodeBlockLowLight.configure({
         lowlight,
@@ -132,9 +138,14 @@ const Tiptap = ({ note }: { note?: Note }) => {
   }, [debounced]);
 
   return (
-    <div className="flex flex-col grow editorWrapper m-5">
-      <ToolBar editor={editor} note={note} />
-      <EditorContent editor={editor} className="flex grow pt-5 px-5" />
+    <div className="flex flex-col flex-1 bg-background overflow-hidden">
+      <ToolBar editor={editor} />
+      <div className="flex-1 overflow-y-auto min-h-0">
+        <EditorContent
+          editor={editor}
+          className="flex flex-col min-h-0 w-full text-foreground text-lg leading-relaxed 2xl:max-w-300 md:max-w-150 max-w-50"
+        />
+      </div>
     </div>
   );
 };

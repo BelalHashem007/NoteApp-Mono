@@ -45,7 +45,7 @@ export const CreateFolderSchema = z.object({
 
 export const UpdateFolderSchema = z.object({
   folderName: z.string().max(50).min(1),
-  folderId: z.string().min(1),
+  id: z.string().min(1),
 });
 
 export const DeleteFolderSchema = z.object({
@@ -54,5 +54,8 @@ export const DeleteFolderSchema = z.object({
 
 // note validation
 export const CreateNoteSchema = z.object({
+  title: z.string().max(50).min(1),
+});
+export const UpdateNoteTitleSchema = z.object({
   title: z.string().max(50).min(1),
 });

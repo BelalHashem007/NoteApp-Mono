@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
-import { Toaster } from "react-hot-toast";
-import "react-loading-skeleton/dist/skeleton.css";
 import { cn } from "@/lib/utils";
 import Providers from "./providers";
 
@@ -38,7 +36,6 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Providers>{children}</Providers>
-        <Toaster toastOptions={{ duration: 3000 }} />
       </body>
     </html>
   );

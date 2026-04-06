@@ -9,23 +9,39 @@ import {
 } from "@/components/ui/context-menu";
 import CreationAndEditModal from "../modals/CreationAndEditModal";
 import { Dialog } from "@/components/ui/dialog";
+import { useQuery } from "@tanstack/react-query";
+import { useFetchWrapperClient } from "@/lib/fetchWrapperClient";
+import FolderComponentSkeleton from "@/components/placeholders/FolderComponentSkeleton";
 
-export default function FoldersComponent({
-  folders,
-}: {
-  folders: FolderWithNotes[];
-}) {
+export default function FoldersComponent({}) {
   const [showModal, setShowModal] = useState<boolean>(false);
-  const [query, setQuery] = useState<string>("");
-  const filteredFolders = folders.filter((f) =>
-    f.folderName.toLowerCase().includes(query.toLowerCase()),
-  );
+  const fetchClient = useFetchWrapperClient();
+  const {
+    data: result,
+    isPending,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ["foldersAndNotes"],
+    queryFn: async ({ signal }) => {
+      return fetchClient(`http://localhost:5001/api/Folders/GetAllItems`, {
+        signal,
+      });
+    },
+  });
+
+  if (isPending) return <FolderComponentSkeleton />;
+
+  if (isError) {
+    console.error(error);
+    return <div>Failed to fetch folders</div>;
+  }
 
   return (
     <div className="h-full w-full flex flex-col">
       {/* <FolderSearch query={query} setQuery={setQuery} /> */}
 
-      <FolderList folders={filteredFolders} level={0} />
+      <FolderList folders={result.data as FolderWithNotes[]} level={0} />
 
       <Dialog
         open={showModal}

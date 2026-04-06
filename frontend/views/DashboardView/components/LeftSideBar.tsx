@@ -1,12 +1,10 @@
-import { Settings, Files, User } from "lucide-react";
-import LogoutButton from "./LogoutButton";
-import FolderDataLayer from "./folderComponents/FolderDataLayer";
-import { Suspense } from "react";
-import FolderComponentSkeleton from "@/components/placeholders/FolderComponentSkeleton";
+import { Settings, Files } from "lucide-react";
+import AccountComponent from "./AccountComponent";
+import FoldersComponent from "./folderComponents/FoldersComponent";
 
 export default async function LeftSideBar() {
   return (
-    <div className="min-w-100 bg-muted border-r border-border flex max-h-screen ">
+    <div className="lg:min-w-100 min-w-min bg-muted border-r border-border flex max-h-screen ">
       <div className="w-12 bg-card border-r border-border flex flex-col items-center py-3">
         <button
           className={`w-10 h-10 flex items-center justify-center rounded-lg transition-colors mb-1 ${
@@ -19,17 +17,7 @@ export default async function LeftSideBar() {
           <Files className="w-5 h-5" />
         </button>
         <div className="flex-1" />
-
-        <button
-          className={`w-10 h-10 flex items-center justify-center rounded-lg transition-colors mb-1 ${
-            false
-              ? "bg-primary/10 text-primary"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-          title="Account"
-        >
-          <User className="w-5 h-5" />
-        </button>
+        <AccountComponent />
         <button
           className={`w-10 h-10 flex items-center justify-center rounded-lg transition-colors ${
             false
@@ -43,14 +31,11 @@ export default async function LeftSideBar() {
       </div>
 
       <div className="pb-4 space-y-1 grow">
-        <LogoutButton />
         <div className="h-9 px-4 flex items-center justify-between text-foreground/70 text-xs font-semibold uppercase tracking-wider">
           <span>Explorer</span>
         </div>
         {/* Folders and notes */}
-        <Suspense fallback={<FolderComponentSkeleton />}>
-          <FolderDataLayer />
-        </Suspense>
+        <FoldersComponent />
       </div>
     </div>
   );

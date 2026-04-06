@@ -8,11 +8,19 @@ import { useEffect } from "react";
 export default function NoteTappedNavigation({ note }: { note?: Note }) {
   const { openedNotes, setOpenedNotes } = useTapsContext();
   const router = useRouter();
-  useEffect(() => {
-    localStorage.setItem("openNotes", JSON.stringify(openedNotes));
-  }, [openedNotes]);
 
-  console.log(openedNotes);
+  useEffect(() => {
+    const handleLocalStorage = () => {
+      if (note && !openedNotes.find((x) => x.slug === note.slug)) {
+        setOpenedNotes((prev) => [
+          ...prev,
+          { slug: note.slug, title: note.title },
+        ]);
+      }
+    };
+    handleLocalStorage();
+  }, [setOpenedNotes, note]);
+
   return (
     <div className="h-9 bg-muted/30 border-b border-border flex items-center overflow-x-auto">
       {openedNotes.map((openedNote) => {

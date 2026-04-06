@@ -22,7 +22,7 @@ import {
   Code,
   Minus,
   Underline,
-  Save,
+  ListTodo,
 } from "lucide-react";
 
 type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
@@ -35,13 +35,7 @@ type DropDownState =
   | "Heading 5"
   | "Heading 6";
 
-export default function ToolBar({
-  editor,
-  note,
-}: {
-  editor: Editor | null;
-  note?: Note;
-}) {
+export default function ToolBar({ editor }: { editor: Editor | null }) {
   const [open, setOpen] = useState<boolean>(false);
   const editorState = useEditorState({
     editor,
@@ -71,7 +65,7 @@ export default function ToolBar({
     }, 0);
   };
   return (
-    <div className="bg-[rgb(248,250,252)] border-b p-3 flex items-center gap-5">
+    <div className="bg-card border-b p-3 flex items-center gap-5">
       {/* History */}
       <div className="flex gap-2">
         <button
@@ -196,6 +190,7 @@ export default function ToolBar({
           onClick={() => editor.chain().focus().toggleBulletList().run()}
           className={`${editorState?.isBulletList ? "bg-gray-500 shadow text-white" : "hover:bg-gray-300"} rounded-lg p-2`}
           title="Bullet List"
+          type="button"
         >
           <List className="pointer-events-none" />
         </button>
@@ -203,8 +198,17 @@ export default function ToolBar({
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
           className={`${editorState?.isOrderedList ? "bg-gray-500 shadow text-white" : "hover:bg-gray-300"} rounded-lg p-2`}
           title="Ordered List"
+          type="button"
         >
           <ListOrdered className="pointer-events-none" />
+        </button>
+        <button
+          onClick={() => editor.chain().focus().toggleTaskList().run()}
+          className={`${editorState?.isTaskList ? "bg-gray-500 shadow text-white" : "hover:bg-gray-300"} rounded-lg p-2`}
+          title="Task List"
+          type="button"
+        >
+          <ListTodo className="pointer-events-none" />
         </button>
       </div>
 
