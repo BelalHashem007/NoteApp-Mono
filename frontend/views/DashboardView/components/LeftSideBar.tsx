@@ -1,4 +1,4 @@
-import { Settings, Files } from "lucide-react";
+import { Settings, Files, FolderPlus } from "lucide-react";
 import AccountComponent from "./AccountComponent";
 import FoldersComponent from "./folderComponents/FoldersComponent";
 
@@ -33,6 +33,9 @@ export default async function LeftSideBar() {
       <div className="pb-4 space-y-1 grow">
         <div className="h-9 px-4 flex items-center justify-between text-foreground/70 text-xs font-semibold uppercase tracking-wider">
           <span>Explorer</span>
+          <button className={` p-1 hover:bg-gray-200 `} title={"New Folder..."}>
+            <FolderPlus className="w-5 h-5" />
+          </button>
         </div>
         {/* Folders and notes */}
         <FoldersComponent />

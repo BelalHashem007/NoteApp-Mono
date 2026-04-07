@@ -12,6 +12,8 @@ import { useMutation } from "@tanstack/react-query";
 import { updateNoteTitle } from "@/actions/actions";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { Dialog } from "@/components/ui/dialog";
+import { DeleteModal } from "../modals/DeleteModal";
 
 export default function NoteList({
   notes,
@@ -22,6 +24,9 @@ export default function NoteList({
 }) {
   const { setOpenedNotes } = useTapsContext();
   const [editTitle, setEditTitle] = useState<string | null>(null);
+  const [deleteAction, setDeleteAction] = useState<NoteWithoutBody | undefined>(
+    undefined,
+  );
   const mutationToUpdateNoteTitle = useMutation({
     mutationFn: (updatedNote: NoteWithoutBody) => {
       return updateNoteTitle(updatedNote);
@@ -141,11 +146,28 @@ export default function NoteList({
                 <ContextMenuItem onSelect={() => setEditTitle(n.id)}>
                   Rename
                 </ContextMenuItem>
+                <ContextMenuItem onSelect={() => setDeleteAction(n)}>
+                  Delete
+                </ContextMenuItem>
               </ContextMenuContent>
             </ContextMenu>
           </div>
         ),
       )}
+
+      <Dialog
+        open={!!deleteAction}
+        onOpenChange={(open) => {
+          if (!open) setDeleteAction(undefined);
+        }}
+      >
+        {deleteAction && (
+          <DeleteModal
+            onClose={() => setDeleteAction(undefined)}
+            note={deleteAction}
+          />
+        )}
+      </Dialog>
     </div>
   );
 }

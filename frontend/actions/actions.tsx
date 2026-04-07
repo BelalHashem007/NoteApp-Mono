@@ -13,20 +13,14 @@ import { updateTag } from "next/cache";
 /**********************Folder actions***********************************/
 //-----------------------------------------------------------------------
 
-export async function createFolder(
-  _prevState: unknown,
-  formData: FormData,
-): Promise<ActionError | undefined> {
+export async function createFolder(folderName: string, parendId?: string) {
   //validate input
-  const data = Object.fromEntries(formData.entries());
-  console.log(data);
+  console.log(parendId);
 
-  const validationResult = CreateFolderSchema.safeParse(
-    Object.fromEntries(formData.entries()),
-  );
+  const validationResult = CreateFolderSchema.safeParse({ folderName });
   if (!validationResult.success) {
     console.log(validationResult.error?.issues);
-    return { validationErrors: validationResult.error?.issues };
+    throw new Error(validationResult.error?.issues.toString());
   }
 
   //check user
@@ -40,25 +34,22 @@ export async function createFolder(
   try {
     const response = await fetch("http://localhost:5001/api/Folders", {
       method: "POST",
-      body: JSON.stringify(
-        data.parentId
-          ? { ...validationResult.data, parentId: data.parentId }
-          : validationResult.data,
-      ),
+      body: JSON.stringify({
+        folderName,
+        parentId: parendId ?? null,
+      }),
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${session.accessToken}`,
       },
     });
-    const body = await response.json();
-    console.log(body);
-    if (!response.ok) return { serverErrors: { message: body.message } };
 
-    updateTag("folders");
-    return { status: "success" };
+    if (!response.ok) throw new Error(await response.json());
+
+    return response.json();
   } catch (error) {
     console.error("Failed to create folder", error);
-    return { serverErrors: { message: "Something went wrong!" } };
+    throw new Error("Something went wrong!");
   }
 }
 
@@ -105,30 +96,33 @@ export async function updateFolder(newFolder: Folder) {
   }
 }
 
-type DeleteObject = {
-  id: string;
-};
-
-export async function deleteFolder(formData: FormData) {
-  const data = Object.fromEntries(formData.entries()) as DeleteObject;
+export async function deleteFolder(folderToDelete: Folder) {
   //check user
   const session = await requireAuth();
-  console.log(data);
+  console.log(folderToDelete);
   if (!session.user) throw new Error("Unauthorized");
 
-  //create folder
+  //delete folder
   try {
-    await fetch(`http://localhost:5001/api/Folders/${data.id}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${session.accessToken}`,
+    const result = await fetch(
+      `http://localhost:5001/api/Folders/${folderToDelete.id}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.accessToken}`,
+        },
       },
-    });
+    );
 
-    updateTag("folders");
+    if (!result.ok) throw new Error(await result.json());
+
+    if (result.status === 204) return Promise.resolve();
+
+    return result.json();
   } catch (error) {
     console.error("Failed to delete folder", error);
+    throw error;
   }
 }
 
@@ -136,20 +130,14 @@ export async function deleteFolder(formData: FormData) {
 /**********************Note actions***********************************/
 //-----------------------------------------------------------------------
 
-export async function createNote(
-  _prevState: unknown,
-  formData: FormData,
-): Promise<ActionError | undefined> {
+export async function createNote(folderId: string, title: string) {
   //validate input
-  const data = Object.fromEntries(formData.entries());
-  console.log(data);
+  console.log(folderId, title);
 
-  const validationResult = CreateNoteSchema.safeParse(
-    Object.fromEntries(formData.entries()),
-  );
+  const validationResult = CreateNoteSchema.safeParse({ title });
   if (!validationResult.success) {
     console.log(validationResult.error?.issues);
-    return { validationErrors: validationResult.error?.issues };
+    throw new Error(validationResult.error?.issues.toString());
   }
 
   //check user
@@ -162,18 +150,16 @@ export async function createNote(
   //create Note
   const objectToSend = {
     ...validationResult.data,
-    body: data.body ?? null,
   };
 
   console.log(objectToSend);
   try {
     const response = await fetch(
-      `http://localhost:5001/api/folders/${data.folderId}/notes`,
+      `http://localhost:5001/api/folders/${folderId}/notes`,
       {
         method: "POST",
         body: JSON.stringify({
           ...validationResult.data,
-          body: data.body ?? null,
         }),
         headers: {
           "Content-Type": "application/json",
@@ -183,13 +169,12 @@ export async function createNote(
     );
     const body = await response.json();
     console.log(body);
-    if (!response.ok) return { serverErrors: { message: body.message } };
+    if (!response.ok) throw new Error(await response.json());
 
-    updateTag("foldersWithNotes");
-    return { status: "success" };
+    return Promise.resolve();
   } catch (error) {
     console.error("Failed to create folder", error);
-    return { serverErrors: { message: "Something went wrong!" } };
+    throw new Error("Something went wrong!");
   }
 }
 
@@ -253,5 +238,35 @@ export async function updateNoteTitle(updatedNote: NoteWithoutBody) {
   } catch (error) {
     console.error("Failed to update folder", error);
     throw new Error("Something went wrong!");
+  }
+}
+
+export async function deleteNote(noteToDelete: NoteWithoutBody) {
+  //check user
+  const session = await requireAuth();
+  console.log(noteToDelete);
+  if (!session.user) throw new Error("Unauthorized");
+
+  //delete note
+  try {
+    const result = await fetch(
+      `http://localhost:5001/api/notes/${noteToDelete.id}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+      },
+    );
+
+    if (!result.ok) throw new Error(await result.json());
+
+    if (result.status === 204) return Promise.resolve();
+
+    return result.json();
+  } catch (error) {
+    console.error("Failed to delete note", error);
+    throw error;
   }
 }
