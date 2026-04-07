@@ -11,7 +11,7 @@ namespace NoteApp.Api.Controllers
     [Authorize]
     [ApiController]
     [Route("api/[controller]")]
-    public class FoldersController(IFolderService service) : ControllerBase
+    public class FoldersController(IFolderService folderService) : ControllerBase
     {
         [HttpGet]
         [Route("")]
@@ -19,7 +19,7 @@ namespace NoteApp.Api.Controllers
         {
             var userId = User.GetUserId();
 
-            var result = await service.GetFolders(userId, ct);
+            var result = await folderService.GetFolders(userId, ct);
             var response = new ResponseViewModel<IEnumerable<FolderViewModel>>
             {
                 Success = true,
@@ -36,7 +36,7 @@ namespace NoteApp.Api.Controllers
         {
             var userId = User.GetUserId();
 
-            var result = await service.GetFolder(userId, id,ct);
+            var result = await folderService.GetFolder(userId, id,ct);
             var response =  new ResponseViewModel<FolderViewModel>
             {
                 Success = true,
@@ -53,7 +53,7 @@ namespace NoteApp.Api.Controllers
         {
             var userId = User.GetUserId();
 
-            var result = await service.CreateFolder(userId, dto,ct);
+            var result = await folderService.CreateFolder(userId, dto,ct);
 
             var response = new ResponseViewModel<FolderViewModel>
             {
@@ -71,7 +71,7 @@ namespace NoteApp.Api.Controllers
         {
             var userId = User.GetUserId();
 
-            var result = await service.UpdateFolder(userId, id, dto, ct);
+            var result = await folderService.UpdateFolder(userId, id, dto, ct);
             var response =  new ResponseViewModel<FolderViewModel>
             {
                 Success = true,
@@ -88,7 +88,7 @@ namespace NoteApp.Api.Controllers
         {
             var userId = User.GetUserId();
 
-            await service.DeleteFolder(userId, id, ct);
+            await folderService.DeleteFolder(userId, id, ct);
             return NoContent();
         }
 
@@ -98,7 +98,7 @@ namespace NoteApp.Api.Controllers
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            var result = await service.GetAllFolderItems(userId);
+            var result = await folderService.GetAllFolderItems(userId);
 
             var response = new ResponseViewModel<List<FoldersAndNotesViewModel>>
             {

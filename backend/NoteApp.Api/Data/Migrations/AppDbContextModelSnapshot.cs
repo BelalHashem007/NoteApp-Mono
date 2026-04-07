@@ -265,7 +265,7 @@ namespace NoteApp.Api.Data.Migrations
 
                     b.HasIndex("NoteId");
 
-                    b.ToTable("Attachments");
+                    b.ToTable("Attachments", (string)null);
                 });
 
             modelBuilder.Entity("NoteApp.Api.Entities.Folder", b =>
@@ -298,7 +298,7 @@ namespace NoteApp.Api.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Folders");
+                    b.ToTable("Folders", (string)null);
                 });
 
             modelBuilder.Entity("NoteApp.Api.Entities.Note", b =>
@@ -347,7 +347,7 @@ namespace NoteApp.Api.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Notes");
+                    b.ToTable("Notes", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -429,7 +429,7 @@ namespace NoteApp.Api.Data.Migrations
 
                             b1.HasKey("ApplicationUserId", "Id");
 
-                            b1.ToTable("RefreshToken");
+                            b1.ToTable("RefreshToken", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("ApplicationUserId");

@@ -67,8 +67,9 @@ namespace NoteApp.Api.Services
         public async Task DeleteFolder(string userId, Guid id, CancellationToken ct)
         {
             var folderToDelete = await unitOfWork.Folders.Find(x => x.UserId == userId && x.Id == id, ct) ?? throw new NotFoundException("No folder to delete");
-            unitOfWork.Folders.Delete(folderToDelete);
-            await unitOfWork.Complete(ct);
+            var result = await dapper.DeleteFolderRecursively(id,userId);
+            if (!result)
+                throw new Exception("Could not delete folder");
         }
 
         public async Task<List<FoldersAndNotesViewModel>> GetAllFolderItems(string userId)
@@ -81,8 +82,23 @@ namespace NoteApp.Api.Services
             //var result = new FoldersAndNotesViewModel { Folders = folders, Notes = notes };
             //return result;
 
-            var items = await unitOfWork.Folders.GetAllItems(userId);
-            return items;
+            var folders = await unitOfWork.Folders.GetAllItems(userId);
+            var rootFolders = new List<FoldersAndNotesViewModel>();
+            var FoldersToLookUp = folders.ToDictionary(f => f.Id);
+
+            foreach (var folder in folders)
+            {
+                if (folder.ParentId == null)
+                {
+                    rootFolders.Add(folder);
+                }
+                else if (FoldersToLookUp.TryGetValue(folder.ParentId.Value, out var parentFolder))
+                {
+                    parentFolder.SubFolders.Add(folder);
+                }
+            }
+
+            return rootFolders;
         }
     }
 }

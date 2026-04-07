@@ -20,27 +20,12 @@ namespace NoteApp.Api.Repositories
             {
                 Id = f.Id,
                 FolderName = f.FolderName,
-                Notes = f.Notes.Select(n => new NoteWithoutBodyViewModel { Id = n.Id, Title = n.Title }).ToList(),
+                Notes = f.Notes.Select(n => new NoteWithoutBodyViewModel { Id = n.Id, Title = n.Title, Slug = n.Slug }).ToList(),
                 ParentId = f.ParentId,
                 CreatedAt = f.CreatedAt,
             }).ToListAsync();
 
-            var rootFolders = new List<FoldersAndNotesViewModel>();
-            var FoldersToLookUp = folders.ToDictionary(f => f.Id);
-
-            foreach(var folder in folders)
-            {
-                if (folder.ParentId == null)
-                {
-                    rootFolders.Add(folder);
-                }
-                else if (FoldersToLookUp.TryGetValue(folder.ParentId.Value, out var parentFolder))
-                {
-                    parentFolder.SubFolders.Add(folder);
-                }
-            }
-
-            return rootFolders;
+            return folders;
         }
     }
 }

@@ -9,16 +9,16 @@ namespace NoteApp.Api.Controllers
 {
     [Authorize]
     [ApiController]
-    [Route("api/folders/{folderId}/notes")]
+    [Route("api/notes")]
     public class NotesController(INoteService service) : ControllerBase
     {
         [HttpGet]
         [Route("")]
-        public async Task<ActionResult<ResponseViewModel<IEnumerable<NoteViewModel>>>> GetNotes(Guid folderId, CancellationToken ct, [FromQuery] string? searchQuery = "")
+        public async Task<ActionResult<ResponseViewModel<IEnumerable<NoteViewModel>>>> GetNotes(CancellationToken ct, [FromQuery] string? searchQuery = "")
         {
             var userId = User.GetUserId();
 
-            var result = await service.GetNotes(userId, folderId, searchQuery, ct);
+            var result = await service.GetNotes(userId, searchQuery, ct);
             var response = new ResponseViewModel<IEnumerable<NoteViewModel>>
             {
                 Success = true,
@@ -31,11 +31,11 @@ namespace NoteApp.Api.Controllers
 
         [HttpGet]
         [Route("{id}")]
-        public async Task<ActionResult<ResponseViewModel<NoteViewModel>>> GetNote(Guid folderId,Guid id, CancellationToken ct )
+        public async Task<ActionResult<ResponseViewModel<NoteViewModel>>> GetNote(Guid id, CancellationToken ct )
         {
             var userId = User.GetUserId();
 
-            var result = await service.GetNote(userId, folderId, id,ct);
+            var result = await service.GetNote(userId, id,ct);
             var response = new ResponseViewModel<NoteViewModel>
             {
                 Success = true,
@@ -47,7 +47,7 @@ namespace NoteApp.Api.Controllers
         }
 
         [HttpPost]
-        [Route("")]
+        [Route("~/api/folders/{folderid}/notes")]
         public async Task<ActionResult> CreateNote(Guid folderId, CreateNoteViewModel dto, CancellationToken ct)
         {
             var userId = User.GetUserId();
@@ -69,7 +69,7 @@ namespace NoteApp.Api.Controllers
         {
             var userId = User.GetUserId();
 
-            var result = await service.UpdateNote(userId, folderId, id, dto,ct);
+            var result = await service.UpdateNote(userId, id, dto,ct);
             var response = new ResponseViewModel<NoteViewModel>
             {
                 Success = true,
@@ -81,11 +81,11 @@ namespace NoteApp.Api.Controllers
 
         [HttpDelete]
         [Route("{id}")]
-        public async Task<ActionResult> DeleteNote(Guid folderId, Guid id, CancellationToken ct)
+        public async Task<ActionResult> DeleteNote( Guid id, CancellationToken ct)
         {
             var userId = User.GetUserId();
 
-            await service.DeleteNote(userId, folderId, id, ct);
+            await service.DeleteNote(userId, id, ct);
             return NoContent();
         }
 
@@ -100,6 +100,22 @@ namespace NoteApp.Api.Controllers
                 Success = true,
                 Message = "Image uploaded successfully",
                 Data = new AttachmentViewModel { Url = url }
+            };
+
+            return Ok(response);
+        }
+
+        [HttpGet]
+        [Route("GetBySlug/{slug}")]
+        public async Task<ActionResult<ResponseViewModel<NoteViewModel>>> GetNoteBySlug(string slug, CancellationToken ct)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var result = await service.GetBySlugName(userId,slug, ct);
+            var response = new ResponseViewModel<NoteViewModel>()
+            {
+                Success = true,
+                Message = "Retrieved Note Successfully",
+                Data = result
             };
 
             return Ok(response);
