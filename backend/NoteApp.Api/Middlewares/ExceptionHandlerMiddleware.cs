@@ -56,6 +56,13 @@ namespace NoteApp.Api.Middlewares
                     response.Error.Code = "CONFLICT";
                     break;
 
+                case TaskCanceledException:
+                case OperationCanceledException:
+                    context.Response.StatusCode = 499;
+                    response.Message = "Request was cancelled by the client.";
+                    response.Error.Code = "REQUEST_CANCELLED";
+                    break;
+
                 default:
                     context.Response.StatusCode = StatusCodes.Status500InternalServerError;
                     break;

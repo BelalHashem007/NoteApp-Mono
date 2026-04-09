@@ -202,7 +202,7 @@ namespace NoteApp.Api.Services
             }
         }
 
-        public async Task<RefreshToken> GoogleLogin(ExternalLoginInfo? info)
+        public async Task<LoginExternalViewModel> GoogleLogin(ExternalLoginInfo? info)
         {
             if (info == null)
                 throw new ExternalLoginFailedException("Failed to extract ExternalLoginInfo");
@@ -252,8 +252,17 @@ namespace NoteApp.Api.Services
             var refreshToken = tokenService.GenerateRefreshToken();
             user.RefreshTokens.Add(refreshToken);
             await authRepository.UpdateUser(user);
+            var userRoles = await authRepository.GetUserRoles(user);
 
-            return refreshToken;
+            var accessToken = tokenService.GenerateJwtToken(user, userRoles);
+
+            return new LoginExternalViewModel
+            {
+                AccessToken = accessToken,
+                AccessTokenExpiresOn = DateTime.UtcNow.AddMinutes(30).ToString("O"),
+                RefreshToken = refreshToken.Token,
+                RefreshTokenExpiresOn = refreshToken.ExpiresOn.ToString("O")
+            };
         }
     }
 }

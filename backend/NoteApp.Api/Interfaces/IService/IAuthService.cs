@@ -10,7 +10,7 @@ namespace NoteApp.Api.Interfaces.IService
         public Task<AuthViewModel> Register (RegisterViewModel dto);
         public Task<AuthViewModel> RefreshToken(string token);
 
-        public Task<RefreshToken> GoogleLogin(ExternalLoginInfo? info);
+        public Task<LoginExternalViewModel> GoogleLogin(ExternalLoginInfo? info);
 
     }
 }

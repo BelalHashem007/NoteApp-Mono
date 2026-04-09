@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using NoteApp.Api.Entities.DTOs;
 using NoteApp.Api.Extensions;
+using NoteApp.Api.Helpers;
+using NoteApp.Api.Interfaces.IRepositories;
 using NoteApp.Api.Interfaces.IService;
 using System.Security.Claims;
 
@@ -91,15 +93,15 @@ namespace NoteApp.Api.Controllers
 
         [HttpPost]
         [Route("{id}/upload-image")]
-        public async Task<IActionResult> UploadImage(Guid id,IFormFile file, CancellationToken ct)
+        public async Task<ActionResult<ResponseViewModel<AttachmentViewModel>>> UploadImage(Guid id,IFormFile file, CancellationToken ct)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "";
-            var url = await service.UploadImage(userId, id, file, ct);
+            var attachmentId = await service.UploadImage(userId, id, file, ct);
             var response = new ResponseViewModel<AttachmentViewModel>()
             {
                 Success = true,
                 Message = "Image uploaded successfully",
-                Data = new AttachmentViewModel { Url = url }
+                Data = new AttachmentViewModel { AttachmentId = attachmentId }
             };
 
             return Ok(response);

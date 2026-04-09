@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using NoteApp.Api.Entities;
+using NoteApp.Api.Helpers;
 
 namespace NoteApp.Api.Data
 {
@@ -93,6 +94,21 @@ namespace NoteApp.Api.Data
                 .HasDefaultValueSql("NEWSEQUENTIALID()");
         }
 
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            var parser = new TipTapParser();
+
+            var entries = ChangeTracker.Entries<Note>()
+                .Where(e => e.State == EntityState.Added || e.State == EntityState.Modified);
+
+            foreach(var entry in entries)
+            {
+                entry.Entity.SearchableBody = parser.ExtractPlainText(entry.Entity.Body ?? "");
+                entry.Entity.UpdatedAt = DateTime.UtcNow;
+            }
+
+            return base.SaveChangesAsync(cancellationToken);
+        }
         public DbSet<Note> Notes { get; set; }
         public DbSet<Folder> Folders { get; set; }
         public DbSet<Attachment> Attachments { get; set; }

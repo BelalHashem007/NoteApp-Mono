@@ -2,6 +2,6 @@
 {
     public class AttachmentViewModel
     {
-        public string Url { get; set; }
+        public string AttachmentId { get; set; }
     }
 }

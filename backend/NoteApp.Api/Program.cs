@@ -145,16 +145,21 @@ builder.Services.AddAuthentication(options =>
 
         options.Events = new JwtBearerEvents
         {
-            //read token from cookie or header
+            //read token from cookie or header or query
             OnMessageReceived = context =>
             {
                 var token = context.Request.Cookies["accessToken"];
                 if (string.IsNullOrWhiteSpace(token))
                 {
                     var authHeader = context.Request.Headers["Authorization"].ToString();
+                    var accessTokenFromQuery = context.Request.Query["access_token"].ToString();
                     if (authHeader.StartsWith("Bearer "))
                     {
                         token = authHeader.Substring("Bearer ".Length);
+                    }
+                    else if (!string.IsNullOrEmpty(accessTokenFromQuery))
+                    {
+                        token = accessTokenFromQuery;
                     }
                 }
                 context.Token = token;
@@ -188,7 +193,6 @@ RecurringJob.AddOrUpdate<RefreshTokenCleaning>("cleanup-refreshTokens", job => j
 
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseStaticFiles();
 app.UseRateLimiter();
 
 app.MapControllers().RequireRateLimiting("GlobalRateLimiterPolicy");

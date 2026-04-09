@@ -113,7 +113,7 @@ namespace NoteApp.Api.Services
 
             //save to file
             var fileName = Guid.NewGuid().ToString() + fileExtension;
-            var path = Path.Combine(Directory.GetCurrentDirectory(), $"wwwroot/{userId}/{noteId.ToString()}");
+            var path = Path.Combine(Directory.GetCurrentDirectory(), $"Uploads/{userId}/{noteId.ToString()}");
 
             if (!Directory.Exists(path))
                 Directory.CreateDirectory(path);
@@ -131,15 +131,15 @@ namespace NoteApp.Api.Services
                 OriginalName = file.FileName,
                 CreatedAt = DateTime.Now,
                 FileSize = size,
-                StoragePath = path,
+                StoragePath = Path.Combine(path, fileName),
                 MimeType = file.ContentType,
             };
 
             await unitOfWork.Attachments.Add(attachment);
             await unitOfWork.Complete();
 
-            var url = $"http://localhost:5001/{userId}/{noteId}/{fileName}";
-            return url;
+            var attachmentId = attachment.Id;
+            return attachmentId.ToString();
         }
 
         public async Task<NoteViewModel> GetBySlugName(string userId,string slug, CancellationToken ct) 
