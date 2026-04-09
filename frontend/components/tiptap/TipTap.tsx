@@ -9,8 +9,7 @@ import { all, createLowlight } from "lowlight";
 import Image from "@tiptap/extension-image";
 import FileHandler from "@tiptap/extension-file-handler";
 import { uploadImage } from "@/lib/utils";
-import { useSession } from "next-auth/react";
-import { useRef, useEffect } from "react";
+import { useEffect } from "react";
 import { Editor } from "@tiptap/react";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { updateNoteBody } from "@/actions/actions";
@@ -21,9 +20,6 @@ import { TaskItem } from "@tiptap/extension-list";
 const lowlight = createLowlight(all);
 
 const Tiptap = ({ note }: { note?: Note }) => {
-  const { data: session } = useSession();
-  const sessionRef = useRef(session);
-
   const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: (noteToUpdate: { body: string; id?: string }) => {
@@ -54,20 +50,8 @@ const Tiptap = ({ note }: { note?: Note }) => {
     },
   });
 
-  useEffect(() => {
-    sessionRef.current = session;
-  }, [session]);
-
   const handleUploadImage = (file: File, editor: Editor, pos?: number) => {
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    const currentSession = sessionRef.current;
-
-    if (!currentSession?.accessToken) {
-      console.warn("No session available for upload");
-      return;
-    }
-
-    uploadImage(file, editor, currentSession, note?.id, pos);
+    uploadImage(file, editor, note?.id, pos);
   };
 
   const editor = useEditor({

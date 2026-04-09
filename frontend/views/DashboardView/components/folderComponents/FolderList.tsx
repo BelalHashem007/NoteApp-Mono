@@ -15,7 +15,8 @@ import {
 } from "@/components/ui/context-menu";
 import { Dialog } from "@/components/ui/dialog";
 import { useMutation } from "@tanstack/react-query";
-import { createNote, updateFolder } from "@/actions/actions";
+import { createNote } from "@/actions/actions";
+import { updateFolderRequest } from "@/lib/folderApi";
 import toast from "react-hot-toast";
 import { DeleteModal } from "../modals/DeleteModal";
 
@@ -29,7 +30,6 @@ export default function FolderList({
   onCreateFolder: (args: { folderName: string; parentId?: string }) => void;
 }) {
   const [openFolders, setOpenFolders] = useState<string[]>([]);
-  const [renameFolder, setRenameFolder] = useState<string | null>(null);
   const [activeAction, setActiveAction] = useState<
     | null
     | { type: "createNote"; folder: FolderWithNotes }
@@ -53,7 +53,7 @@ export default function FolderList({
 
   const mutationToUpdateFolder = useMutation({
     mutationFn: (updatedFolder: Folder) => {
-      return updateFolder(updatedFolder);
+      return updateFolderRequest(updatedFolder);
     },
     onMutate: async (updatedFolder, context) => {
       await context.client.cancelQueries({ queryKey: ["foldersAndNotes"] });

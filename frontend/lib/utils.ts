@@ -1,7 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { auth } from "@/auth";
-import { redirect } from "next/navigation";
+import { Editor } from "@tiptap/react";
+// import { requireAuth } from "./dal";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -21,29 +21,14 @@ export function formatIso(iso: string): string {
   return result;
 }
 
-export async function requireAuth() {
-  const session = await auth();
-
-  if (!session || session.error === "RefreshTokenError")
-    return redirect("/login?forceLogout=true");
-
-  return session;
-}
-
-import { Editor } from "@tiptap/react";
-import { Session } from "next-auth";
-
 export async function uploadImage(
   file: File,
   editor: Editor,
-  session: Session | null,
   noteId?: string,
   pos?: number,
 ) {
-  if (!session?.accessToken) {
-    console.error("No session yet");
-    return;
-  }
+  // const { accessToken } = await requireAuth();
+
   if (!noteId) {
     throw new Error("no note id is given");
   }
@@ -52,14 +37,15 @@ export async function uploadImage(
   if (pos !== undefined) {
     editor
       .chain()
-      .insertContentAt(pos, { type: "image", attrs: { src: tempUrl } })
+      .insertContentAt(pos, {
+        type: "image",
+        attrs: { src: tempUrl, alt: file.name },
+      })
       .focus()
       .run();
   } else {
     editor.chain().focus().setImage({ src: tempUrl }).run();
   }
-  console.log("test");
-  console.log("session", session);
   //send to backend
   const formData = new FormData();
   formData.append("file", file);
@@ -69,7 +55,7 @@ export async function uploadImage(
       {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${session?.accessToken}`,
+          Authorization: `Bearer ${accessToken}`,
         },
         body: formData,
       },
@@ -84,7 +70,7 @@ export async function uploadImage(
       if (node.type.name === "image" && node.attrs.src === tempUrl) {
         const transaction = state.tr.setNodeMarkup(nodePos, null, {
           ...node.attrs,
-          src: data.data.url,
+          src: data.data.url + `?access_token=${accessToken}`,
         });
         view.dispatch(transaction);
       }
@@ -94,4 +80,11 @@ export async function uploadImage(
   } finally {
     URL.revokeObjectURL(tempUrl);
   }
+}
+
+export function toMaxAge(dateString: string) {
+  return Math.max(
+    0,
+    Math.floor((new Date(dateString).getTime() - Date.now()) / 1000),
+  );
 }

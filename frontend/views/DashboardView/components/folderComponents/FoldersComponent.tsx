@@ -8,10 +8,9 @@ import {
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useFetchWrapperClient } from "@/lib/fetchWrapperClient";
 import FolderComponentSkeleton from "@/components/placeholders/FolderComponentSkeleton";
 import { ChevronRight, FolderClosed } from "lucide-react";
-import { createFolder } from "@/actions/actions";
+import { createFolderRequest } from "@/lib/folderApi";
 import toast from "react-hot-toast";
 
 export default function FoldersComponent({}) {
@@ -36,7 +35,7 @@ export default function FoldersComponent({}) {
       folderName: string;
       parentId?: string;
     }) => {
-      return createFolder(folderName, parentId);
+      return createFolderRequest(folderName, parentId);
     },
     onMutate: async ({ folderName, parentId }, context) => {
       await context.client.cancelQueries({ queryKey: ["foldersAndNotes"] });
@@ -107,7 +106,6 @@ export default function FoldersComponent({}) {
     },
   });
 
-  const fetchClient = useFetchWrapperClient();
   const {
     data: result,
     isPending,
@@ -116,9 +114,13 @@ export default function FoldersComponent({}) {
   } = useQuery({
     queryKey: ["foldersAndNotes"],
     queryFn: async ({ signal }) => {
-      return fetchClient(`http://localhost:5001/api/Folders/GetAllItems`, {
+      const res = await fetch(`/api/folders`, {
         signal,
       });
+
+      if (!res.ok) throw Error("Failed to fetch folders");
+
+      return res.json();
     },
   });
 

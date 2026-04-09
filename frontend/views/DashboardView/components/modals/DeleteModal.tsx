@@ -1,6 +1,7 @@
 "use client";
 import { Trash2, AlertTriangle } from "lucide-react";
-import { deleteFolder, deleteNote } from "@/actions/actions";
+import { deleteNote } from "@/actions/actions";
+import { deleteFolderRequest } from "@/lib/folderApi";
 import { TailSpin } from "react-loader-spinner";
 import toast from "react-hot-toast";
 import {
@@ -13,10 +14,11 @@ import {
 import { useMutation } from "@tanstack/react-query";
 import { useTapsContext } from "@/app/dashboard/providers";
 import { usePathname, useRouter } from "next/navigation";
+import { OpenedNote } from "@/app/dashboard/providers";
 
 interface DeleteFolderModalProps {
   onClose: () => void;
-  folder?: Folder;
+  folder?: FolderWithNotes;
   note?: NoteWithoutBody;
 }
 
@@ -26,8 +28,8 @@ export function DeleteModal({ onClose, folder, note }: DeleteFolderModalProps) {
   const path = usePathname();
 
   const mutatuionToDeleteFolder = useMutation({
-    mutationFn: (folderToDelete: Folder) => {
-      return deleteFolder(folderToDelete);
+    mutationFn: (folderToDelete: FolderWithNotes) => {
+      return deleteFolderRequest(folderToDelete);
     },
     onMutate: async (folderToDelete, context) => {
       await context.client.cancelQueries({ queryKey: ["foldersAndNotes"] });
@@ -57,7 +59,29 @@ export function DeleteModal({ onClose, folder, note }: DeleteFolderModalProps) {
 
       return { previousFolders };
     },
-    onSuccess: () => {
+    onSuccess: (data, folderToDelete) => {
+      const notesToDeleteSlugs = new Set(
+        folderToDelete.notes.map((n) => n.slug),
+      );
+
+      if (notesToDeleteSlugs.size > 0) {
+        const remainingNotes = openedNotes.filter(
+          (note) => !notesToDeleteSlugs.has(note.slug),
+        );
+
+        const currentSlug = path.split("/").pop();
+        const isCurrentNoteDeleted = notesToDeleteSlugs.has(currentSlug ?? "");
+
+        setOpenedNotes(remainingNotes);
+
+        if (isCurrentNoteDeleted) {
+          const nextPath =
+            remainingNotes.length > 0
+              ? `/dashboard/note/${remainingNotes[0].slug}`
+              : "/dashboard";
+          router.push(nextPath);
+        }
+      }
       onClose();
       toast.success("Folder is deleted");
     },

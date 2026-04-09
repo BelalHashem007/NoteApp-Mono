@@ -43,6 +43,7 @@ export default function LoginForm() {
             <button
               type="button"
               className="text-sm text-primary hover:text-primary/80 transition-colors"
+              tabIndex={-1}
             >
               Forgot?
             </button>
@@ -86,11 +87,7 @@ export default function LoginForm() {
 
         <button
           className="w-full flex justify-center items-center"
-          onClick={() =>
-            router.push(
-              "http://localhost:5001/api/auth/login/google?returnUrl=http://localhost:3000/auth/callback",
-            )
-          }
+          onClick={() => (window.location.href = "/api/auth/google/login")}
         >
           <Image src={GoogleLight} alt="Sign up with google" />
         </button>

@@ -8,7 +8,7 @@ import {
 } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
-type OpenedNote = {
+export type OpenedNote = {
   slug: string;
   title: string;
 };

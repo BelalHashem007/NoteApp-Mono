@@ -37,3 +37,17 @@ type ApiError = {
   code: string;
   errors: string;
 };
+
+type LoginResponse = {
+  user: {
+    id: string;
+    email: string;
+    userName: string;
+    fullName: string;
+    roles: string[];
+  };
+  accessToken: string;
+  accessTokenExpirationDate: string;
+  refreshTokenExpiration: string;
+  refreshToken: string;
+};

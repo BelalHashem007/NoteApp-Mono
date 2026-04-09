@@ -1,6 +1,5 @@
 "use client";
 import { LogOut, User } from "lucide-react";
-import { handleLogout } from "@/actions/authActions";
 import { useTapsContext } from "@/app/dashboard/providers";
 import {
   DropdownMenu,
@@ -8,14 +7,27 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 export default function AccountComponent() {
   const { setOpenedNotes } = useTapsContext();
+  const router = useRouter();
   const onLogout = async () => {
-    localStorage.removeItem("openNotes");
-    setOpenedNotes([]);
-
-    await handleLogout();
+    try {
+      const res = await fetch("http://localhost:3000/api/auth/logout", {
+        method: "POST",
+      });
+      if (!res.ok) {
+        return toast.error("Failed to logout");
+      }
+      localStorage.removeItem("openNotes");
+      setOpenedNotes([]);
+      router.push("/login");
+    } catch (error) {
+      toast.error("Failed to logout");
+      console.error(error);
+    }
   };
   return (
     <DropdownMenu>
