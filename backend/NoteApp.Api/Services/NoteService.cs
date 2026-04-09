@@ -77,6 +77,7 @@ namespace NoteApp.Api.Services
             if (dto.Title != null)
                 note.Title = dto.Title;
 
+            note.UpdatedAt = DateTime.UtcNow;
             unitOfWork.Notes.Update(note);
             await unitOfWork.Complete(ct);
 
@@ -85,7 +86,14 @@ namespace NoteApp.Api.Services
 
         public async Task DeleteNote(string userId, Guid id, CancellationToken ct)
         {
-            var noteToDelete = await unitOfWork.Notes.Find(x => x.UserId == userId && x.Id == id, ct) ?? throw new NotFoundException("Note does not exist");
+            var noteToDelete = await unitOfWork.Notes.FindWithAttachments(x => x.UserId == userId && x.Id == id, ct) ?? throw new NotFoundException("Note does not exist");
+            var attachments = noteToDelete.Attachments.Where(a => !a.IsDeleted).ToList();
+
+            foreach (var attachment in attachments)
+            {
+                attachment.IsDeleted = true;
+                attachment.DeletedAt = DateTime.UtcNow;
+            }
             unitOfWork.Notes.Delete(noteToDelete);
             await unitOfWork.Complete(ct);
         }

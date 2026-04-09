@@ -93,7 +93,7 @@ builder.Services.AddCors((options) =>
 {
     options.AddPolicy("DevCors", (corsBuilder) =>
     {
-        corsBuilder.WithOrigins("http://localhost:4200", "http://localhost:3000", "http://localhost:8000")
+        corsBuilder.WithOrigins("http://localhost:4200", "http://localhost:3000", "http://localhost:8000", "http://localhost:5001")
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials();
@@ -190,6 +190,7 @@ app.UseHangfireDashboard();
 
 //jobs
 RecurringJob.AddOrUpdate<RefreshTokenCleaning>("cleanup-refreshTokens", job => job.Execute(), Cron.Daily());
+RecurringJob.AddOrUpdate<AttachmentsCleaning>("cleanup-attachments", job => job.Execute(), Cron.DayInterval(2));
 
 app.UseAuthentication();
 app.UseAuthorization();

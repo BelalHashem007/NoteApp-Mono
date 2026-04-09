@@ -74,14 +74,6 @@ namespace NoteApp.Api.Services
 
         public async Task<List<FoldersAndNotesViewModel>> GetAllFolderItems(string userId)
         {
-            //var folder = await unitOfWork.Folders.GetById(id) ?? throw new NotFoundException("Folder does not exist");
-            //var folders = new List<FolderViewModel>();
-            //var notes = new List<NoteViewModel>();
-            //await dapper.GetAllItemsInsideASingleFolder(id, userId, folders, notes);
-
-            //var result = new FoldersAndNotesViewModel { Folders = folders, Notes = notes };
-            //return result;
-
             var folders = await unitOfWork.Folders.GetAllItems(userId);
             var rootFolders = new List<FoldersAndNotesViewModel>();
             var FoldersToLookUp = folders.ToDictionary(f => f.Id);

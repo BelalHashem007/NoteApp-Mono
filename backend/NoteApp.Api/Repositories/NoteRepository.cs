@@ -25,5 +25,10 @@ namespace NoteApp.Api.Repositories
 
             return await query.ToListAsync(ct);
         }
+
+        public async Task<Note?> FindWithAttachments(Expression<Func<Note, bool>> criteria, CancellationToken ct = default)
+        {
+            return await _context.Notes.Include(n => n.Attachments).SingleOrDefaultAsync(criteria, ct);
+        }
     }
 }

@@ -75,7 +75,8 @@ namespace NoteApp.Api.Data
                 .HasMany(n => n.Attachments)
                 .WithOne(a => a.Note)
                 .HasForeignKey(a => a.NoteId)
-                .IsRequired(true);
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Attachment>()
                 .Property(a => a.CreatedAt)

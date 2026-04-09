@@ -30,6 +30,12 @@ namespace NoteApp.Api.Repositories
             _context.Set<T>().Update(entity);
             return entity;
         }
+
+        public List<T> UpdateRange(List<T> entities, CancellationToken ct = default)
+        {
+            _context.Set<T>().UpdateRange(entities);
+            return entities;
+        }
         public void Delete(T entity, CancellationToken ct = default)
         {
             _context.Set<T>().Remove(entity);
