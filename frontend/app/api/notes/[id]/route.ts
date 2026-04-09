@@ -1,6 +1,6 @@
 import { requireAuth } from "@/lib/dal";
 import { serverFetchWithAuth } from "@/lib/serverFetchWithAuthentication";
-import { UpdateFolderSchema } from "@/lib/zod";
+import { UpdateNoteTitleSchema } from "@/lib/zod";
 import { NextResponse } from "next/server";
 import * as z from "zod";
 import { forwardJsonError } from "@/lib/dal";
@@ -19,12 +19,12 @@ export async function PUT(request: Request, context: RouteContext) {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  const body = json as { folderName?: unknown };
+  const body = json as { title?: unknown };
 
-  const validationResult = UpdateFolderSchema.safeParse({
-    id,
-    folderName: body.folderName,
+  const validationResult = UpdateNoteTitleSchema.safeParse({
+    title: body.title,
   });
+
   if (!validationResult.success) {
     return NextResponse.json(
       { error: z.flattenError(validationResult.error) },
@@ -33,13 +33,12 @@ export async function PUT(request: Request, context: RouteContext) {
   }
 
   const res = await serverFetchWithAuth(
-    `http://localhost:5001/api/Folders/${validationResult.data.id}`,
+    `http://localhost:5001/api/notes/${id}`,
     {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        folderName: validationResult.data.folderName,
-        id: validationResult.data.id,
+        title: validationResult.data.title,
       }),
     },
   );
@@ -55,7 +54,7 @@ export async function DELETE(_request: Request, context: RouteContext) {
   const { id } = await context.params;
 
   const res = await serverFetchWithAuth(
-    `http://localhost:5001/api/Folders/${id}`,
+    `http://localhost:5001/api/notes/${id}`,
     {
       method: "DELETE",
       headers: {

@@ -9,11 +9,11 @@ import {
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import { useMutation } from "@tanstack/react-query";
-import { updateNoteTitle } from "@/actions/actions";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { Dialog } from "@/components/ui/dialog";
 import { DeleteModal } from "../modals/DeleteModal";
+import { updateNoteTitleRequest } from "@/lib/noteApi";
 
 export default function NoteList({
   notes,
@@ -29,7 +29,7 @@ export default function NoteList({
   );
   const mutationToUpdateNoteTitle = useMutation({
     mutationFn: (updatedNote: NoteWithoutBody) => {
-      return updateNoteTitle(updatedNote);
+      return updateNoteTitleRequest(updatedNote);
     },
     onMutate: async (updatedNote, context) => {
       await context.client.cancelQueries({ queryKey: ["foldersAndNotes"] });

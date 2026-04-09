@@ -8,14 +8,14 @@ import CodeBlockLowLight from "@tiptap/extension-code-block-lowlight";
 import { all, createLowlight } from "lowlight";
 import Image from "@tiptap/extension-image";
 import FileHandler from "@tiptap/extension-file-handler";
-import { uploadImage } from "@/lib/utils";
+import { uploadImage } from "@/lib/attachmentApi";
 import { useEffect } from "react";
 import { Editor } from "@tiptap/react";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
-import { updateNoteBody } from "@/actions/actions";
 import { useDebouncedCallback } from "use-debounce";
 import { TaskList } from "@tiptap/extension-list";
 import { TaskItem } from "@tiptap/extension-list";
+import { updateNoteBodyRequest } from "@/lib/noteApi";
 
 const lowlight = createLowlight(all);
 
@@ -23,7 +23,7 @@ const Tiptap = ({ note }: { note?: Note }) => {
   const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: (noteToUpdate: { body: string; id?: string }) => {
-      return updateNoteBody(noteToUpdate.body, noteToUpdate.id);
+      return updateNoteBodyRequest(noteToUpdate.body, noteToUpdate.id);
     },
     onMutate: async (noteToUpdate, context) => {
       await context.client.cancelQueries({ queryKey: ["note", note?.slug] });

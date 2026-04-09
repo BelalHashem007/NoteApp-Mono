@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
 
 function toMaxAge(dateString: string) {
   return Math.max(

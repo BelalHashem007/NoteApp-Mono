@@ -1,13 +1,17 @@
 import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { toMaxAge } from "@/lib/utils";
 
-export async function POST() {
+export async function POST(request: NextRequest) {
   const cookieStore = await cookies();
-  const refreshToken = cookieStore.get("refreshToken")?.value;
+  let refreshToken = cookieStore.get("refreshToken")?.value;
 
-  if (!refreshToken)
-    return NextResponse.json({ error: "No refresh token" }, { status: 401 });
+  if (!refreshToken) {
+    const body = await request.json();
+    refreshToken = body.refreshToken;
+    if (!refreshToken)
+      return NextResponse.json({ error: "No refresh token" }, { status: 401 });
+  }
 
   console.log("iam in refreshaccesstoken");
 
@@ -27,7 +31,10 @@ export async function POST() {
   if (!body.data)
     return NextResponse.json({ error: "Refresh failed" }, { status: 401 });
 
-  const response = NextResponse.json({ success: true });
+  const response = NextResponse.json({
+    success: true,
+    accessToken: body.data.accessToken,
+  });
 
   response.cookies.set("accessToken", body.data?.accessToken, {
     httpOnly: true,

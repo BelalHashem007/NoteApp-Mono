@@ -1,25 +1,14 @@
 import { requireAuth } from "@/lib/dal";
-import { fetchWithAuth } from "@/lib/fetchWithAuthentication";
+import { serverFetchWithAuth } from "@/lib/serverFetchWithAuthentication";
 import { CreateFolderSchema } from "@/lib/zod";
 import { NextResponse } from "next/server";
 import * as z from "zod";
-
-async function forwardJsonError(res: Response) {
-  const text = await res.text();
-  if (!text) {
-    return NextResponse.json({ error: res.statusText }, { status: res.status });
-  }
-  try {
-    return NextResponse.json(JSON.parse(text), { status: res.status });
-  } catch {
-    return NextResponse.json({ error: text }, { status: res.status });
-  }
-}
+import { forwardJsonError } from "@/lib/dal";
 
 export async function GET() {
   await requireAuth();
 
-  const res = await fetchWithAuth(
+  const res = await serverFetchWithAuth(
     `http://localhost:5001/api/Folders/GetAllItems`,
   );
 
@@ -57,7 +46,7 @@ export async function POST(request: Request) {
       ? null
       : String(body.parentId);
 
-  const res = await fetchWithAuth(`http://localhost:5001/api/Folders`, {
+  const res = await serverFetchWithAuth(`http://localhost:5001/api/Folders`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({

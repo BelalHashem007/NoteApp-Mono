@@ -1,7 +1,7 @@
 "use client";
 import { Trash2, AlertTriangle } from "lucide-react";
-import { deleteNote } from "@/actions/actions";
 import { deleteFolderRequest } from "@/lib/folderApi";
+import { deleteNoteRequest } from "@/lib/noteApi";
 import { TailSpin } from "react-loader-spinner";
 import toast from "react-hot-toast";
 import {
@@ -14,7 +14,6 @@ import {
 import { useMutation } from "@tanstack/react-query";
 import { useTapsContext } from "@/app/dashboard/providers";
 import { usePathname, useRouter } from "next/navigation";
-import { OpenedNote } from "@/app/dashboard/providers";
 
 interface DeleteFolderModalProps {
   onClose: () => void;
@@ -96,7 +95,7 @@ export function DeleteModal({ onClose, folder, note }: DeleteFolderModalProps) {
 
   const mutatuionToDeleteNote = useMutation({
     mutationFn: (noteToDelete: NoteWithoutBody) => {
-      return deleteNote(noteToDelete);
+      return deleteNoteRequest(noteToDelete);
     },
     onMutate: async (noteToDelete, context) => {
       await context.client.cancelQueries({ queryKey: ["foldersAndNotes"] });

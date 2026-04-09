@@ -15,10 +15,10 @@ import {
 } from "@/components/ui/context-menu";
 import { Dialog } from "@/components/ui/dialog";
 import { useMutation } from "@tanstack/react-query";
-import { createNote } from "@/actions/actions";
 import { updateFolderRequest } from "@/lib/folderApi";
 import toast from "react-hot-toast";
 import { DeleteModal } from "../modals/DeleteModal";
+import { createNoteRequest } from "@/lib/noteApi";
 
 export default function FolderList({
   folders,
@@ -102,7 +102,7 @@ export default function FolderList({
 
   const mutationToCreateNote = useMutation({
     mutationFn: ({ folderId, title }: { folderId: string; title: string }) => {
-      return createNote(folderId, title);
+      return createNoteRequest(folderId, title);
     },
     onMutate: async ({ folderId, title }, context) => {
       await context.client.cancelQueries({ queryKey: ["foldersAndNotes"] });

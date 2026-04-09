@@ -1,34 +1,31 @@
-import { cookies } from "next/headers";
+"use client";
 
 export async function fetchWithAuth(url: string, options: RequestInit = {}) {
-  const cookieStore = await cookies();
-  let accessToken = cookieStore.get("accessToken")?.value;
-
   let res = await fetch(url, {
     ...options,
+    credentials: "include",
     headers: {
       ...options.headers,
-      Authorization: `Bearer ${accessToken}`,
     },
   });
 
   // If expired → refresh
   if (res.status === 401) {
+    console.log("iam gonna hit refresh");
     const refreshRes = await fetch("http://localhost:3000/api/auth/refresh", {
       method: "POST",
+      credentials: "include",
     });
-
+    console.log(refreshRes);
     if (!refreshRes.ok) {
-      throw new Error("Session expired");
+      window.location.href = "login";
     }
-
-    accessToken = (await cookies()).get("accessToken")?.value;
 
     res = await fetch(url, {
       ...options,
+      credentials: "include",
       headers: {
         ...options.headers,
-        Authorization: `Bearer ${accessToken}`,
       },
     });
   }

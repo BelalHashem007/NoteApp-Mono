@@ -2,19 +2,16 @@
 import Tiptap from "@/components/tiptap/TipTap";
 import { useQuery } from "@tanstack/react-query";
 import NoteTappedNavigation from "./components/noteComponent/NoteTappedNavigation";
+import { fetchWithAuth } from "@/lib/fetchWithAuthentication";
 
 export default function NoteView({ slug }: { slug: string }) {
   const { data, isPending, error, isError } = useQuery({
     queryKey: ["note", slug],
     queryFn: async ({ queryKey, signal }) => {
       const [_key, slug] = queryKey;
-      const res = await fetch(
-        `http://localhost:5001/api/notes/GetBySlug/${slug}`,
-        {
-          signal,
-        },
-      );
-
+      const res = await fetchWithAuth(`/api/notes/getBySlug/${slug}`, {
+        signal,
+      });
       return res.json();
     },
   });
@@ -31,6 +28,7 @@ export default function NoteView({ slug }: { slug: string }) {
     return <div>Failed to load note data</div>;
   }
 
+  console.log(data);
   return (
     <div className="flex flex-col min-h-0 overflow-hidden">
       <NoteTappedNavigation note={data.data} />
