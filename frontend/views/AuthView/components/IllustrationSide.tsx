@@ -22,7 +22,7 @@ export default function IllustrationSide() {
             </div>
 
             <div className="relative z-10 max-w-md text-center">
-                <div className="inline-flex items-center justify-center w-20 h-20 bg-white rounded-3xl shadow-lg mb-6">
+                <div className="inline-flex items-center justify-center w-20 h-20 bg-white rounded-full shadow-lg mb-6">
                     <StickyNote className="w-10 h-10 text-primary" />
                 </div>
                 <h1 className="text-4xl mb-4 text-foreground">{header}</h1>

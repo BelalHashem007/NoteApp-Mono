@@ -162,7 +162,7 @@ export function DeleteModal({ onClose, folder, note }: DeleteFolderModalProps) {
       {/* Header */}
       <DialogHeader>
         <DialogTitle className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-destructive/10 flex items-center justify-center rel">
+          <div className="w-10 h-10 rounded-full bg-destructive/10 flex items-center justify-center rel">
             <AlertTriangle className="w-5 h-5 text-destructive" />
           </div>
           <span className="text-xl">
@@ -215,7 +215,7 @@ export function DeleteModal({ onClose, folder, note }: DeleteFolderModalProps) {
                   mutatuionToDeleteNote.isPending
                 }
                 type="button"
-                className="bg-muted hover:bg-muted/80 text-foreground h-10 px-6 rounded-md
+                className="bg-muted hover:bg-muted/80 text-foreground h-10 px-6 rounded-full
                         disabled:bg-[#e0e0e0] disabled:text-[#a1a1a1] disabled:opacity-70 disabled:border disabled:border-[#d1d1d1]"
               >
                 Cancel
@@ -227,7 +227,7 @@ export function DeleteModal({ onClose, folder, note }: DeleteFolderModalProps) {
                 mutatuionToDeleteNote.isPending
               }
               type="submit"
-              className="bg-destructive hover:bg-destructive/90 text-destructive-foreground h-10 px-6 gap-2 flex items-center justify-center rounded-md "
+              className="bg-destructive hover:bg-destructive/90 text-destructive-foreground h-10 px-6 gap-2 flex items-center justify-center rounded-full "
             >
               {mutatuionToDeleteFolder.isPending ||
               mutatuionToDeleteNote.isPending ? (

@@ -1,14 +1,17 @@
 "use client";
-import { FileText } from "lucide-react";
+import { FileText, Pencil, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useTapsContext } from "@/app/dashboard/providers";
 import {
   ContextMenu,
   ContextMenuContent,
+  ContextMenuGroup,
   ContextMenuItem,
+  ContextMenuSeparator,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import { useMutation } from "@tanstack/react-query";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { Dialog } from "@/components/ui/dialog";
@@ -22,6 +25,8 @@ export default function NoteList({
   notes: NoteWithoutBody[];
   level: number;
 }) {
+  const pathname = usePathname();
+  const activeNoteSlug = pathname.match(/^\/dashboard\/note\/([^/]+)/)?.[1];
   const { setOpenedNotes } = useTapsContext();
   const [editTitle, setEditTitle] = useState<string | null>(null);
   const [deleteAction, setDeleteAction] = useState<NoteWithoutBody | undefined>(
@@ -95,7 +100,7 @@ export default function NoteList({
             className="flex gap-2  w-full  items-center "
             style={{ paddingLeft: 28 + level * 8 }}
           >
-            <FileText className="w-4 h-4 shrink-0 text-primary" />
+            <FileText className="w-4 h-4 shrink-0 text-black" />
             <input
               className="pl-1"
               type="text"
@@ -125,7 +130,11 @@ export default function NoteList({
             <ContextMenu>
               <ContextMenuTrigger asChild>
                 <Link
-                  className="flex gap-2 hover:bg-gray-200 w-full truncate items-center"
+                  className={`flex gap-2 w-full truncate items-center ${
+                    activeNoteSlug === n.slug
+                      ? "bg-secondary/10 text-secondary font-bold"
+                      : "text-foreground hover:bg-primary/10"
+                  }`}
                   style={{ paddingLeft: 28 + level * 8 }}
                   href={`/dashboard/note/${n.slug}`}
                   onClick={() => {
@@ -135,7 +144,13 @@ export default function NoteList({
                     });
                   }}
                 >
-                  <FileText className="w-4 h-4 shrink-0 text-primary" />{" "}
+                  <FileText
+                    className={`w-4 h-4 shrink-0 ${
+                      activeNoteSlug === n.slug
+                        ? "text-secondary"
+                        : "text-black"
+                    }`}
+                  />{" "}
                   {!mutationToUpdateNoteTitle.isError &&
                   mutationToUpdateNoteTitle.variables?.id === n.id
                     ? mutationToUpdateNoteTitle.variables.title
@@ -143,11 +158,23 @@ export default function NoteList({
                 </Link>
               </ContextMenuTrigger>
               <ContextMenuContent>
-                <ContextMenuItem onSelect={() => setEditTitle(n.id)}>
-                  Rename
-                </ContextMenuItem>
-                <ContextMenuItem onSelect={() => setDeleteAction(n)}>
-                  Delete
+                <ContextMenuGroup>
+                  <ContextMenuItem onSelect={() => setEditTitle(n.id)}>
+                    <div className="flex items-center gap-2">
+                      <Pencil className="w-4 h-4 shrink-0" />
+                      <span className="text-sm">Rename</span>
+                    </div>
+                  </ContextMenuItem>
+                </ContextMenuGroup>
+                <ContextMenuSeparator />
+                <ContextMenuItem
+                  onSelect={() => setDeleteAction(n)}
+                  className="focus:bg-destructive/10"
+                >
+                  <div className="flex items-center gap-2 text-destructive">
+                    <Trash2 className="w-4 h-4 shrink-0" />
+                    <span className="text-sm">Delete</span>
+                  </div>
                 </ContextMenuItem>
               </ContextMenuContent>
             </ContextMenu>

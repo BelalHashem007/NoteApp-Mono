@@ -22,14 +22,14 @@ export default function NoteTappedNavigation({ note }: { note?: Note }) {
   }, [setOpenedNotes, note]);
 
   return (
-    <div className="h-9 bg-muted/30 border-b border-border flex items-center overflow-x-auto">
+    <div className="h-9 bg-muted/30 flex items-center overflow-x-auto">
       {openedNotes.map((openedNote) => {
         return (
           <div
             key={openedNote.slug}
-            className={`group h-full flex items-center gap-2 border-r border-border cursor-pointer min-w-30 max-w-50 ${
+            className={`group h-full flex items-center gap-2 border-border cursor-pointer min-w-30 max-w-50 ${
               note?.slug === openedNote.slug
-                ? "bg-background text-foreground"
+                ? "bg-white text-secondary border-b-2 border-secondary"
                 : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
             }`}
           >
@@ -37,8 +37,14 @@ export default function NoteTappedNavigation({ note }: { note?: Note }) {
               href={`/dashboard/note/${openedNote.slug}`}
               className="pl-3 flex w-full gap-2 h-full items-center justify-center"
             >
-              <FileText className="w-4 h-4 shrink-0" />
-              <span className="text-xs truncate flex-1">
+              <FileText
+                className={`w-4 h-4 shrink-0 ${
+                  note?.slug === openedNote.slug ? "text-secondary" : ""
+                }`}
+              />
+              <span
+                className={`text-xs truncate flex-1 text-black ${note?.slug === openedNote.slug ? "font-bold" : ""} `}
+              >
                 {openedNote.title}
               </span>
             </Link>
@@ -56,7 +62,7 @@ export default function NoteTappedNavigation({ note }: { note?: Note }) {
                   }
                 }
               }}
-              className="mr-3 w-4 h-4 flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-muted rounded transition-all"
+              className="mr-3 w-4 h-4 flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-muted rounded-full transition-all"
             >
               <X className="w-3 h-3" />
             </button>

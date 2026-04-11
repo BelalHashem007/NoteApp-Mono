@@ -34,7 +34,7 @@ export default function AccountComponent() {
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          className={`w-10 h-10 flex items-center justify-center rounded-lg transition-colors mb-1 ${
+          className={`w-10 h-10 flex items-center justify-center rounded-full transition-colors mb-1 ${
             false
               ? "bg-primary/10 text-primary"
               : "text-muted-foreground hover:text-foreground"
@@ -47,7 +47,7 @@ export default function AccountComponent() {
       <DropdownMenuContent align="start" side="right">
         <DropdownMenuItem
           variant="destructive"
-          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-foreground/70 hover:bg-background hover:text-foreground transition-colors text-sm"
+          className="w-full flex items-center gap-3 px-3 py-2 rounded-full text-foreground/70 hover:bg-background hover:text-foreground transition-colors text-sm"
           onSelect={onLogout}
         >
           <LogOut className="w-4 h-4" />

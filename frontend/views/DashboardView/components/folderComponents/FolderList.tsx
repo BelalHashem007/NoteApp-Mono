@@ -6,11 +6,17 @@ import {
   ChevronRight,
   ChevronDown,
   FileText,
+  FolderPlus,
+  FilePlus,
+  Pencil,
+  Trash2,
 } from "lucide-react";
 import {
   ContextMenu,
   ContextMenuContent,
+  ContextMenuGroup,
   ContextMenuItem,
+  ContextMenuSeparator,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import { Dialog } from "@/components/ui/dialog";
@@ -153,12 +159,12 @@ export default function FolderList({
                 {openFolders.includes(f.id) ? (
                   <>
                     <ChevronDown className="w-3 h-3" />
-                    <FolderOpen className="w-4 h-4 shrink-0 text-accent" />
+                    <FolderOpen className="w-4 h-4 shrink-0 text-primary" />
                   </>
                 ) : (
                   <>
                     <ChevronRight className="w-3 h-3" />
-                    <FolderClosed className="w-4 h-4 shrink-0 text-accent" />
+                    <FolderClosed className="w-4 h-4 shrink-0 text-primary" />
                   </>
                 )}
                 <input
@@ -188,7 +194,7 @@ export default function FolderList({
               <ContextMenu>
                 <ContextMenuTrigger asChild>
                   <button
-                    className=" flex gap-2 hover:bg-gray-200 w-full items-center"
+                    className=" flex gap-2 hover:bg-primary/10 w-full items-center rounded-full"
                     style={{ paddingLeft: 8 + level * 8 }}
                     onClick={() =>
                       setOpenFolders(
@@ -209,12 +215,12 @@ export default function FolderList({
                     {openFolders.includes(f.id) ? (
                       <>
                         <ChevronDown className="w-3 h-3" />
-                        <FolderOpen className="w-4 h-4 shrink-0 text-accent" />
+                        <FolderOpen className="w-4 h-4 shrink-0 text-primary" />
                       </>
                     ) : (
                       <>
                         <ChevronRight className="w-3 h-3" />
-                        <FolderClosed className="w-4 h-4 shrink-0 text-accent" />
+                        <FolderClosed className="w-4 h-4 shrink-0 text-primary" />
                       </>
                     )}{" "}
                     <span className="truncate inline-block max-w-50">
@@ -239,43 +245,55 @@ export default function FolderList({
                     }
                   }}
                 >
-                  <ContextMenuItem
-                    onSelect={() => {
-                      if (!openFolders.find((x) => x === f.id)) {
-                        setOpenFolders((prev) => [...prev, f.id]);
-                      }
-                      setActiveAction({
-                        type: "createNote",
-                        folder: f,
-                      });
-                    }}
-                  >
-                    New Note...
-                  </ContextMenuItem>
-                  <ContextMenuItem
-                    onSelect={() => {
-                      if (!openFolders.find((x) => x === f.id)) {
-                        setOpenFolders((prev) => [...prev, f.id]);
-                      }
-                      setActiveAction({
-                        type: "createFolder",
-                        folder: f,
-                        parentId: f.id,
-                      });
-                    }}
-                  >
-                    New Folder...
-                  </ContextMenuItem>
-                  <ContextMenuItem
-                    onSelect={() => {
-                      setActiveAction({
-                        type: "renameFolder",
-                        folder: f,
-                      });
-                    }}
-                  >
-                    Rename
-                  </ContextMenuItem>
+                  <ContextMenuGroup>
+                    <ContextMenuItem
+                      onSelect={() => {
+                        if (!openFolders.find((x) => x === f.id)) {
+                          setOpenFolders((prev) => [...prev, f.id]);
+                        }
+                        setActiveAction({
+                          type: "createNote",
+                          folder: f,
+                        });
+                      }}
+                    >
+                      <div className="flex items-center gap-2">
+                        <FilePlus className="w-4 h-4 shrink-0 " />
+                        <span className="text-sm">New Note...</span>
+                      </div>
+                    </ContextMenuItem>
+                    <ContextMenuItem
+                      onSelect={() => {
+                        if (!openFolders.find((x) => x === f.id)) {
+                          setOpenFolders((prev) => [...prev, f.id]);
+                        }
+                        setActiveAction({
+                          type: "createFolder",
+                          folder: f,
+                          parentId: f.id,
+                        });
+                      }}
+                    >
+                      <div className="flex items-center gap-2">
+                        <FolderPlus className="w-4 h-4 shrink-0" />
+                        <span className="text-sm">New Folder...</span>
+                      </div>
+                    </ContextMenuItem>
+                    <ContextMenuItem
+                      onSelect={() => {
+                        setActiveAction({
+                          type: "renameFolder",
+                          folder: f,
+                        });
+                      }}
+                    >
+                      <div className="flex items-center gap-2">
+                        <Pencil className="w-4 h-4 shrink-0" />
+                        <span className="text-sm">Rename</span>
+                      </div>
+                    </ContextMenuItem>
+                  </ContextMenuGroup>
+                  <ContextMenuSeparator />
                   <ContextMenuItem
                     onSelect={() => {
                       setActiveAction({
@@ -283,8 +301,12 @@ export default function FolderList({
                         folder: f,
                       });
                     }}
+                    className="focus:bg-destructive/10"
                   >
-                    Delete
+                    <div className="flex items-center gap-2 text-destructive">
+                      <Trash2 className="w-4 h-4 shrink-0" />
+                      <span className="text-sm">Delete</span>
+                    </div>
                   </ContextMenuItem>
                 </ContextMenuContent>
               </ContextMenu>
@@ -299,7 +321,7 @@ export default function FolderList({
                       style={{ paddingLeft: 8 + (level + 1) * 8 }}
                     >
                       <ChevronRight className="w-3 h-3" />
-                      <FolderClosed className="w-4 h-4 shrink-0 text-accent" />
+                      <FolderClosed className="w-4 h-4 shrink-0 text-primary" />
                       <input
                         className="pl-1"
                         type="text"
@@ -337,7 +359,7 @@ export default function FolderList({
                       className="flex gap-2  w-full  items-center "
                       style={{ paddingLeft: 28 + (level + 1) * 8 }}
                     >
-                      <FileText className="w-4 h-4 shrink-0 text-primary" />
+                      <FileText className="w-4 h-4 shrink-0 text-black" />
                       <input
                         className="pl-1"
                         type="text"
