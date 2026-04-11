@@ -8,9 +8,7 @@ namespace NoteApp.Api.Interfaces.IService
     {
         public Task<AuthViewModel> Login (LoginViewModel dto);
         public Task<AuthViewModel> Register (RegisterViewModel dto);
-        public Task<AuthViewModel> RefreshToken(string token);
-
+        public Task<AuthViewModel> RefreshToken(string token, CancellationToken ct);
         public Task<LoginExternalViewModel> GoogleLogin(ExternalLoginInfo? info);
-
     }
 }

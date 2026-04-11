@@ -95,7 +95,7 @@ namespace NoteApp.Api.Controllers
         [Route("{id}/upload-image")]
         public async Task<ActionResult<ResponseViewModel<AttachmentViewModel>>> UploadImage(Guid id,IFormFile file, CancellationToken ct)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "";
+            var userId = User.GetUserId();
             var attachmentId = await service.UploadImage(userId, id, file, ct);
             var response = new ResponseViewModel<AttachmentViewModel>()
             {
@@ -111,7 +111,7 @@ namespace NoteApp.Api.Controllers
         [Route("GetBySlug/{slug}")]
         public async Task<ActionResult<ResponseViewModel<NoteViewModel>>> GetNoteBySlug(string slug, CancellationToken ct)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = User.GetUserId();
             var result = await service.GetBySlugName(userId,slug, ct);
             var response = new ResponseViewModel<NoteViewModel>()
             {

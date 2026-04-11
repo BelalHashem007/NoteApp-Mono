@@ -18,5 +18,8 @@ namespace NoteApp.Api.Interfaces.IRepositories
         public Task<ApplicationUser?> FindUser(Expression<Func<ApplicationUser, bool>> expression);
         public Task<IdentityResult> AddLoginExternal(ApplicationUser user, UserLoginInfo info);
         public Task<ApplicationUser?> FindLoginExternal(string loginProvider, string providerKey);
+        public Task<RefreshToken?> FindRefreshTokenIncludingUser(string refreshToken, CancellationToken ct);
+        public Task<List<RefreshToken>> GetActiveRefreshTokens(string userId);
+        public Task AddRefreshToken(RefreshToken refreshToken);
     }
 }

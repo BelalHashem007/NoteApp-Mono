@@ -93,6 +93,15 @@ namespace NoteApp.Api.Data
             modelBuilder.Entity<Attachment>()
                 .Property(a => a.Id)
                 .HasDefaultValueSql("NEWSEQUENTIALID()");
+
+            //refresh token constrains
+            modelBuilder.Entity<RefreshToken>()
+                .Property(r => r.UserId)
+                .HasMaxLength(450);
+            modelBuilder.Entity<RefreshToken>()
+                .HasOne(r => r.User)
+                .WithMany(u => u.RefreshTokens)
+                .HasForeignKey(r => r.UserId);
         }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

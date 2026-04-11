@@ -50,5 +50,10 @@ namespace NoteApp.Api.Repositories
         {
             return await _context.Set<T>().Where(criteria).ToListAsync(ct);
         }
+
+        public async Task<int> ExecuteDelete(Expression<Func<T, bool>> criteria, CancellationToken ct = default)
+        {
+            return await _context.Set<T>().Where(criteria).ExecuteDeleteAsync(ct);
+        }
     }
 }

@@ -75,6 +75,7 @@ builder.Services.AddHangfireServer();
 builder.Services.AddScoped<INoteService, NoteService>();
 builder.Services.AddScoped<IFolderService, FolderService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IAttachmentService, AttachmentService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<INoteRepository, NoteRepository>();

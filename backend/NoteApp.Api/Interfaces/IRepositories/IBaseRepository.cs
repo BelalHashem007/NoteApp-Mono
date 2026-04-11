@@ -13,5 +13,6 @@ namespace NoteApp.Api.Interfaces.IRepositories
         public void Delete(T entity, CancellationToken ct = default );
         public Task<T?> Find(Expression<Func<T, bool>> criteria, CancellationToken ct = default);
         public Task<IEnumerable<T>> FindAll(Expression<Func<T, bool>> criteria, CancellationToken ct = default);
+        public Task<int> ExecuteDelete(Expression<Func<T, bool>> criteria, CancellationToken ct = default);
     }
 }

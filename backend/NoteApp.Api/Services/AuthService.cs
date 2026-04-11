@@ -52,20 +52,20 @@ namespace NoteApp.Api.Services
                     AccessToken = accessToken,
                     AccessTokenExpirationDate = DateTime.UtcNow.AddMinutes(jwtOptions.Value.LifeTime)
                 };
-
-                if (user.RefreshTokens.Any(t => t.IsActive))
+                var activeRefreshTokens = await authRepository.GetActiveRefreshTokens(user.Id);
+                if (activeRefreshTokens.Count > 0)
                 {
-                    var activeRefreshToken = user.RefreshTokens.FirstOrDefault(t => t.IsActive);
+                    var activeRefreshToken = activeRefreshTokens[0];
                     authViewModel.RefreshToken = activeRefreshToken.Token;
                     authViewModel.RefreshTokenExpiration = activeRefreshToken.ExpiresOn;
                 }
                 else
                 {
                     var refreshToken = tokenService.GenerateRefreshToken();
+                    refreshToken.UserId = user.Id;
                     authViewModel.RefreshToken = refreshToken.Token;
                     authViewModel.RefreshTokenExpiration = refreshToken.ExpiresOn;
-                    user.RefreshTokens.Add(refreshToken);
-                    await authRepository.UpdateUser(user);
+                    await authRepository.AddRefreshToken(refreshToken);
                 }
 
                 return authViewModel;
@@ -127,17 +127,17 @@ namespace NoteApp.Api.Services
             };
 
             var refreshToken = tokenService.GenerateRefreshToken();
+            refreshToken.UserId = user.Id;
 
             authViewModel.RefreshToken = refreshToken.Token;
             authViewModel.RefreshTokenExpiration = refreshToken.ExpiresOn;
 
-            user.RefreshTokens.Add(refreshToken);
-            await authRepository.UpdateUser(user);
+           await authRepository.AddRefreshToken(refreshToken);
 
             return authViewModel;
         }
 
-        public async Task<AuthViewModel> RefreshToken(string token)
+        public async Task<AuthViewModel> RefreshToken(string token, CancellationToken ct)
         {
             Console.WriteLine($"Request came with token {token}");
             var cacheKey = token;
@@ -160,15 +160,11 @@ namespace NoteApp.Api.Services
                     return cached;
                 }
 
-                var user = await authRepository.FindUser(u => u.RefreshTokens.Any(t => t.Token == token));
-                if (user == null)
+                var refreshToken = await authRepository.FindRefreshTokenIncludingUser(token, ct);
+                if (refreshToken == null || refreshToken.User == null)
                     throw new NotFoundException("Invalid refresh token");
 
-                var refreshToken = user.RefreshTokens.FirstOrDefault(t => t.Token == token);
-
-                if (!refreshToken.IsActive)
-                    throw new NotFoundException("Invalid refresh token");
-
+                var user = refreshToken.User;
                 var userRoles = await authRepository.GetUserRoles(user);
                 refreshToken.RevokedOn = DateTime.UtcNow;
 
@@ -249,8 +245,23 @@ namespace NoteApp.Api.Services
             }
 
             //login
+            //if user has active refresh token, return it with new access token, else generate new refresh token and return
+            var activeRefreshTokens = await authRepository.GetActiveRefreshTokens(user.Id);
+            if (activeRefreshTokens.Count > 0)
+            {
+                var activeRefreshToken = activeRefreshTokens[0];
+                return new LoginExternalViewModel
+                {
+                    AccessToken = tokenService.GenerateJwtToken(user, await authRepository.GetUserRoles(user)),
+                    AccessTokenExpiresOn = DateTime.UtcNow.AddMinutes(30).ToString("O"),
+                    RefreshToken = activeRefreshToken.Token,
+                    RefreshTokenExpiresOn = activeRefreshToken.ExpiresOn.ToString("O")
+                };
+            }
+
             var refreshToken = tokenService.GenerateRefreshToken();
-            user.RefreshTokens.Add(refreshToken);
+            refreshToken.UserId = user.Id;
+            await authRepository.AddRefreshToken(refreshToken);
             await authRepository.UpdateUser(user);
             var userRoles = await authRepository.GetUserRoles(user);
 

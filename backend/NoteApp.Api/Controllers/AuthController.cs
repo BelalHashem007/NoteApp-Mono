@@ -53,13 +53,13 @@ namespace NoteApp.Api.Controllers
 
         [HttpPost]
         [Route("refresh")]
-        public async Task<ActionResult<ResponseViewModel<AuthViewModel>>> Refresh([FromBody] RefreshTokenViewModel? dto)
+        public async Task<ActionResult<ResponseViewModel<AuthViewModel>>> Refresh([FromBody] RefreshTokenViewModel? dto, CancellationToken ct)
         {
             var refreshToken = Request.Cookies["refreshToken"] ?? dto?.RefreshToken;
             if (refreshToken == null)
                 throw new ValidationException("Missing refreshToken");
 
-            var result = await authService.RefreshToken(refreshToken);
+            var result = await authService.RefreshToken(refreshToken, ct);
             if (result != null && !string.IsNullOrWhiteSpace(result.RefreshToken))
                 SetRefreshTokenToCookie(result.RefreshToken, result.RefreshTokenExpiration);
 
