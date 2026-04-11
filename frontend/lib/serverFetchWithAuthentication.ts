@@ -16,7 +16,6 @@ export async function serverFetchWithAuth(
       headers: {
         ...(options.headers || {}),
         Authorization: token ? `Bearer ${token}` : "",
-        "Content-Type": "application/json",
       },
     });
 

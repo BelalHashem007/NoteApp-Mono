@@ -8,7 +8,7 @@ import CodeBlockLowLight from "@tiptap/extension-code-block-lowlight";
 import { all, createLowlight } from "lowlight";
 import Image from "@tiptap/extension-image";
 import FileHandler from "@tiptap/extension-file-handler";
-import { uploadImage } from "@/lib/attachmentApi";
+import { deleteAttachment, uploadImage } from "@/lib/attachmentApi";
 import { useEffect } from "react";
 import { Editor } from "@tiptap/react";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
@@ -21,9 +21,17 @@ const lowlight = createLowlight(all);
 
 const Tiptap = ({ note }: { note?: Note }) => {
   const queryClient = useQueryClient();
-  const mutation = useMutation({
-    mutationFn: (noteToUpdate: { body: string; id?: string }) => {
-      return updateNoteBodyRequest(noteToUpdate.body, noteToUpdate.id);
+  const mutationToUpdateNote = useMutation({
+    mutationFn: (noteToUpdate: {
+      body: string;
+      id?: string;
+      imageIds: string[];
+    }) => {
+      return updateNoteBodyRequest(
+        noteToUpdate.body,
+        noteToUpdate.id,
+        noteToUpdate.imageIds,
+      );
     },
     onMutate: async (noteToUpdate, context) => {
       await context.client.cancelQueries({ queryKey: ["note", note?.slug] });
@@ -57,7 +65,6 @@ const Tiptap = ({ note }: { note?: Note }) => {
   const editor = useEditor({
     content: JSON.parse(note?.body ?? "{}"),
     onUpdate: ({ editor }) => {
-      console.log("Editor is updating....");
       debounced(editor.getJSON());
     },
     extensions: [
@@ -108,9 +115,17 @@ const Tiptap = ({ note }: { note?: Note }) => {
   const debounced = useDebouncedCallback(
     (json) => {
       console.log("iam saving....");
-      mutation.mutate({
+      const imageIds: string[] = [];
+      editor?.state.doc.descendants((node) => {
+        if (node.type.name === "image") {
+          imageIds.push(node.attrs.src.split("/").filter(Boolean)[2]);
+        }
+      });
+      console.log(imageIds);
+      mutationToUpdateNote.mutate({
         body: JSON.stringify(json),
         id: note?.id,
+        imageIds: imageIds,
       });
     },
     2000,

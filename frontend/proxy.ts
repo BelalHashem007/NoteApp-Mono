@@ -10,7 +10,8 @@ export const proxy = async (req: NextRequest) => {
   const isPublicRoute = publicRoutes.includes(path);
   const cookieStore = await cookies();
   const accessToken = cookieStore.get("accessToken")?.value;
-  const isAuthenticated = !!accessToken;
+  const refreshToken = cookieStore.get("refreshToken")?.value;
+  const isAuthenticated = !!accessToken || !!refreshToken;
 
   if (isProtectedRoute && !isAuthenticated) {
     return NextResponse.redirect(new URL("/login", req.nextUrl));

@@ -23,12 +23,14 @@ export async function updateNoteTitleRequest(updatedNote: NoteWithoutBody) {
 export async function updateNoteBodyRequest(
   bodyToUpdate: string,
   noteId?: string,
+  imageIds?: string[],
 ) {
   if (!noteId) throw new Error("no note id is given!!");
   const res = await fetchWithAuth(`/api/notes/${noteId}/body`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ body: bodyToUpdate }),
+    body: JSON.stringify({ body: bodyToUpdate, imageIds }),
+    keepalive: true,
   });
   await throwIfNotOk(res);
 }

@@ -19,7 +19,7 @@ export async function PUT(request: Request, context: RouteContext) {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  const data = json as { body: string };
+  const data = json as { body: string; imageIds: string[] };
 
   const res = await serverFetchWithAuth(
     `http://localhost:5001/api/notes/${id}`,
@@ -28,6 +28,7 @@ export async function PUT(request: Request, context: RouteContext) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         body: data.body,
+        imageIds: data.imageIds,
       }),
     },
   );

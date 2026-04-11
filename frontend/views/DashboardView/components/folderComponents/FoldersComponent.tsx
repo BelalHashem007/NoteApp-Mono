@@ -1,6 +1,6 @@
 "use client";
 import FolderList from "./FolderList";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -17,15 +17,6 @@ export default function FoldersComponent({}) {
   const [showFolderCreationInput, setShowFolderCreationInput] =
     useState<boolean>(false);
   const inputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (showFolderCreationInput) {
-      const timer = setTimeout(() => {
-        inputRef.current?.focus();
-      }, 0);
-      return () => clearTimeout(timer);
-    }
-  }, [showFolderCreationInput]);
 
   const mutationToCreateFolder = useMutation({
     mutationFn: ({
@@ -166,7 +157,15 @@ export default function FoldersComponent({}) {
       )}
       <ContextMenu>
         <ContextMenuTrigger className="grow"></ContextMenuTrigger>
-        <ContextMenuContent>
+        <ContextMenuContent
+          onCloseAutoFocus={(e) => {
+            if (inputRef.current) {
+              inputRef.current.focus();
+              inputRef.current = null;
+              e.preventDefault();
+            }
+          }}
+        >
           <ContextMenuItem onSelect={() => setShowFolderCreationInput(true)}>
             New Folder...
           </ContextMenuItem>

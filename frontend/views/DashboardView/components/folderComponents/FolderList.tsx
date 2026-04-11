@@ -39,18 +39,6 @@ export default function FolderList({
   >(null);
   const creationInputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    if (
-      activeAction?.type === "createFolder" ||
-      activeAction?.type === "createNote"
-    ) {
-      const timer = setTimeout(() => {
-        creationInputRef.current?.focus();
-      }, 150);
-      return () => clearTimeout(timer);
-    }
-  }, [activeAction]);
-
   const mutationToUpdateFolder = useMutation({
     mutationFn: (updatedFolder: Folder) => {
       return updateFolderRequest(updatedFolder);
@@ -239,8 +227,16 @@ export default function FolderList({
                 </ContextMenuTrigger>
                 <ContextMenuContent
                   onCloseAutoFocus={(e) => {
-                    if (activeAction?.type === "createFolder")
-                      e.preventDefault();
+                    if (
+                      activeAction?.type === "createFolder" ||
+                      activeAction?.type === "createNote"
+                    ) {
+                      if (creationInputRef.current) {
+                        creationInputRef.current.focus();
+                        creationInputRef.current = null;
+                        e.preventDefault();
+                      }
+                    }
                   }}
                 >
                   <ContextMenuItem

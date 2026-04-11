@@ -14,6 +14,7 @@ export async function POST(request: NextRequest) {
   }
 
   console.log("iam in refreshaccesstoken");
+  console.log(refreshToken);
 
   const result = await fetch("http://localhost:5001/api/auth/refresh", {
     method: "POST",
@@ -22,6 +23,8 @@ export async function POST(request: NextRequest) {
       "Content-Type": "application/json",
     },
   });
+
+  console.log(result);
 
   if (!result.ok)
     return NextResponse.json({ error: "Refresh failed" }, { status: 401 });
