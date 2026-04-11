@@ -23,6 +23,7 @@ namespace NoteApp.Api.Entities.DTOs
     {
         public string? Title { get; set; }
         public string? Body { get; set; }
+        public List<string>? ImageIds { get; set; }
     }
 
     public class UpdateNoteViewModelValidator : AbstractValidator<UpdateNoteViewModel>

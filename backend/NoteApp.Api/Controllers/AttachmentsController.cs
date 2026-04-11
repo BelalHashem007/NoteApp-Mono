@@ -20,14 +20,5 @@ namespace NoteApp.Api.Controllers
 
             return PhysicalFile(attachment.StoragePath, attachment.MimeType);
         }
-
-        [HttpDelete]
-        [Route("{attachmentId}")]
-        public async Task<IActionResult> RemoveAttachment(Guid attachmentId, CancellationToken ct)
-        {
-            var userId = User.GetUserId();
-            await attachmentService.RemoveAttachment(attachmentId, userId, ct);
-            return NoContent();
-        }
     }
 }

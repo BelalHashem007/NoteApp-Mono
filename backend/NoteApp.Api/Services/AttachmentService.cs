@@ -19,18 +19,5 @@ namespace NoteApp.Api.Services
 
             return attachment;
         }
-
-        public async Task RemoveAttachment(Guid attachmentId, string userId, CancellationToken ct)
-        {
-            var attachment = await unitOfWork.Attachments.Find(a => a.UserId == userId && a.Id == attachmentId, ct);
-
-            if (attachment == null)
-                throw new ValidationException("Resource not found");
-
-            attachment.IsDeleted = true;
-            attachment.DeletedAt = DateTime.UtcNow;
-
-            await unitOfWork.Complete();
-        }
     }
 }

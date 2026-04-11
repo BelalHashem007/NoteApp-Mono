@@ -69,8 +69,26 @@ namespace NoteApp.Api.Services
             if (!result.IsValid)
                 throw new ValidationException(result.ToString());
 
-            var note = await unitOfWork.Notes.Find(x => x.UserId == userId && x.Id == id, ct) ?? throw new NotFoundException("Note does not exist");
+            var note = await unitOfWork.Notes.FindWithAttachments(x => x.UserId == userId && x.Id == id, ct) ?? throw new NotFoundException("Note does not exist");
 
+            if (dto.ImageIds != null)
+            {
+                var activeGuids = dto.ImageIds.Select(Guid.Parse).ToHashSet();
+                foreach (var attachment in note.Attachments)
+                {
+                    if (activeGuids.Contains(attachment.Id))
+                    {
+                        attachment.IsDeleted = false;
+                        attachment.DeletedAt = null;
+                    }
+                    else
+                    {
+                        attachment.IsDeleted = true;
+                        attachment.DeletedAt = DateTime.UtcNow;
+                    }
+                }
+            }
+           
             if (dto.Body != null)
                 note.Body = dto.Body;
 
