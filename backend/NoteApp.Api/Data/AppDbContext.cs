@@ -96,8 +96,12 @@ namespace NoteApp.Api.Data
 
             //refresh token constrains
             modelBuilder.Entity<RefreshToken>()
+                .ToTable("RefreshToken");
+
+            modelBuilder.Entity<RefreshToken>()
                 .Property(r => r.UserId)
                 .HasMaxLength(450);
+
             modelBuilder.Entity<RefreshToken>()
                 .HasOne(r => r.User)
                 .WithMany(u => u.RefreshTokens)
@@ -122,5 +126,6 @@ namespace NoteApp.Api.Data
         public DbSet<Note> Notes { get; set; }
         public DbSet<Folder> Folders { get; set; }
         public DbSet<Attachment> Attachments { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
     }
 }

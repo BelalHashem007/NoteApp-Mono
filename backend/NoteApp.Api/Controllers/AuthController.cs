@@ -89,7 +89,7 @@ namespace NoteApp.Api.Controllers
         {
             var info = await signInManager.GetExternalLoginInfoAsync();
             var result = await authService.GoogleLogin(info);
-            return Redirect($"{returnUrl}?accessToken={result.AccessToken}&refreshToken={result.RefreshToken}&accessExp={result.AccessTokenExpiresOn}&refreshExp={result.RefreshTokenExpiresOn}");
+            return Redirect($"{returnUrl}?accessToken={result.AccessToken}&refreshToken={Uri.EscapeDataString(result.RefreshToken)}&accessExp={result.AccessTokenExpiresOn}&refreshExp={result.RefreshTokenExpiresOn}");
         }
 
         private void SetRefreshTokenToCookie(string refreshToken, DateTime refreshTokenExpiration)

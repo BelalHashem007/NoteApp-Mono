@@ -84,7 +84,7 @@ namespace NoteApp.Api.Repositories
 
         public async Task<RefreshToken?> FindRefreshTokenIncludingUser(string refreshToken, CancellationToken ct)
         {
-            return await _context.Set<RefreshToken>().Include(x => x.User).FirstOrDefaultAsync( t=> t.Token == refreshToken && t.IsActive );
+            return await _context.Set<RefreshToken>().Include(x => x.User).FirstOrDefaultAsync( t=> t.Token == refreshToken && t.RevokedOn == null );
         }
 
         public async Task<List<RefreshToken>> GetActiveRefreshTokens(string userId)

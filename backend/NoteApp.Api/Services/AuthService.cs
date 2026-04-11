@@ -169,11 +169,10 @@ namespace NoteApp.Api.Services
                 refreshToken.RevokedOn = DateTime.UtcNow;
 
                 var newRefreshToken = tokenService.GenerateRefreshToken();
+                newRefreshToken.UserId = user.Id;
                 var accessToken = tokenService.GenerateJwtToken(user, userRoles);
 
-                user.RefreshTokens.Add(newRefreshToken);
-
-                await authRepository.UpdateUser(user);
+                await authRepository.AddRefreshToken(newRefreshToken);
 
                 var userViewModel = ObjectMapperHelper.Map<ApplicationUser, ApplicationUserViewModel>(user);
                 userViewModel.Roles = userRoles;
