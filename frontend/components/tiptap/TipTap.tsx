@@ -16,6 +16,9 @@ import { useDebouncedCallback } from "use-debounce";
 import { TaskList } from "@tiptap/extension-list";
 import { TaskItem } from "@tiptap/extension-list";
 import { updateNoteBodyRequest } from "@/lib/noteApi";
+import DragHandle from "@tiptap/extension-drag-handle-react";
+import { GripVertical } from "lucide-react";
+import HighLight from "@tiptap/extension-highlight";
 
 const lowlight = createLowlight(all);
 
@@ -89,6 +92,7 @@ const Tiptap = ({ note }: { note?: Note }) => {
           alwaysPreserveAspectRatio: true,
         },
       }),
+      HighLight.configure({ multicolor: true }),
       FileHandler.configure({
         allowedMimeTypes: [
           "image/png",
@@ -140,6 +144,14 @@ const Tiptap = ({ note }: { note?: Note }) => {
     <div className="flex flex-col flex-1 bg-background overflow-hidden">
       <ToolBar editor={editor} />
       <div className="flex-1 overflow-y-auto min-h-0">
+        {editor && (
+          <DragHandle
+            editor={editor}
+            nested={{ edgeDetection: { threshold: -16 } }}
+          >
+            <GripVertical className="size-5 cursor-grab bg-muted text-center relative top-2 right-2 p-0.5" />
+          </DragHandle>
+        )}
         <EditorContent
           editor={editor}
           className="flex flex-col min-h-0 w-full text-foreground text-lg leading-relaxed 2xl:max-w-300 md:max-w-150 max-w-50"

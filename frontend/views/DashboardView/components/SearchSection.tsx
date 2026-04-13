@@ -97,7 +97,7 @@ export default function SearchSection() {
         </div>
       </div>
 
-      <div className="px-2 overflow-y-auto">
+      <div className="px-2 overflow-y-auto py-1">
         {trimmed.length === 0 ? (
           <div className="px-2 py-3 text-sm text-muted-foreground">
             Type to search your notes.
@@ -115,7 +115,7 @@ export default function SearchSection() {
             No results.
           </div>
         ) : (
-          <div className="space-y-1">
+          <div className="space-y-2 flex flex-col gap-1">
             {results.map((r) => (
               <Link
                 key={r.id}

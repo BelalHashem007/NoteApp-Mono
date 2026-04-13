@@ -37,7 +37,6 @@
       margin-bottom: 0.25em;
     }
   }
-
   ul[data-type="taskList"] {
     list-style: none;
     padding: 0;
@@ -228,9 +227,10 @@
   --sidebar-ring: #c266f5;
 }
 @theme inline {
-  --font-sans: var(--font-plus-jakarta-sans, ui-sans-serif), ui-sans-serif,
-    system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
-    "Segoe UI Symbol", "Noto Color Emoji";
+  --font-sans:
+    var(--font-plus-jakarta-sans, ui-sans-serif), ui-sans-serif, system-ui,
+    sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+    "Noto Color Emoji";
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
