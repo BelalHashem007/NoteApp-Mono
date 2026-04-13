@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NoteApp.Api.Data;
 using NoteApp.Api.Entities;
+using NoteApp.Api.Entities.DTOs;
 using NoteApp.Api.Interfaces.IRepositories;
 using System.Linq.Expressions;
 
@@ -9,21 +10,17 @@ namespace NoteApp.Api.Repositories
     public class NoteRepository : BaseRepository<Note>, INoteRepository
     {
         private readonly AppDbContext _context;
-        public NoteRepository(AppDbContext context) : base(context)
+        private readonly AppDbContextDapper _dapper;
+        public NoteRepository(AppDbContext context, AppDbContextDapper dapper) : base(context)
         {
             _context = context;
+            _dapper = dapper;
         }
 
-        public async Task<IEnumerable<Note>> GetAllNotesWithSearch(Expression<Func<Note, bool>> criteria, string? searchQuery, CancellationToken ct = default)
+        public async Task<List<NoteForSearchViewModel>> GetAllNotesWithSearch(string userId,string searchQuery, CancellationToken ct = default)
         {
-            var query = _context.Notes.AsQueryable();
-
-            query = query.Where(criteria);
-
-            if (!string.IsNullOrEmpty(searchQuery))
-                query = query.Where(n => n.Title.Contains(searchQuery) || n.Body.Contains(searchQuery));
-
-            return await query.ToListAsync(ct);
+            var results = await _dapper.GetNotesWithSearch(userId, searchQuery);
+            return results;
         }
 
         public async Task<Note?> FindWithAttachments(Expression<Func<Note, bool>> criteria, CancellationToken ct = default)

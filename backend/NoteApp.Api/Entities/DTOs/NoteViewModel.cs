@@ -19,6 +19,44 @@ namespace NoteApp.Api.Entities.DTOs
         public string Slug { get; set; }
     }
 
+    public class  NoteForSearchViewModel
+    {
+        public Guid Id { get; set; }
+        public string Title { get; set; }
+        public string SearchableBody { get; set; }
+        public string Slug { get; set; }
+        public string FolderName { get; set; }
+        public int Rank { get; set; }
+    }
+
+    public class NoteForSearchFilteredViewModel
+    {
+        public Guid Id { get; set; }
+        public string Title { get; set; }
+        public string? Snippet { get; set; }
+        public string Slug { get; set; }
+        public string FolderName { get; set; }
+        public HighLighted HighLighted { get; set; }
+    }
+
+    public class HighLighted
+    {
+        public TitleMatch Title { get; set; }
+        public BodyMatch Body { get; set; }
+    }
+
+    public class TitleMatch
+    {
+        public int? StartIndex { get; set; }
+        public int? EndIndex { get; set; }
+    }
+
+    public class BodyMatch
+    {
+        public int? StartIndex { get; set; }
+        public int? EndIndex { get; set; }
+    }
+
     public class UpdateNoteViewModel
     {
         public string? Title { get; set; }

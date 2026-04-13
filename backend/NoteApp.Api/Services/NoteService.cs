@@ -9,16 +9,45 @@ namespace NoteApp.Api.Services
 {
     public class NoteService(IUnitOfWork unitOfWork) : INoteService
     {
-        public async Task<IEnumerable<NoteViewModel>> GetNotes(string userId, string? searchQuery, CancellationToken ct)
+        public async Task<List<NoteForSearchFilteredViewModel>> GetNotes(string userId, string searchQuery, CancellationToken ct)
         {
-            var notes = await unitOfWork.Notes.GetAllNotesWithSearch(x => x.UserId == userId, searchQuery, ct);
-            IList<NoteViewModel> noteViews = [];
+            var notes = await unitOfWork.Notes.GetAllNotesWithSearch(userId, searchQuery);
+            List<NoteForSearchFilteredViewModel> results = [];
+
             foreach (var note in notes)
             {
-                noteViews.Add(ObjectMapperHelper.Map<Note, NoteViewModel>(note));
+                var filteredNote = ObjectMapperHelper.Map<NoteForSearchViewModel, NoteForSearchFilteredViewModel>(note);
+                filteredNote.HighLighted = new HighLighted();
+                if (!string.IsNullOrEmpty(note.SearchableBody) && note.SearchableBody.Contains(searchQuery, StringComparison.OrdinalIgnoreCase))
+                {
+                    var startIndex = note.SearchableBody.IndexOf(searchQuery, StringComparison.OrdinalIgnoreCase);
+                    var startOfSnippet = startIndex - 30 >= 0 ? startIndex - 30 : 0;
+                    var length = Math.Min(100, note.SearchableBody.Length - startOfSnippet);
+                    var relativeStart = startIndex - startOfSnippet;
+                    var relativeEnd = relativeStart + searchQuery.Length;
+
+                    filteredNote.Snippet = note.SearchableBody.Substring(startOfSnippet, length);
+                    filteredNote.HighLighted.Body = new BodyMatch
+                    {
+                        StartIndex = relativeStart,
+                        EndIndex = relativeEnd
+                    };
+                }
+                if (note.Title.Contains(searchQuery, StringComparison.OrdinalIgnoreCase))
+                {
+                    var startIndex = note.Title.IndexOf(searchQuery, StringComparison.OrdinalIgnoreCase);
+                    var endIndex = startIndex + searchQuery.Length;
+                    filteredNote.HighLighted.Title = new TitleMatch
+                    {
+                        StartIndex = startIndex,
+                        EndIndex = endIndex
+                    };
+                }
+
+                results.Add(filteredNote);
             }
 
-            return noteViews;
+            return results;
         }
 
         public async Task<NoteViewModel> GetNote(string userId, Guid id, CancellationToken ct)
