@@ -26,6 +26,24 @@ type NoteWithoutBody = {
   slug: string;
 };
 
+type SearchNotesResponse = {
+  id: string;
+  title: string;
+  slug: string;
+  snippet?: string;
+  folderName: string;
+  highLighted: {
+    title?: {
+      startIndex: number;
+      endIndex: number;
+    };
+    body?: {
+      startIndex: number;
+      endIndex: number;
+    };
+  };
+}[];
+
 type ApiResponse<TData> = {
   success: boolean;
   messsage: string;

@@ -8,7 +8,7 @@ import CodeBlockLowLight from "@tiptap/extension-code-block-lowlight";
 import { all, createLowlight } from "lowlight";
 import Image from "@tiptap/extension-image";
 import FileHandler from "@tiptap/extension-file-handler";
-import { deleteAttachment, uploadImage } from "@/lib/attachmentApi";
+import { uploadImage } from "@/lib/attachmentApi";
 import { useEffect } from "react";
 import { Editor } from "@tiptap/react";
 import { useQueryClient, useMutation } from "@tanstack/react-query";

@@ -41,3 +41,14 @@ export async function deleteNoteRequest(noteToDelete: NoteWithoutBody) {
   });
   await throwIfNotOk(res);
 }
+
+export async function searchNotesRequest(searchQuery: string) {
+  const res = await fetchWithAuth(
+    `/api/notes/search?searchQuery=${searchQuery}`,
+    {
+      method: "GET",
+    },
+  );
+  await throwIfNotOk(res);
+  return res.json() as Promise<ApiResponse<SearchNotesResponse>>;
+}
