@@ -3,6 +3,7 @@ using Microsoft.Data.SqlClient;
 using NoteApp.Api.Entities;
 using NoteApp.Api.Entities.DTOs;
 using System.Data;
+using System.Text.Json;
 
 namespace NoteApp.Api.Data
 {
@@ -22,12 +23,12 @@ namespace NoteApp.Api.Data
             }
         }
 
-        public async Task<List<NoteForSearchViewModel>> GetNotesWithSearch(string userId, string searchQuery)
+        public async Task<List<NoteForSearchViewModel>> GetNotesWithSearch(string userId, string searchQuery, string? tags)
         {
             using (var dbConnection = new SqlConnection(config.GetConnectionString("Default")))
             {
                 var storedProcedureName = "spNotes_SearchNotes";
-                var values = new { SearchTerm = searchQuery, userId};
+                var values = new { SearchTerm = searchQuery, userId, TagsJson = tags};
                 dbConnection.Open();
                 List<NoteForSearchViewModel> results = (await dbConnection.QueryAsync<NoteForSearchViewModel>(storedProcedureName, values, commandType: CommandType.StoredProcedure)).ToList();
                 return results;

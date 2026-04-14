@@ -10,6 +10,6 @@ namespace NoteApp.Api.Interfaces.IService
         public Task<FolderViewModel> CreateFolder(string userid, CreateFolderViewModel dto, CancellationToken ct);
         public Task<FolderViewModel> UpdateFolder(string userid, Guid id, UpdateFolderViewModel dto, CancellationToken ct);
         public Task DeleteFolder(string userid, Guid id, CancellationToken ct);
-        public Task<List<FoldersAndNotesViewModel>> GetAllFolderItems(string userId);
+        public Task<FoldersAndNotesAndTagsViewModel> GetAllFolderItems(string userId);
     }
 }

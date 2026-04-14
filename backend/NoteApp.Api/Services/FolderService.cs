@@ -72,7 +72,7 @@ namespace NoteApp.Api.Services
                 throw new Exception("Could not delete folder");
         }
 
-        public async Task<List<FoldersAndNotesViewModel>> GetAllFolderItems(string userId)
+        public async Task<FoldersAndNotesAndTagsViewModel> GetAllFolderItems(string userId)
         {
             var folders = await unitOfWork.Folders.GetAllItems(userId);
             var rootFolders = new List<FoldersAndNotesViewModel>();
@@ -90,7 +90,13 @@ namespace NoteApp.Api.Services
                 }
             }
 
-            return rootFolders;
+            var foldersAndTagsViewModel = new FoldersAndNotesAndTagsViewModel
+            {
+                Folders = rootFolders,
+                Tags = [.. (await unitOfWork.Tags.FindAll(x => x.UserId == userId))]
+            };
+
+            return foldersAndTagsViewModel;
         }
     }
 }

@@ -6,7 +6,10 @@ namespace NoteApp.Api.Interfaces.IRepositories
     {
         IFolderRepository Folders { get; }
         IBaseRepository<Attachment> Attachments { get; }
+        IBaseRepository<Tag> Tags { get; }
+        IBaseRepository<NotesToTags> NotesToTages { get; }
         INoteRepository Notes { get; }
+
 
         Task<int> Complete(CancellationToken ct = default);
     }

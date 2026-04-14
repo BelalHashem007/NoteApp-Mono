@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NoteApp.Api.Data;
 
@@ -11,9 +12,11 @@ using NoteApp.Api.Data;
 namespace NoteApp.Api.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260414102400_AddingUniqueIndexToUserIdAndNameInTagsTable")]
+    partial class AddingUniqueIndexToUserIdAndNameInTagsTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -271,7 +274,7 @@ namespace NoteApp.Api.Data.Migrations
 
                     b.HasIndex("NoteId");
 
-                    b.ToTable("Attachments", (string)null);
+                    b.ToTable("Attachments");
                 });
 
             modelBuilder.Entity("NoteApp.Api.Entities.Folder", b =>
@@ -304,7 +307,7 @@ namespace NoteApp.Api.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Folders", (string)null);
+                    b.ToTable("Folders");
                 });
 
             modelBuilder.Entity("NoteApp.Api.Entities.Note", b =>
@@ -356,7 +359,7 @@ namespace NoteApp.Api.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Notes", (string)null);
+                    b.ToTable("Notes");
                 });
 
             modelBuilder.Entity("NoteApp.Api.Entities.RefreshToken", b =>
@@ -414,7 +417,7 @@ namespace NoteApp.Api.Data.Migrations
                     b.HasIndex("UserId", "Name")
                         .IsUnique();
 
-                    b.ToTable("Tags", (string)null);
+                    b.ToTable("Tags");
                 });
 
             modelBuilder.Entity("NotesToTags", b =>
@@ -429,7 +432,7 @@ namespace NoteApp.Api.Data.Migrations
 
                     b.HasIndex("TagsId");
 
-                    b.ToTable("NotesToTags", (string)null);
+                    b.ToTable("NotesToTags");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

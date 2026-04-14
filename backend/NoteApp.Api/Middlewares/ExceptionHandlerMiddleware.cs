@@ -51,6 +51,7 @@ namespace NoteApp.Api.Middlewares
                     break;
 
                 case UserAlreadyExistsException:
+                case ResourceAlreadyExistsException:
                     context.Response.StatusCode = StatusCodes.Status409Conflict;
                     response.Message = e.Message;
                     response.Error.Code = "CONFLICT";

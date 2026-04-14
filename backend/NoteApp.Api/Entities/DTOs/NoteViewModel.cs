@@ -10,6 +10,7 @@ namespace NoteApp.Api.Entities.DTOs
         public string Slug { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
+        public List<TagViewModel> Tags { get; set; }
     }
 
     public class NoteWithoutBodyViewModel

@@ -9,9 +9,9 @@ namespace NoteApp.Api.Services
 {
     public class NoteService(IUnitOfWork unitOfWork) : INoteService
     {
-        public async Task<List<NoteForSearchFilteredViewModel>> GetNotes(string userId, string searchQuery, CancellationToken ct)
+        public async Task<List<NoteForSearchFilteredViewModel>> GetNotes(string userId, string searchQuery,string? tags, CancellationToken ct)
         {
-            var notes = await unitOfWork.Notes.GetAllNotesWithSearch(userId, searchQuery);
+            var notes = await unitOfWork.Notes.GetAllNotesWithSearch(userId, searchQuery, tags);
             List<NoteForSearchFilteredViewModel> results = [];
 
             foreach (var note in notes)
@@ -202,9 +202,15 @@ namespace NoteApp.Api.Services
             if (string.IsNullOrWhiteSpace(slug))
                 throw new ValidationException("Slug is required");
 
-            var note = await unitOfWork.Notes.Find(n => n.Slug == slug && n.UserId == userId, ct) ?? throw new NotFoundException("Note does not exist");
-                
-            return ObjectMapperHelper.Map<Note,NoteViewModel>(note);
+            var note = await unitOfWork.Notes.FindWithTags(n => n.Slug == slug && n.UserId == userId, ct) ?? throw new NotFoundException("Note does not exist");
+            var noteView = ObjectMapperHelper.Map<Note,NoteViewModel>(note);
+            noteView.Tags = [];
+            foreach(var tag in note.Tags)
+            {
+                noteView.Tags.Add(ObjectMapperHelper.Map<Tag, TagViewModel>(tag));
+            }
+
+            return noteView;
         }
     }
 }

@@ -106,6 +106,22 @@ namespace NoteApp.Api.Data
                 .HasOne(r => r.User)
                 .WithMany(u => u.RefreshTokens)
                 .HasForeignKey(r => r.UserId);
+
+            //tags constraints
+            modelBuilder.Entity<Tag>()
+                .Property(t => t.Name)
+                .HasMaxLength(100);
+
+            modelBuilder.Entity<Tag>()
+                .HasMany(t => t.Notes)
+                .WithMany(n => n.Tags)
+                .UsingEntity<NotesToTags>(
+                    r => r.HasOne(e => e.Note).WithMany().OnDelete(DeleteBehavior.Cascade),
+                    l => l.HasOne(e => e.Tag).WithMany().OnDelete(DeleteBehavior.NoAction));
+
+            modelBuilder.Entity<Tag>()
+                .HasIndex(t => new {t.UserId, t.Name})
+                .IsUnique();
         }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
@@ -127,5 +143,6 @@ namespace NoteApp.Api.Data
         public DbSet<Folder> Folders { get; set; }
         public DbSet<Attachment> Attachments { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<Tag> Tags { get; set; }
     }
 }

@@ -94,13 +94,13 @@ namespace NoteApp.Api.Controllers
 
         [HttpGet]
         [Route("GetAllItems")]
-        public async Task<ActionResult<ResponseViewModel<List<FoldersAndNotesViewModel>>>> GetAllFolderItems()
+        public async Task<ActionResult<ResponseViewModel<FoldersAndNotesAndTagsViewModel>>> GetAllFolderItems()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             var result = await folderService.GetAllFolderItems(userId);
 
-            var response = new ResponseViewModel<List<FoldersAndNotesViewModel>>
+            var response = new ResponseViewModel<FoldersAndNotesAndTagsViewModel>
             {
                 Success = true,
                 Message = "Retrieved all the items successfully",

@@ -18,5 +18,6 @@ namespace NoteApp.Api.Entities
         public ApplicationUser User { get; set; }
         public string UserId { get; set; }
         public List<Attachment> Attachments { get; set; }
+        public List<Tag> Tags { get; set; }
     }
 }

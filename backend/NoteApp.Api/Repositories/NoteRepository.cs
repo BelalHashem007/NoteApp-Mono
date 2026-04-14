@@ -17,15 +17,20 @@ namespace NoteApp.Api.Repositories
             _dapper = dapper;
         }
 
-        public async Task<List<NoteForSearchViewModel>> GetAllNotesWithSearch(string userId,string searchQuery, CancellationToken ct = default)
+        public async Task<List<NoteForSearchViewModel>> GetAllNotesWithSearch(string userId, string searchQuery, string? tags, CancellationToken ct = default)
         {
-            var results = await _dapper.GetNotesWithSearch(userId, searchQuery);
+            var results = await _dapper.GetNotesWithSearch(userId, searchQuery, tags);
             return results;
         }
 
         public async Task<Note?> FindWithAttachments(Expression<Func<Note, bool>> criteria, CancellationToken ct = default)
         {
             return await _context.Notes.Include(n => n.Attachments).SingleOrDefaultAsync(criteria, ct);
+        }
+
+        public async Task<Note?> FindWithTags(Expression<Func<Note, bool>> criteria, CancellationToken ct = default)
+        {
+            return await _context.Notes.Include(n => n.Tags).SingleOrDefaultAsync(criteria, ct);
         }
     }
 }
