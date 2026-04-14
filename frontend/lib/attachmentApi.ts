@@ -18,13 +18,20 @@ export async function uploadImage(
     editor
       .chain()
       .insertContentAt(pos, {
-        type: "image",
+        type: "imageResize",
         attrs: { src: tempUrl, alt: file.name },
       })
       .focus()
       .run();
   } else {
-    editor.chain().focus().setImage({ src: tempUrl }).run();
+    editor
+      .chain()
+      .focus()
+      .insertContent({
+        type: "imageResize",
+        attrs: { src: tempUrl, alt: file.name },
+      })
+      .run();
   }
   //send to backend
   const formData = new FormData();
@@ -45,7 +52,7 @@ export async function uploadImage(
     const { state, view } = editor;
 
     state.doc.descendants((node, nodePos) => {
-      if (node.type.name === "image" && node.attrs.src === tempUrl) {
+      if (node.type.name === "imageResize" && node.attrs.src === tempUrl) {
         const transaction = state.tr.setNodeMarkup(nodePos, null, {
           ...node.attrs,
           src: `/api/attachments/${data.data.attachmentId}`,

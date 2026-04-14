@@ -6,7 +6,7 @@ import ToolBar from "./ToolBar";
 import Underline from "@tiptap/extension-underline";
 import CodeBlockLowLight from "@tiptap/extension-code-block-lowlight";
 import { all, createLowlight } from "lowlight";
-import Image from "@tiptap/extension-image";
+import ImageResize from "tiptap-extension-resize-image";
 import FileHandler from "@tiptap/extension-file-handler";
 import { uploadImage } from "@/lib/attachmentApi";
 import { useEffect } from "react";
@@ -83,14 +83,8 @@ const Tiptap = ({ note }: { note?: Note }) => {
       CodeBlockLowLight.configure({
         lowlight,
       }),
-      Image.configure({
-        resize: {
-          enabled: true,
-          directions: ["top", "bottom", "left", "right"],
-          minWidth: 50,
-          minHeight: 50,
-          alwaysPreserveAspectRatio: true,
-        },
+      ImageResize.configure({
+        minWidth: 50,
       }),
       HighLight.configure({ multicolor: true }),
       FileHandler.configure({
