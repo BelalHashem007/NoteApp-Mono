@@ -63,7 +63,7 @@ export default function FoldersComponent({
       {/* <FolderSearch query={query} setQuery={setQuery} /> */}
 
       <FolderList
-        folders={result.data as FolderWithNotes[]}
+        folders={result.data.folders as FolderWithNotes[]}
         level={0}
         onCreateFolder={onCreateFolder}
         openFolders={openFolders}

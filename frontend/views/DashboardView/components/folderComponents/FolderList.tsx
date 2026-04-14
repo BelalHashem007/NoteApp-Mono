@@ -32,13 +32,13 @@ export default function FolderList({
   level = 0,
   onCreateFolder,
   openFolders,
-  setOpenFolders
+  setOpenFolders,
 }: {
   folders: FolderWithNotes[];
   level: number;
   onCreateFolder: (args: { folderName: string; parentId?: string }) => void;
-  openFolders:string[],
-  setOpenFolders: React.Dispatch<React.SetStateAction<string[]>>
+  openFolders: string[];
+  setOpenFolders: React.Dispatch<React.SetStateAction<string[]>>;
 }) {
   const pathname = usePathname();
   const activeNoteSlug = pathname.split("/").filter(Boolean)[2];
@@ -235,7 +235,7 @@ export default function FolderList({
               <ContextMenu>
                 <ContextMenuTrigger asChild>
                   <button
-                    className=" flex gap-2 hover:bg-primary/10 w-full items-center rounded-full"
+                    className=" flex gap-2 hover:bg-primary/10 w-full items-center"
                     style={{ paddingLeft: 8 + level * 8 }}
                     onClick={() =>
                       setOpenFolders(

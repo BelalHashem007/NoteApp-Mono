@@ -5,6 +5,7 @@ interface Note {
   slug: string;
   createdAt: string;
   updatedAt: string;
+  tags: Tag[];
 }
 
 interface Folder {
@@ -24,6 +25,16 @@ type NoteWithoutBody = {
   id: string;
   title: string;
   slug: string;
+};
+
+type FoldersWithTags = {
+  Folders: FolderWithNotes[];
+  Tags: Tag[];
+};
+
+type Tag = {
+  id: string;
+  name: string;
 };
 
 type SearchNotesResponse = {

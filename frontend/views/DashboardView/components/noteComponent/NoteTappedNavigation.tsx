@@ -22,7 +22,7 @@ export default function NoteTappedNavigation({ note }: { note?: Note }) {
   }, [setOpenedNotes, note]);
 
   return (
-    <div className="h-9 bg-muted/30 flex items-center overflow-x-auto">
+    <div className="h-9 bg-muted/30 border-b flex items-center overflow-x-auto">
       {openedNotes.map((openedNote) => {
         return (
           <div
