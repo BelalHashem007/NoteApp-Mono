@@ -26,7 +26,7 @@ export default function NoteList({
   level: number;
 }) {
   const pathname = usePathname();
-  const activeNoteSlug = pathname.match(/^\/dashboard\/note\/([^/]+)/)?.[1];
+  const activeNoteSlug = pathname.split("/").filter(Boolean)[2];
   const { setOpenedNotes } = useTapsContext();
   const [editTitle, setEditTitle] = useState<string | null>(null);
   const [deleteAction, setDeleteAction] = useState<NoteWithoutBody | undefined>(

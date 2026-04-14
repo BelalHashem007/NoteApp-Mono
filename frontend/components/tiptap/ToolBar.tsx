@@ -38,7 +38,7 @@ type DropDownState =
 
 export default function ToolBar({ editor }: { editor: Editor | null }) {
   const [openHeadingsList, setOpenHeadingsList] = useState<boolean>(false);
-  const [highLighterColor, setHighLighterColor] = useState<string>("#eab308");
+  const [highLighterColor, setHighLighterColor] = useState<string>("yellow");
   const colorInputRef = useRef<HTMLInputElement | null>(null);
   const editorState = useEditorState({
     editor,
@@ -310,15 +310,15 @@ export default function ToolBar({ editor }: { editor: Editor | null }) {
       <div className="relative flex items-center gap-2">
         <label
           htmlFor="highlighter-input"
-          className="flex items-center justify-center rounded-full p-2 cursor-pointer hover:bg-primary/10 transition-all bg-white"
-          style={{ color: highLighterColor }}
+          className="flex items-center justify-center rounded-full p-2 cursor-pointer hover:bg-primary/10 transition-all"
         >
-          <Highlighter />
+          <Highlighter style={{ fill: highLighterColor }} />
         </label>
         <input
           id="highlighter-input"
           type="color"
           ref={colorInputRef}
+          defaultValue={highLighterColor}
           className="absolute inset-0 w-0 h-0 opacity-0"
           autoFocus={false}
           onBlur={() => {
@@ -335,7 +335,7 @@ export default function ToolBar({ editor }: { editor: Editor | null }) {
             setHighLighterColor(color);
             editor.chain().focus().toggleHighlight({ color }).run();
           }}
-          className={`${editorState?.isHighlight ? "bg-primary/50 shadow text-white p-1" : ""} rounded-md flex gap-1 text-black`}
+          className={`${editorState?.isHighlight ? "bg-primary/50 shadow text-white" : ""} hover:bg-primary/10 transition-colors p-2 rounded-full flex gap-1 text-black`}
         >
           Toggle
         </button>

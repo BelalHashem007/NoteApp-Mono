@@ -12,15 +12,12 @@ import FolderComponentSkeleton from "@/components/placeholders/FolderComponentSk
 import { ChevronRight, FolderClosed, FolderPlus } from "lucide-react";
 
 type FoldersComponentProps = {
-  onCreateFolder: (args: {
-    folderName: string;
-    parentId?: string;
-  }) => void;
+  onCreateFolder: (args: { folderName: string; parentId?: string }) => void;
   showFolderCreationInput: boolean;
-  setShowFolderCreationInput: React.Dispatch<
-    React.SetStateAction<boolean>
-  >;
+  setShowFolderCreationInput: React.Dispatch<React.SetStateAction<boolean>>;
   inputRef: React.RefObject<HTMLInputElement | null>;
+  openFolders: string[];
+  setOpenFolders: React.Dispatch<React.SetStateAction<string[]>>;
 };
 
 export default function FoldersComponent({
@@ -28,6 +25,8 @@ export default function FoldersComponent({
   showFolderCreationInput,
   setShowFolderCreationInput,
   inputRef,
+  openFolders,
+  setOpenFolders,
 }: FoldersComponentProps) {
   useEffect(() => {
     if (!showFolderCreationInput) return;
@@ -67,6 +66,8 @@ export default function FoldersComponent({
         folders={result.data as FolderWithNotes[]}
         level={0}
         onCreateFolder={onCreateFolder}
+        openFolders={openFolders}
+        setOpenFolders={setOpenFolders}
       />
 
       {showFolderCreationInput && (

@@ -25,17 +25,24 @@ import { updateFolderRequest } from "@/lib/folderApi";
 import toast from "react-hot-toast";
 import { DeleteModal } from "../modals/DeleteModal";
 import { createNoteRequest } from "@/lib/noteApi";
+import { usePathname } from "next/navigation";
 
 export default function FolderList({
   folders,
   level = 0,
   onCreateFolder,
+  openFolders,
+  setOpenFolders
 }: {
   folders: FolderWithNotes[];
   level: number;
   onCreateFolder: (args: { folderName: string; parentId?: string }) => void;
+  openFolders:string[],
+  setOpenFolders: React.Dispatch<React.SetStateAction<string[]>>
 }) {
-  const [openFolders, setOpenFolders] = useState<string[]>([]);
+  const pathname = usePathname();
+  const activeNoteSlug = pathname.split("/").filter(Boolean)[2];
+
   const [activeAction, setActiveAction] = useState<
     | null
     | { type: "createNote"; folder: FolderWithNotes }
@@ -44,6 +51,40 @@ export default function FolderList({
     | { type: "delete"; folder: FolderWithNotes }
   >(null);
   const creationInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!activeNoteSlug) return;
+
+    const findPathToNote = (foldersList: FolderWithNotes[]): string[] => {
+      const path: string[] = [];
+
+      for (const folder of foldersList) {
+        const hasNote = folder.notes.some((n) => n.slug === activeNoteSlug);
+        if (hasNote) {
+          path.push(folder.id);
+          return path;
+        }
+
+        const subFolderPath = findPathToNote(folder.subFolders);
+
+        if (subFolderPath.length > 0) {
+          path.push(folder.id, ...subFolderPath);
+          return path;
+        }
+      }
+      return path;
+    };
+
+    const folderIdsToOpen = findPathToNote(folders);
+
+    const updateState = () =>
+      setOpenFolders((prev) => {
+        const combined = new Set([...prev, ...folderIdsToOpen]);
+        return Array.from(combined);
+      });
+
+    updateState();
+  }, [activeNoteSlug, folders]);
 
   const mutationToUpdateFolder = useMutation({
     mutationFn: (updatedFolder: Folder) => {
@@ -351,6 +392,8 @@ export default function FolderList({
                   folders={f.subFolders}
                   level={level + 1}
                   onCreateFolder={onCreateFolder}
+                  openFolders={openFolders}
+                  setOpenFolders={setOpenFolders}
                 />
                 {/* input for note creation */}
                 {activeAction?.type === "createNote" &&

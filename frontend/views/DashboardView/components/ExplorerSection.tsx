@@ -1,6 +1,6 @@
 "use client";
 
-import { FolderPlus } from "lucide-react";
+import { CopyMinus, FolderPlus } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import toast from "react-hot-toast";
@@ -10,6 +10,7 @@ import FoldersComponent from "./folderComponents/FoldersComponent";
 export default function ExplorerSection() {
   const [showFolderCreationInput, setShowFolderCreationInput] =
     useState<boolean>(false);
+  const [openFolders, setOpenFolders] = useState<string[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const mutationToCreateFolder = useMutation({
@@ -95,20 +96,32 @@ export default function ExplorerSection() {
     <div className="pb-4 space-y-1 grow">
       <div className="h-9 px-4 flex items-center justify-between text-foreground/70 text-xs font-semibold uppercase tracking-wider">
         <span>Explorer</span>
-        <button
-          type="button"
-          className="p-1 hover:bg-primary/10 rounded-md"
-          title="New Folder..."
-          onClick={() => setShowFolderCreationInput(true)}
-        >
-          <FolderPlus className="w-5 h-5" />
-        </button>
+        <div>
+          <button
+            type="button"
+            title="Collapse Folders"
+            className="p-1 hover:bg-primary/10 rounded-md"
+            onClick={() => setOpenFolders([])}
+          >
+            <CopyMinus className="w-4 h-4" />
+          </button>
+          <button
+            type="button"
+            className="p-1 hover:bg-primary/10 rounded-md"
+            title="New Folder..."
+            onClick={() => setShowFolderCreationInput(true)}
+          >
+            <FolderPlus className="w-4 h-4" />
+          </button>
+        </div>
       </div>
       <FoldersComponent
         onCreateFolder={mutationToCreateFolder.mutate}
         showFolderCreationInput={showFolderCreationInput}
         setShowFolderCreationInput={setShowFolderCreationInput}
         inputRef={inputRef}
+        openFolders={openFolders}
+        setOpenFolders={setOpenFolders}
       />
     </div>
   );
