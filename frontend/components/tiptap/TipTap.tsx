@@ -136,7 +136,7 @@ const Tiptap = ({ note }: { note?: Note }) => {
 
   return (
     <div className="flex flex-col flex-1 bg-background overflow-hidden">
-      <ToolBar editor={editor} />
+      <ToolBar editor={editor} note={note} />
       <div className="flex-1 overflow-y-auto min-h-0">
         {editor && (
           <DragHandle

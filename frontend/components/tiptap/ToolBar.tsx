@@ -25,6 +25,7 @@ import {
   ListTodo,
   Highlighter,
 } from "lucide-react";
+import { TagPickerPopover } from "@/views/DashboardView/components/tagComponents/TagPickerPopover";
 
 type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
 type DropDownState =
@@ -36,7 +37,13 @@ type DropDownState =
   | "Heading 5"
   | "Heading 6";
 
-export default function ToolBar({ editor }: { editor: Editor | null }) {
+export default function ToolBar({
+  editor,
+  note,
+}: {
+  editor: Editor | null;
+  note?: Note;
+}) {
   const [openHeadingsList, setOpenHeadingsList] = useState<boolean>(false);
   const [highLighterColor, setHighLighterColor] = useState<string>("yellow");
   const colorInputRef = useRef<HTMLInputElement | null>(null);
@@ -86,7 +93,7 @@ export default function ToolBar({ editor }: { editor: Editor | null }) {
     }, 0);
   };
   return (
-    <div className="bg-primary/10 border-b p-3 flex items-center gap-5">
+    <div className="bg-primary/10 border-b  p-3 flex items-center gap-5">
       {/* History */}
       <div className="flex gap-2">
         <button
@@ -109,6 +116,28 @@ export default function ToolBar({ editor }: { editor: Editor | null }) {
 
       {/*Seperator*/}
       <div className="h-full w-px bg-gray-400"></div>
+
+      {/* Tags */}
+      {note?.id && note?.slug && (
+        <>
+          <TagPickerPopover
+            noteId={note.id}
+            noteSlug={note.slug}
+            currentTags={note.tags}
+          >
+            <button
+              type="button"
+              className="hover:bg-primary/10 rounded-full px-3 py-2 text-sm font-semibold transition-all"
+              title="Tags"
+            >
+              #
+            </button>
+          </TagPickerPopover>
+
+          {/*Seperator*/}
+          <div className="h-full w-px bg-gray-400"></div>
+        </>
+      )}
 
       {/*Headers List*/}
       <div>
