@@ -1,4 +1,6 @@
 ﻿using FluentValidation;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace NoteApp.Api.Entities.DTOs
 {
@@ -18,6 +20,7 @@ namespace NoteApp.Api.Entities.DTOs
         public Guid Id { get; set; }
         public string Title { get; set; }
         public string Slug { get; set; }
+        public List<TagViewModel> Tags { get; set; } 
     }
 
     public class  NoteForSearchViewModel
@@ -28,6 +31,9 @@ namespace NoteApp.Api.Entities.DTOs
         public string Slug { get; set; }
         public string FolderName { get; set; }
         public int Rank { get; set; }
+        [JsonIgnore]
+        public string? TagsJson { get; set; }
+        public List<TagViewModel> Tags => string.IsNullOrEmpty(TagsJson) ? [] : JsonSerializer.Deserialize<List<TagViewModel>>(TagsJson) ?? [];
     }
 
     public class NoteForSearchFilteredViewModel
@@ -38,6 +44,7 @@ namespace NoteApp.Api.Entities.DTOs
         public string Slug { get; set; }
         public string FolderName { get; set; }
         public HighLighted HighLighted { get; set; }
+        public List<TagViewModel> Tags { get; set; }
     }
 
     public class HighLighted

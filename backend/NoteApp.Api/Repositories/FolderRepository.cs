@@ -16,14 +16,14 @@ namespace NoteApp.Api.Repositories
 
         public async Task<List<FoldersAndNotesViewModel>> GetAllItems(string userId)
         {
-            var folders = await _context.Folders.Where(f => f.UserId == userId).Select(f => new FoldersAndNotesViewModel
+            var folders = await _context.Folders.AsNoTracking().Where(f => f.UserId == userId).Select(f => new FoldersAndNotesViewModel
             {
                 Id = f.Id,
                 FolderName = f.FolderName,
-                Notes = f.Notes.Select(n => new NoteWithoutBodyViewModel { Id = n.Id, Title = n.Title, Slug = n.Slug }).ToList(),
+                Notes = f.Notes.Select(n => new NoteWithoutBodyViewModel { Id = n.Id, Title = n.Title, Slug = n.Slug, Tags = n.Tags.Select(t => new TagViewModel {Id = t.Id, Name = t.Name }).ToList() }).ToList(),
                 ParentId = f.ParentId,
                 CreatedAt = f.CreatedAt,
-            }).ToListAsync();
+            }).AsSplitQuery().ToListAsync();
 
             return folders;
         }
