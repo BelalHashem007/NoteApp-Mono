@@ -4,6 +4,6 @@ export function getAllUserTagsFromFoldersCache(cached: unknown): Tag[] {
   return tags;
 }
 
-export function tagNameEquals(a: string, b: string) {
-  return a.trim().toLowerCase() === b.trim().toLowerCase();
+export function tagNameEquals(a: string[], b: string) {
+  return a.some((tag) => tag.trim().toLowerCase() === b.trim().toLowerCase());
 }

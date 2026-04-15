@@ -5,7 +5,11 @@ import {
   getAllUserTagsFromFoldersCache,
   tagNameEquals,
 } from "@/lib/tagsFromFoldersCache";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as React from "react";
 
@@ -43,7 +47,9 @@ export function TagPickerPopover({
 
   const hasExactMatch = React.useMemo(() => {
     if (!normalizedQuery) return false;
-    return allUserTags.some((t) => tagNameEquals(t.name, normalizedQuery));
+    return allUserTags.some(
+      (t) => t.name.trim().toLowerCase() === normalizedQuery.toLowerCase(),
+    );
   }, [allUserTags, normalizedQuery]);
 
   const mutation = useMutation({
@@ -58,35 +64,55 @@ export function TagPickerPopover({
       await queryClient.cancelQueries({ queryKey: ["note", noteSlug] });
 
       // Optimistic: note tags
-      queryClient.setQueryData(["note", noteSlug], (old: any) => {
-        const existingTags: Tag[] = (old?.data?.tags ?? []) as Tag[];
-        if (existingTags.some((t) => tagNameEquals(t.name, normalizedName)))
-          return old;
-        const nextTags = [
-          ...existingTags,
-          { id: crypto.randomUUID(), name: normalizedName } satisfies Tag,
-        ];
-        return { ...old, data: { ...old.data, tags: nextTags } };
-      });
+      queryClient.setQueryData(
+        ["note", noteSlug],
+        (old: { data: NoteWithoutBody }) => {
+          const existingTags: Tag[] = (old?.data?.tags ?? []) as Tag[];
+          if (
+            existingTags.some(
+              (t) =>
+                t.name.trim().toLowerCase() === normalizedName.toLowerCase(),
+            )
+          )
+            return old;
+          const nextTags = [
+            ...existingTags,
+            { id: crypto.randomUUID(), name: normalizedName } satisfies Tag,
+          ];
+          return { ...old, data: { ...old.data, tags: nextTags } };
+        },
+      );
 
       // Optimistic: global tags list in folders cache
-      queryClient.setQueryData(["foldersAndNotes"], (old: any) => {
-        if (!old?.data || typeof old.data !== "object" || Array.isArray(old.data))
-          return old;
-        const existing: Tag[] = Array.isArray(old.data.tags)
-          ? (old.data.tags as Tag[])
-          : [];
-        if (existing.some((t) => tagNameEquals(t.name, normalizedName)))
-          return old;
-        const nextTags = [
-          ...existing,
-          { id: crypto.randomUUID(), name: normalizedName } satisfies Tag,
-        ];
-        return {
-          ...old,
-          data: { ...old.data, tags: nextTags },
-        };
-      });
+      queryClient.setQueryData(
+        ["foldersAndNotes"],
+        (old: { data: FoldersWithTags }) => {
+          if (
+            !old?.data ||
+            typeof old.data !== "object" ||
+            Array.isArray(old.data)
+          )
+            return old;
+          const existing: Tag[] = Array.isArray(old.data.tags)
+            ? (old.data.tags as Tag[])
+            : [];
+          if (
+            existing.some(
+              (t) =>
+                t.name.trim().toLowerCase() === normalizedName.toLowerCase(),
+            )
+          )
+            return old;
+          const nextTags = [
+            ...existing,
+            { id: crypto.randomUUID(), name: normalizedName } satisfies Tag,
+          ];
+          return {
+            ...old,
+            data: { ...old.data, tags: nextTags },
+          };
+        },
+      );
 
       setOpen(false);
       setQuery("");
@@ -158,7 +184,9 @@ export function TagPickerPopover({
             )}
 
             {filtered.slice(0, 30).map((t) => {
-              const alreadyOnNote = currentTagNames.has(t.name.trim().toLowerCase());
+              const alreadyOnNote = currentTagNames.has(
+                t.name.trim().toLowerCase(),
+              );
               return (
                 <button
                   key={t.id ?? t.name}
@@ -183,4 +211,3 @@ export function TagPickerPopover({
     </Popover>
   );
 }
-

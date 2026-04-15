@@ -30,7 +30,7 @@ export default function NoteList({
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const activeNoteSlug = pathname.split("/").filter(Boolean)[2];
-  const tagSuffix = tagQuerySuffix(searchParams.get("tag"));
+  const tagSuffix = tagQuerySuffix(searchParams.getAll("tag"));
   const { setOpenedNotes } = useTapsContext();
   const [editTitle, setEditTitle] = useState<string | null>(null);
   const [deleteAction, setDeleteAction] = useState<NoteWithoutBody | undefined>(

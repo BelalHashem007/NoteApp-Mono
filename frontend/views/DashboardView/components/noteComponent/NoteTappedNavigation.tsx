@@ -10,7 +10,7 @@ function NoteTappedNavigationInner({ note }: { note?: Note }) {
   const { openedNotes, setOpenedNotes } = useTapsContext();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const tagSuffix = tagQuerySuffix(searchParams.get("tag"));
+  const tagSuffix = tagQuerySuffix(searchParams.getAll("tag"));
 
   useEffect(() => {
     const handleLocalStorage = () => {
