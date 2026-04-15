@@ -42,13 +42,18 @@ export async function deleteNoteRequest(noteToDelete: NoteWithoutBody) {
   await throwIfNotOk(res);
 }
 
-export async function searchNotesRequest(searchQuery: string) {
-  const res = await fetchWithAuth(
-    `/api/notes/search?searchQuery=${searchQuery}`,
-    {
-      method: "GET",
-    },
-  );
+export async function searchNotesRequest(
+  searchQuery: string,
+  tags: string[] = [],
+) {
+  const params = new URLSearchParams();
+  params.set("searchQuery", searchQuery);
+  if (tags.length > 0) {
+    params.set("tags", JSON.stringify(tags));
+  }
+  const res = await fetchWithAuth(`/api/notes/search?${params.toString()}`, {
+    method: "GET",
+  });
   await throwIfNotOk(res);
   return res.json() as Promise<ApiResponse<SearchNotesResponse>>;
 }

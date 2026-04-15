@@ -5,13 +5,16 @@ import { NextResponse } from "next/server";
 export async function GET(request: Request) {
   await requireAuth();
 
-  const searchQuery = new URL(request.url).searchParams.get("searchQuery");
-  const tags = new URL(request.url).searchParams.get("tags");
+  const url = new URL(request.url);
+  const searchQuery = url.searchParams.get("searchQuery") ?? "";
+  const tags = url.searchParams.getAll("tags");
   const res = await serverFetchWithAuth(
-    `http://localhost:5001/api/notes?searchQuery=${searchQuery}${tags ? `&tags=${tags}` : ""}`,
+    `http://localhost:5001/api/notes?searchQuery=${encodeURIComponent(searchQuery)}${
+      tags ? `&tags=${tags}` : ""
+    }`,
   );
 
   if (!res.ok) return forwardJsonError(res);
-
-  return NextResponse.json(await res.json());
+  const body = await res.json();
+  return NextResponse.json(body);
 }

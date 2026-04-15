@@ -44,6 +44,7 @@ type SearchNotesResponse = {
   slug: string;
   snippet?: string;
   folderName: string;
+  tags: Tag[];
   highLighted: {
     title?: {
       startIndex: number;
