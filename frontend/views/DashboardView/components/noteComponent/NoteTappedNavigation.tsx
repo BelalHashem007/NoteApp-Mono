@@ -2,12 +2,15 @@
 import { useTapsContext } from "@/app/dashboard/providers";
 import Link from "next/link";
 import { FileText, X } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect } from "react";
+import { tagQuerySuffix } from "@/lib/tagQueryUrl";
 
-export default function NoteTappedNavigation({ note }: { note?: Note }) {
+function NoteTappedNavigationInner({ note }: { note?: Note }) {
   const { openedNotes, setOpenedNotes } = useTapsContext();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const tagSuffix = tagQuerySuffix(searchParams.get("tag"));
 
   useEffect(() => {
     const handleLocalStorage = () => {
@@ -34,7 +37,7 @@ export default function NoteTappedNavigation({ note }: { note?: Note }) {
             }`}
           >
             <Link
-              href={`/dashboard/note/${openedNote.slug}`}
+              href={`/dashboard/note/${openedNote.slug}${tagSuffix}`}
               className="pl-3 flex w-full gap-2 h-full items-center justify-center"
             >
               <FileText
@@ -49,6 +52,7 @@ export default function NoteTappedNavigation({ note }: { note?: Note }) {
               </span>
             </Link>
             <button
+              type="button"
               onClick={() => {
                 const updated = openedNotes.filter(
                   (n) => n.slug !== openedNote.slug,
@@ -56,9 +60,12 @@ export default function NoteTappedNavigation({ note }: { note?: Note }) {
                 setOpenedNotes(updated);
                 if (openedNote.slug === note?.slug) {
                   if (updated.length > 0) {
-                    router.push(`/dashboard/note/${updated[0].slug}`);
+                    router.push(
+                      `/dashboard/note/${updated[0].slug}${tagSuffix}`,
+                    );
                   } else {
-                    router.push("/dashboard");
+                    const base = "/dashboard";
+                    router.push(tagSuffix ? `${base}${tagSuffix}` : base);
                   }
                 }
               }}
@@ -70,5 +77,13 @@ export default function NoteTappedNavigation({ note }: { note?: Note }) {
         );
       })}
     </div>
+  );
+}
+
+export default function NoteTappedNavigation({ note }: { note?: Note }) {
+  return (
+    <Suspense fallback={<div className="h-9 bg-muted/30 border-b" />}>
+      <NoteTappedNavigationInner note={note} />
+    </Suspense>
   );
 }

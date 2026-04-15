@@ -5,9 +5,14 @@ import { useMutation } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { createFolderRequest } from "@/lib/folderApi";
+import { updateFoldersInQueryCache } from "@/lib/foldersAndNotesCache";
 import FoldersComponent from "./folderComponents/FoldersComponent";
 
-export default function ExplorerSection() {
+export default function ExplorerSection({
+  folders,
+}: {
+  folders: FolderWithNotes[];
+}) {
   const [showFolderCreationInput, setShowFolderCreationInput] =
     useState<boolean>(false);
   const [openFolders, setOpenFolders] = useState<string[]>([]);
@@ -66,12 +71,8 @@ export default function ExplorerSection() {
           });
       };
 
-      context.client.setQueryData(
-        ["foldersAndNotes"],
-        (old: ApiResponse<FolderWithNotes[]>) => ({
-          ...old,
-          data: createFolderRecursion(old.data ?? []),
-        }),
+      context.client.setQueryData(["foldersAndNotes"], (old: unknown) =>
+        updateFoldersInQueryCache(old, (tree) => createFolderRecursion(tree)),
       );
 
       return { previousFolders };
@@ -93,8 +94,8 @@ export default function ExplorerSection() {
   });
 
   return (
-    <div className="pb-4 space-y-1 grow">
-      <div className="h-9 px-4 flex items-center justify-between text-foreground/70 text-xs font-semibold uppercase tracking-wider">
+    <div className="flex flex-col min-h-0 flex-1 overflow-hidden pb-2">
+      <div className="h-9 px-4 shrink-0 flex items-center justify-between text-foreground/70 text-xs font-semibold uppercase tracking-wider">
         <span>Explorer</span>
         <div>
           <button
@@ -115,14 +116,17 @@ export default function ExplorerSection() {
           </button>
         </div>
       </div>
-      <FoldersComponent
-        onCreateFolder={mutationToCreateFolder.mutate}
-        showFolderCreationInput={showFolderCreationInput}
-        setShowFolderCreationInput={setShowFolderCreationInput}
-        inputRef={inputRef}
-        openFolders={openFolders}
-        setOpenFolders={setOpenFolders}
-      />
+      <div className="min-h-0 flex-1 overflow-y-auto">
+        <FoldersComponent
+          folders={folders}
+          onCreateFolder={mutationToCreateFolder.mutate}
+          showFolderCreationInput={showFolderCreationInput}
+          setShowFolderCreationInput={setShowFolderCreationInput}
+          inputRef={inputRef}
+          openFolders={openFolders}
+          setOpenFolders={setOpenFolders}
+        />
+      </div>
     </div>
   );
 }

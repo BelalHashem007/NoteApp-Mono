@@ -25,6 +25,7 @@ import { updateFolderRequest } from "@/lib/folderApi";
 import toast from "react-hot-toast";
 import { DeleteModal } from "../modals/DeleteModal";
 import { createNoteRequest } from "@/lib/noteApi";
+import { updateFoldersInQueryCache } from "@/lib/foldersAndNotesCache";
 import { usePathname } from "next/navigation";
 
 export default function FolderList({
@@ -108,12 +109,8 @@ export default function FolderList({
         });
       };
 
-      context.client.setQueryData(
-        ["foldersAndNotes"],
-        (old: ApiResponse<FolderWithNotes[]>) => ({
-          ...old,
-          data: updateNameRecursive(old.data ?? []),
-        }),
+      context.client.setQueryData(["foldersAndNotes"], (old: unknown) =>
+        updateFoldersInQueryCache(old, (tree) => updateNameRecursive(tree)),
       );
 
       setActiveAction(null);
@@ -150,7 +147,15 @@ export default function FolderList({
           if (f.id === folderId) {
             return {
               ...f,
-              notes: [...f.notes, { id: crypto.randomUUID(), title, slug: "" }],
+              notes: [
+                ...f.notes,
+                {
+                  id: crypto.randomUUID(),
+                  title,
+                  slug: "",
+                  tags: [],
+                },
+              ],
             };
           }
           if (f.subFolders) {
@@ -160,12 +165,8 @@ export default function FolderList({
         });
       };
 
-      context.client.setQueryData(
-        ["foldersAndNotes"],
-        (old: ApiResponse<FolderWithNotes[]>) => ({
-          ...old,
-          data: createNoteRecursive(old.data ?? []),
-        }),
+      context.client.setQueryData(["foldersAndNotes"], (old: unknown) =>
+        updateFoldersInQueryCache(old, (tree) => createNoteRecursive(tree)),
       );
 
       return { previousFolders };

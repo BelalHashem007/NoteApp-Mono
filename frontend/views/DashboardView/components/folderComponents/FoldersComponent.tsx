@@ -7,11 +7,10 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
-import { useQuery } from "@tanstack/react-query";
-import FolderComponentSkeleton from "@/components/placeholders/FolderComponentSkeleton";
 import { ChevronRight, FolderClosed, FolderPlus } from "lucide-react";
 
 type FoldersComponentProps = {
+  folders: FolderWithNotes[];
   onCreateFolder: (args: { folderName: string; parentId?: string }) => void;
   showFolderCreationInput: boolean;
   setShowFolderCreationInput: React.Dispatch<React.SetStateAction<boolean>>;
@@ -21,6 +20,7 @@ type FoldersComponentProps = {
 };
 
 export default function FoldersComponent({
+  folders,
   onCreateFolder,
   showFolderCreationInput,
   setShowFolderCreationInput,
@@ -33,37 +33,12 @@ export default function FoldersComponent({
     inputRef.current?.focus();
   }, [showFolderCreationInput, inputRef]);
 
-  const {
-    data: result,
-    isPending,
-    isError,
-    error,
-  } = useQuery({
-    queryKey: ["foldersAndNotes"],
-    queryFn: async ({ signal }) => {
-      const res = await fetch(`/api/folders`, {
-        signal,
-      });
-
-      if (!res.ok) throw Error("Failed to fetch folders");
-
-      return res.json();
-    },
-  });
-
-  if (isPending) return <FolderComponentSkeleton />;
-
-  if (isError) {
-    console.error(error);
-    return <div>Failed to fetch folders</div>;
-  }
-
   return (
-    <div className="h-full w-full flex flex-col">
+    <div className="h-full w-full flex flex-col min-h-0">
       {/* <FolderSearch query={query} setQuery={setQuery} /> */}
 
       <FolderList
-        folders={result.data.folders as FolderWithNotes[]}
+        folders={folders}
         level={0}
         onCreateFolder={onCreateFolder}
         openFolders={openFolders}

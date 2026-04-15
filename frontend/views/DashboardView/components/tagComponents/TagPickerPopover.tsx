@@ -1,24 +1,16 @@
 "use client";
 
 import { createTagRequest } from "@/lib/tagsApi";
+import {
+  getAllUserTagsFromFoldersCache,
+  tagNameEquals,
+} from "@/lib/tagsFromFoldersCache";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as React from "react";
 
 function normalizeTagName(input: string) {
   return input.trim().replace(/\s+/g, " ");
-}
-
-function getAllUserTagsFromFoldersCache(cached: unknown): Tag[] {
-  const anyCached = cached as any;
-  const data = anyCached?.data;
-  const tags: unknown =
-    data?.Tags ?? data?.tags ?? data?.TAGS ?? anyCached?.Tags ?? anyCached?.tags;
-  return Array.isArray(tags) ? (tags as Tag[]) : [];
-}
-
-function tagNameEquals(a: string, b: string) {
-  return a.trim().toLowerCase() === b.trim().toLowerCase();
 }
 
 export function TagPickerPopover({
@@ -79,27 +71,21 @@ export function TagPickerPopover({
 
       // Optimistic: global tags list in folders cache
       queryClient.setQueryData(["foldersAndNotes"], (old: any) => {
-        const data = old?.data ?? old;
-        const existing: Tag[] =
-          (data?.Tags ?? data?.tags ?? data?.TAGS ?? []) as Tag[];
+        if (!old?.data || typeof old.data !== "object" || Array.isArray(old.data))
+          return old;
+        const existing: Tag[] = Array.isArray(old.data.tags)
+          ? (old.data.tags as Tag[])
+          : [];
         if (existing.some((t) => tagNameEquals(t.name, normalizedName)))
           return old;
-
         const nextTags = [
           ...existing,
           { id: crypto.randomUUID(), name: normalizedName } satisfies Tag,
         ];
-
-        if (old?.data) {
-          if (Array.isArray(old.data.Tags))
-            return { ...old, data: { ...old.data, Tags: nextTags } };
-          if (Array.isArray(old.data.tags))
-            return { ...old, data: { ...old.data, tags: nextTags } };
-          return { ...old, data: { ...old.data, Tags: nextTags } };
-        }
-        if (Array.isArray(old?.Tags)) return { ...old, Tags: nextTags };
-        if (Array.isArray(old?.tags)) return { ...old, tags: nextTags };
-        return { ...old, Tags: nextTags };
+        return {
+          ...old,
+          data: { ...old.data, tags: nextTags },
+        };
       });
 
       setOpen(false);

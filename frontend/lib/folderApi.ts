@@ -41,3 +41,11 @@ export async function deleteFolderRequest(folder: FolderWithNotes) {
   });
   await throwIfNotOk(res);
 }
+
+export async function fetchFoldersAndNotes(opts?: { signal?: AbortSignal }) {
+  const res = await fetchWithAuth("/api/folders", {
+    signal: opts?.signal,
+  });
+  await throwIfNotOk(res);
+  return res.json() as Promise<unknown>;
+}

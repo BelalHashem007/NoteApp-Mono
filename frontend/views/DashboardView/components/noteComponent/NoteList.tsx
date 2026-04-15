@@ -11,12 +11,14 @@ import {
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import { useMutation } from "@tanstack/react-query";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { Dialog } from "@/components/ui/dialog";
 import { DeleteModal } from "../modals/DeleteModal";
 import { updateNoteTitleRequest } from "@/lib/noteApi";
+import { updateFoldersInQueryCache } from "@/lib/foldersAndNotesCache";
+import { tagQuerySuffix } from "@/lib/tagQueryUrl";
 
 export default function NoteList({
   notes,
@@ -26,7 +28,9 @@ export default function NoteList({
   level: number;
 }) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const activeNoteSlug = pathname.split("/").filter(Boolean)[2];
+  const tagSuffix = tagQuerySuffix(searchParams.get("tag"));
   const { setOpenedNotes } = useTapsContext();
   const [editTitle, setEditTitle] = useState<string | null>(null);
   const [deleteAction, setDeleteAction] = useState<NoteWithoutBody | undefined>(
@@ -61,12 +65,8 @@ export default function NoteList({
         });
       };
 
-      context.client.setQueryData(
-        ["foldersAndNotes"],
-        (old: ApiResponse<FolderWithNotes[]>) => ({
-          ...old,
-          data: updateNameRecursive(old.data ?? []),
-        }),
+      context.client.setQueryData(["foldersAndNotes"], (old: unknown) =>
+        updateFoldersInQueryCache(old, (tree) => updateNameRecursive(tree)),
       );
 
       setEditTitle(null);
@@ -90,7 +90,7 @@ export default function NoteList({
       context.client.invalidateQueries({ queryKey: ["foldersAndNotes"] });
     },
   });
-  console.log(notes);
+
   return (
     <div>
       {notes.map((n) =>
@@ -136,7 +136,7 @@ export default function NoteList({
                       : "text-foreground hover:bg-primary/10"
                   }`}
                   style={{ paddingLeft: 28 + level * 8 }}
-                  href={`/dashboard/note/${n.slug}`}
+                  href={`/dashboard/note/${n.slug}${tagSuffix}`}
                   onClick={() => {
                     setOpenedNotes((prev) => {
                       if (prev.some((x) => x.slug === n.slug)) return prev;

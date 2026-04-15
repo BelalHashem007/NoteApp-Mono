@@ -25,11 +25,12 @@ type NoteWithoutBody = {
   id: string;
   title: string;
   slug: string;
+  tags: Tag[];
 };
 
 type FoldersWithTags = {
-  Folders: FolderWithNotes[];
-  Tags: Tag[];
+  folders: FolderWithNotes[];
+  tags: Tag[];
 };
 
 type Tag = {

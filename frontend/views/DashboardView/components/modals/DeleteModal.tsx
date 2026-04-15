@@ -12,6 +12,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useMutation } from "@tanstack/react-query";
+import { updateFoldersInQueryCache } from "@/lib/foldersAndNotesCache";
 import { useTapsContext } from "@/app/dashboard/providers";
 import { usePathname, useRouter } from "next/navigation";
 
@@ -48,12 +49,8 @@ export function DeleteModal({ onClose, folder, note }: DeleteFolderModalProps) {
         });
       };
 
-      context.client.setQueryData(
-        ["foldersAndNotes"],
-        (old: ApiResponse<FolderWithNotes[]>) => ({
-          ...old,
-          data: deleteFolderRecursive(old.data ?? []),
-        }),
+      context.client.setQueryData(["foldersAndNotes"], (old: unknown) =>
+        updateFoldersInQueryCache(old, (tree) => deleteFolderRecursive(tree)),
       );
 
       return { previousFolders };
@@ -121,12 +118,8 @@ export function DeleteModal({ onClose, folder, note }: DeleteFolderModalProps) {
         });
       };
 
-      context.client.setQueryData(
-        ["foldersAndNotes"],
-        (old: ApiResponse<FolderWithNotes[]>) => ({
-          ...old,
-          data: deleteNoteRecursive(old.data ?? []),
-        }),
+      context.client.setQueryData(["foldersAndNotes"], (old: unknown) =>
+        updateFoldersInQueryCache(old, (tree) => deleteNoteRecursive(tree)),
       );
 
       return { previousFolders };
