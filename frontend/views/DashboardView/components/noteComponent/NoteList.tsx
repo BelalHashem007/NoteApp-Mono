@@ -97,10 +97,10 @@ export default function NoteList({
         editTitle === n.id ? (
           <div
             key={n.id}
-            className="flex gap-2  w-full  items-center "
+            className="flex gap-2 w-full items-center"
             style={{ paddingLeft: 28 + level * 8 }}
           >
-            <FileText className="w-4 h-4 shrink-0 text-black" />
+            <FileText className="w-4 h-4 shrink-0 text-neutral-500" />
             <input
               className="pl-1"
               type="text"
@@ -132,8 +132,8 @@ export default function NoteList({
                 <Link
                   className={`flex gap-2 w-full truncate items-center ${
                     activeNoteSlug === n.slug
-                      ? "bg-secondary/10 text-secondary font-bold"
-                      : "text-foreground hover:bg-primary/10"
+                      ? "bg-neutral-900 text-neutral-50"
+                      : "hover:bg-primary/10"
                   }`}
                   style={{ paddingLeft: 28 + level * 8 }}
                   href={`/dashboard/note/${n.slug}${tagSuffix}`}
@@ -146,9 +146,7 @@ export default function NoteList({
                 >
                   <FileText
                     className={`w-4 h-4 shrink-0 ${
-                      activeNoteSlug === n.slug
-                        ? "text-secondary"
-                        : "text-black"
+                      activeNoteSlug !== n.slug && "text-neutral-500"
                     }`}
                   />{" "}
                   {!mutationToUpdateNoteTitle.isError &&

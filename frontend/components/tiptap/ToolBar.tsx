@@ -26,6 +26,7 @@ import {
   Highlighter,
 } from "lucide-react";
 import { TagPickerPopover } from "@/views/DashboardView/components/tagComponents/TagPickerPopover";
+import { Separator } from "../ui/separator";
 
 type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
 type DropDownState =
@@ -93,7 +94,7 @@ export default function ToolBar({
     }, 0);
   };
   return (
-    <div className="bg-primary/10 border-b  p-3 flex items-center gap-5">
+    <div className="p-3 shrink-0 flex items-center gap-5 border-b border-neutral-200">
       {/* History */}
       <div className="flex gap-2">
         <button
@@ -115,7 +116,7 @@ export default function ToolBar({
       </div>
 
       {/*Seperator*/}
-      <div className="h-full w-px bg-gray-400"></div>
+      <Separator orientation="vertical" />
 
       {/* Tags */}
       {note?.id && note?.slug && (
@@ -135,7 +136,7 @@ export default function ToolBar({
           </TagPickerPopover>
 
           {/*Seperator*/}
-          <div className="h-full w-px bg-gray-400"></div>
+          <Separator orientation="vertical" />
         </>
       )}
 
@@ -146,7 +147,7 @@ export default function ToolBar({
           onOpenChange={setOpenHeadingsList}
         >
           <DropdownMenuTrigger
-            className="border p-2 bg-neutral-100 shadow w-32"
+            className="border p-2 shadow-accent w-32"
             asChild
           >
             <button className="rounded-md text-left relative">
@@ -239,7 +240,7 @@ export default function ToolBar({
       </div>
 
       {/*Seperator*/}
-      <div className="h-full w-px bg-gray-400"></div>
+      <Separator orientation="vertical" />
 
       {/*Lists*/}
       <div className="flex gap-3">
@@ -270,7 +271,7 @@ export default function ToolBar({
       </div>
 
       {/*Seperator*/}
-      <div className="h-full w-px bg-gray-400"></div>
+      <Separator orientation="vertical" />
 
       {/* Text Formatting */}
       <div className="flex gap-3">
@@ -319,7 +320,7 @@ export default function ToolBar({
       </div>
 
       {/*Seperator*/}
-      <div className="h-full w-px bg-gray-400"></div>
+      <Separator orientation="vertical" />
 
       {/* HorizontalLine */}
       <div>
@@ -333,7 +334,7 @@ export default function ToolBar({
       </div>
 
       {/*Seperator*/}
-      <div className="h-full w-px bg-gray-400"></div>
+      <Separator orientation="vertical" />
 
       {/* HighLighter */}
       <div className="relative flex items-center gap-2">

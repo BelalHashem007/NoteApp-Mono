@@ -5,7 +5,7 @@ export default function DashboardView() {
         {/* Header */}
         <div className="space-y-2">
           <h1 className="text-4xl font-semibold text-foreground">
-            Welcome to NoteFlow
+            No note selected
           </h1>
           <p className="text-lg text-muted-foreground">
             Select a note from the explorer or create a new one

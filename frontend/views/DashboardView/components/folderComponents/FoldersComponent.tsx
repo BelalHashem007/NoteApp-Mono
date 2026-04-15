@@ -47,8 +47,8 @@ export default function FoldersComponent({
 
       {showFolderCreationInput && (
         <div className="pl-2 flex gap-2 items-center w-full">
-          <ChevronRight className="w-3 h-3" />
-          <FolderClosed className="w-4 h-4 shrink-0 text-primary" />
+          <ChevronRight className="w-3 h-3 text-neutral-500" />
+          <FolderClosed className="w-4 h-4 shrink-0 text-neutral-500 text-neutral-500" />
           <input
             className="pl-1"
             type="text"

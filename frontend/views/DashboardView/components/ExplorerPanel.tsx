@@ -47,7 +47,7 @@ function ExplorerPanelContent() {
       <div className="flex-7 min-h-0 flex flex-col overflow-hidden">
         <ExplorerSection folders={filteredFolders} />
       </div>
-      <div className="flex-3 min-h-0 flex flex-col overflow-hidden border-t border-border/60 shrink-0">
+      <div className="flex-3 min-h-0 flex flex-col overflow-hidden border-neutral-200 border-t shrink-0">
         <TagFilterSection
           tags={globalTags}
           folders={folders}

@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ChevronDown, Tag as TagIcon } from "lucide-react";
 import { tagNameEquals } from "@/lib/tagsFromFoldersCache";
+import { Badge } from "@/components/ui/badge";
 
 export function TagFilterSection({
   tags,
@@ -66,7 +67,7 @@ export function TagFilterSection({
   if (tags.length === 0) return null;
 
   return (
-    <div className="flex flex-col min-h-0 flex-1 px-2 pt-2 pb-1">
+    <div className="flex flex-col gap-1 min-h-0 flex-1 px-2 pt-2 pb-1">
       <button
         type="button"
         onClick={() => setIsOpen((v) => !v)}
@@ -82,42 +83,20 @@ export function TagFilterSection({
       </button>
 
       {isOpen ? (
-        <div className="overflow-y-auto min-h-0 flex-1 flex flex-col gap-1 px-1">
+        <div className="overflow-y-auto min-h-0 flex-1 flex flex-wrap gap-1 px-1">
           {tags.map((t) => {
             const isActive = !!(
               activeTags && tagNameEquals(activeTags, t.name)
             );
-            const key = t.name.trim().toLowerCase();
-            const count = countsByTag.get(key) ?? 0;
-            const iconClass = colorClasses[Number(t.id) % colorClasses.length];
-
             return (
-              <button
-                key={t.id ?? t.name}
-                type="button"
+              <Badge
+                asChild
+                key={t.id}
+                className={`p-2 ${isActive ? "bg-neutral-950 text-white cursor-pointer" : "bg-neutral-200 text-black"}`}
                 title={t.name}
-                onClick={() => toggle(t.name)}
-                className={`flex items-center justify-between gap-2 rounded-lg px-2 py-1.5 text-sm transition-colors hover:bg-primary/10`}
               >
-                <span className="flex items-center gap-2 min-w-0">
-                  <TagIcon className={`h-4 w-4 shrink-0 ${iconClass}`} />
-                  <span
-                    className={`truncate ${
-                      isActive
-                        ? "bg-secondary/15 text-secondary"
-                        : "text-foreground"
-                    }`}
-                  >
-                    #{t.name}
-                  </span>
-                </span>
-                <span
-                  className={`shrink-0 rounded-full px-2 py-0.5 text-xs tabular-nums bg-muted text-foreground/70`}
-                  aria-label={`${count} notes`}
-                >
-                  {count}
-                </span>
-              </button>
+                <button onClick={() => toggle(t.name)}>#{t.name}</button>
+              </Badge>
             );
           })}
         </div>

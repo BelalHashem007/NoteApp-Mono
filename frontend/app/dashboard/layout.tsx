@@ -8,7 +8,7 @@ export default function layout({
 }>) {
   return (
     <TapProvider>
-      <div className="h-screen w-full flex bg-background overflow-hidden">
+      <div className="h-screen w-full flex bg-white overflow-hidden">
         <LeftSideBar />
         <main className="flex-1 flex flex-col min-h-0">{children}</main>
       </div>

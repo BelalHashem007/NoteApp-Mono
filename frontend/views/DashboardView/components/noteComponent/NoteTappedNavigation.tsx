@@ -25,26 +25,22 @@ function NoteTappedNavigationInner({ note }: { note?: Note }) {
   }, [setOpenedNotes, note]);
 
   return (
-    <div className="h-9 bg-muted/30 border-b flex items-center overflow-x-auto">
+    <div className="h-9 border-b border-neutral-200 flex items-center overflow-x-auto">
       {openedNotes.map((openedNote) => {
         return (
           <div
             key={openedNote.slug}
-            className={`group h-full flex items-center gap-2 border-border cursor-pointer min-w-30 max-w-50 ${
+            className={`group h-full flex items-center gap-2 border-r border-neutral-200 cursor-pointer min-w-30 max-w-50 ${
               note?.slug === openedNote.slug
-                ? "bg-white text-secondary border-b-2 border-secondary"
-                : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                ? "bg-white text-neutral-950"
+                : "bg-neutral-100 text-neutral-500 hover:text-foreground hover:bg-muted/50"
             }`}
           >
             <Link
               href={`/dashboard/note/${openedNote.slug}${tagSuffix}`}
               className="pl-3 flex w-full gap-2 h-full items-center justify-center"
             >
-              <FileText
-                className={`w-4 h-4 shrink-0 ${
-                  note?.slug === openedNote.slug ? "text-secondary" : ""
-                }`}
-              />
+              <FileText className={`w-4 h-4 shrink-0 text-neutral-500`} />
               <span
                 className={`text-xs truncate flex-1 text-black ${note?.slug === openedNote.slug ? "font-bold" : ""} `}
               >
@@ -71,7 +67,7 @@ function NoteTappedNavigationInner({ note }: { note?: Note }) {
               }}
               className="mr-3 w-4 h-4 flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-muted rounded-full transition-all"
             >
-              <X className="w-3 h-3" />
+              <X className="size-3" />
             </button>
           </div>
         );

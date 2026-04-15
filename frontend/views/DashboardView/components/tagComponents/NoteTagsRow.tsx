@@ -51,7 +51,7 @@ export function NoteTagsRow({
         searchParams.toString() ? `?${searchParams.toString()}` : ""
       }`;
 
-      queryClient.setQueryData(["note", noteSlug], (old: {data:Note}) => {
+      queryClient.setQueryData(["note", noteSlug], (old: { data: Note }) => {
         const existingTags: Tag[] = (old?.data?.tags ?? []) as Tag[];
         return {
           ...old,
@@ -86,13 +86,15 @@ export function NoteTagsRow({
                 return { ...n, tags: nextTags };
               });
 
-              const nextSub =
-                f.subFolders?.length ? updateFolders(f.subFolders) : f.subFolders;
+              const nextSub = f.subFolders?.length
+                ? updateFolders(f.subFolders)
+                : f.subFolders;
 
               // keep referential stability when possible
               const notesChanged = nextNotes.some((n, i) => n !== f.notes?.[i]);
               const subChanged =
-                (nextSub ?? []).some((sf, i) => sf !== f.subFolders?.[i]) ?? false;
+                (nextSub ?? []).some((sf, i) => sf !== f.subFolders?.[i]) ??
+                false;
               if (!notesChanged && !subChanged) return f;
 
               return { ...f, notes: nextNotes, subFolders: nextSub ?? [] };
@@ -147,14 +149,22 @@ export function NoteTagsRow({
         router.replace(q ? `${pathname}?${q}` : pathname);
       }
 
-      return { previousNote, previousFoldersAndNotes, removedGlobally, previousUrl };
+      return {
+        previousNote,
+        previousFoldersAndNotes,
+        removedGlobally,
+        previousUrl,
+      };
     },
     onError: (_err, _name, ctx) => {
       if (ctx?.previousNote !== undefined) {
         queryClient.setQueryData(["note", noteSlug], ctx.previousNote);
       }
       if (ctx?.previousFoldersAndNotes !== undefined) {
-        queryClient.setQueryData(["foldersAndNotes"], ctx.previousFoldersAndNotes);
+        queryClient.setQueryData(
+          ["foldersAndNotes"],
+          ctx.previousFoldersAndNotes,
+        );
       }
       if (ctx?.removedGlobally && ctx?.previousUrl) {
         router.replace(ctx.previousUrl);
@@ -167,7 +177,7 @@ export function NoteTagsRow({
   });
 
   return (
-    <div className="bg-muted/10 border-b px-3 py-2">
+    <div className="border-neutral-200 border-b px-3 py-2">
       <div className="flex flex-wrap items-center gap-2 min-h-8">
         {(tags ?? []).map((tag) => (
           <span
@@ -210,4 +220,3 @@ export function NoteTagsRow({
     </div>
   );
 }
-

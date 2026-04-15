@@ -200,13 +200,13 @@ export default function FolderList({
               >
                 {openFolders.includes(f.id) ? (
                   <>
-                    <ChevronDown className="w-3 h-3" />
-                    <FolderOpen className="w-4 h-4 shrink-0 text-primary" />
+                    <ChevronDown className="w-3 h-3 text-neutral-500" />
+                    <FolderOpen className="w-4 h-4 shrink-0 text-neutral-500" />
                   </>
                 ) : (
                   <>
-                    <ChevronRight className="w-3 h-3" />
-                    <FolderClosed className="w-4 h-4 shrink-0 text-primary" />
+                    <ChevronRight className="w-3 h-3 text-neutral-500" />
+                    <FolderClosed className="w-4 h-4 shrink-0 text-neutral-500" />
                   </>
                 )}
                 <input
@@ -256,13 +256,13 @@ export default function FolderList({
                   >
                     {openFolders.includes(f.id) ? (
                       <>
-                        <ChevronDown className="w-3 h-3" />
-                        <FolderOpen className="w-4 h-4 shrink-0 text-primary" />
+                        <ChevronDown className="w-3 h-3 text-neutral-500" />
+                        <FolderOpen className="w-4 h-4 shrink-0 text-neutral-500" />
                       </>
                     ) : (
                       <>
-                        <ChevronRight className="w-3 h-3" />
-                        <FolderClosed className="w-4 h-4 shrink-0 text-primary" />
+                        <ChevronRight className="w-3 h-3 text-neutral-500" />
+                        <FolderClosed className="w-4 h-4 shrink-0 text-neutral-500" />
                       </>
                     )}{" "}
                     <span className="truncate inline-block max-w-50">
@@ -362,8 +362,8 @@ export default function FolderList({
                       className="pl-2 flex gap-2 items-center w-full"
                       style={{ paddingLeft: 8 + (level + 1) * 8 }}
                     >
-                      <ChevronRight className="w-3 h-3" />
-                      <FolderClosed className="w-4 h-4 shrink-0 text-primary" />
+                      <ChevronRight className="w-3 h-3 text-neutral-500" />
+                      <FolderClosed className="w-4 h-4 shrink-0 text-neutral-500" />
                       <input
                         className="pl-1"
                         type="text"
@@ -403,7 +403,7 @@ export default function FolderList({
                       className="flex gap-2  w-full  items-center "
                       style={{ paddingLeft: 28 + (level + 1) * 8 }}
                     >
-                      <FileText className="w-4 h-4 shrink-0 text-black" />
+                      <FileText className="w-4 h-4 shrink-0 text-neutral-500" />
                       <input
                         className="pl-1"
                         type="text"
