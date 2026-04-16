@@ -135,8 +135,8 @@ const Tiptap = ({ note }: { note?: Note }) => {
   }, [debounced]);
 
   return (
-    <div className="flex flex-1 bg-[#FAFAFB] overflow-hidden">
-      <div className="bg-white flex-1 flex flex-col">
+    <div className="flex flex-1 overflow-hidden">
+      <div className="flex-1 flex flex-col">
         <ToolBar editor={editor} note={note} />
         <div className="flex-1 overflow-y-auto min-h-0 max-h-200">
           {editor && (
@@ -148,12 +148,12 @@ const Tiptap = ({ note }: { note?: Note }) => {
                 strategy: "fixed",
               }}
             >
-              <GripVertical className="size-5 cursor-grab text-center p-0.5" />
+              <GripVertical className="size-5 cursor-grab text-center p-0.5 mr-5" />
             </DragHandle>
           )}
           <EditorContent
             editor={editor}
-            className="flex flex-col min-h-0 text-foreground text-lg leading-relaxed"
+            className="flex flex-col min-h-0 dark:text-neutral-50 text-foreground text-lg leading-relaxed"
           />
         </div>
       </div>

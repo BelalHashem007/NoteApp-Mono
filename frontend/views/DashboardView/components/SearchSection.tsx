@@ -17,6 +17,11 @@ import {
   getAllUserTagsFromFoldersCache,
   tagNameEquals,
 } from "@/lib/tagsFromFoldersCache";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 
 type HighlightRange =
   | {
@@ -47,7 +52,7 @@ function HighlightedText({
   return (
     <>
       {before}
-      <mark className="bg-primary/20 text-foreground rounded px-0.5 truncate">
+      <mark className="bg-primary/20 dark:bg-neutral-600 font-bold text-foreground dark:text-foreground/80 rounded px-0.5 truncate">
         {match}
       </mark>
       {after}
@@ -105,14 +110,14 @@ export default function SearchSection() {
       </div>
 
       <div className="px-4">
-        <div className="flex items-center gap-2 rounded-md border border-border bg-background px-3 py-2">
-          <Search className="w-4 h-4 text-muted-foreground shrink-0" />
+        <div className="flex items-center gap-2 rounded-md border border-border dark:border-neutral-600 bg-background dark:bg-neutral-800 px-3 py-2">
+          <Search className="w-4 h-4 text-muted-foreground dark:text-neutral-500 shrink-0" />
           <input
             ref={inputRef}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search notes..."
-            className="w-full bg-transparent outline-none text-sm text-foreground placeholder:text-muted-foreground"
+            className="w-full bg-transparent outline-none text-sm text-foreground placeholder:text-muted-foreground dark:placeholder:text-neutral-500"
             type="text"
             autoFocus
           />
@@ -120,13 +125,13 @@ export default function SearchSection() {
             <PopoverTrigger asChild>
               <button
                 type="button"
-                className="inline-flex min-h-7.5 items-center gap-2 rounded-md border border-border bg-background/60 px-2 py-1 text-xs text-muted-foreground hover:bg-background hover:text-foreground transition-colors"
+                className="inline-flex min-h-7.5 items-center gap-2 rounded-md border border-border dark:border-neutral-600 bg-background/60 dark:bg-neutral-700 px-2 py-1 text-xs text-muted-foreground dark:text-neutral-400 hover:bg-background dark:hover:bg-neutral-600 hover:text-foreground transition-colors"
                 title="Filter tags"
               >
                 <Filter className="h-3.5 w-3.5" />
                 <span className="hidden sm:inline">Filter</span>
                 {selectedTags.length > 0 ? (
-                  <span className="ml-1 rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] text-foreground tabular-nums">
+                  <span className="ml-1 rounded-full bg-primary/10 dark:bg-neutral-500  px-1.5 py-0.5 text-[10px] text-foreground tabular-nums">
                     {selectedTags.length}
                   </span>
                 ) : null}
@@ -138,7 +143,7 @@ export default function SearchSection() {
                   value={tagQuery}
                   onChange={(e) => setTagQuery(e.target.value)}
                   placeholder="Filter tags..."
-                  className="h-9 w-full rounded-md border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/30"
+                  className="h-9 w-full rounded-md border border-border dark:border-0 bg-background dark:bg-neutral-700 px-3 text-sm outline-none focus:outline-0 focus:ring-2 focus:ring-primary/30 dark:focus:ring-neutral-600"
                   onKeyDown={(e) => {
                     if (e.key === "Escape") {
                       e.preventDefault();
@@ -172,14 +177,14 @@ export default function SearchSection() {
                               return [...prev, t.name.trim()];
                             });
                           }}
-                          className="w-full flex items-center justify-between gap-2 text-left px-3 py-2 text-sm hover:bg-muted/40"
+                          className="w-full flex items-center justify-between gap-2 text-left px-3 py-2 text-sm hover:bg-muted/40 dark:hover:bg-neutral-700/40"
                           title={t.name}
                         >
                           <div className="flex max-w-full gap-2 items-center">
                             <span
-                              className={`h-4 w-4 shrink-0 rounded-full border border-border text-[10px] flex items-center justify-center ${
+                              className={`h-4 w-4 shrink-0 rounded-full border border-border dark:border-neutral-500 text-[10px] flex items-center justify-center ${
                                 isSelected
-                                  ? "bg-primary text-primary-foreground"
+                                  ? "bg-primary text-primary-foreground dark:text-neutral-100 dark:bg-neutral-600"
                                   : "bg-background"
                               }`}
                               aria-hidden="true"
@@ -214,11 +219,11 @@ export default function SearchSection() {
 
       <div className="px-2 overflow-y-auto py-1">
         {trimmed.length === 0 ? (
-          <div className="px-2 py-3 text-sm text-muted-foreground">
+          <div className="px-2 py-3 text-sm text-muted-foreground dark:text-neutral-400">
             Type to search your notes.
           </div>
         ) : isFetching ? (
-          <div className="px-2 py-3 text-sm text-muted-foreground">
+          <div className="px-2 py-3 text-sm text-muted-foreground dark:text-neutral-400">
             Searching…
           </div>
         ) : isError ? (
@@ -226,7 +231,7 @@ export default function SearchSection() {
             Failed to search.
           </div>
         ) : results.length === 0 ? (
-          <div className="px-2 py-3 text-sm text-muted-foreground">
+          <div className="px-2 py-3 text-sm text-muted-foreground dark:text-neutral-400">
             No results.
           </div>
         ) : (
@@ -241,7 +246,7 @@ export default function SearchSection() {
                     return [...prev, { slug: r.slug, title: r.title }];
                   });
                 }}
-                className="flex gap-3 rounded-md px-3 py-2 hover:bg-primary/10"
+                className="flex gap-3 rounded-md px-3 py-2 hover:bg-primary/10 dark:hover:bg-neutral-800"
               >
                 <FileText className="w-4 h-4 mt-0.5 text-foreground/70 shrink-0" />
                 <div className="min-w-0 flex flex-col gap-0.5">
@@ -251,7 +256,7 @@ export default function SearchSection() {
                       range={r.highLighted?.title}
                     />
                   </div>
-                  <div className="text-xs text-muted-foreground truncate">
+                  <div className="text-xs text-muted-foreground dark:text-neutral-400 truncate">
                     {r.folderName}
                   </div>
                   {r.snippet ? (
@@ -267,38 +272,31 @@ export default function SearchSection() {
                       {(r.tags ?? []).slice(0, 2).map((t: Tag) => (
                         <span
                           key={t.id ?? t.name}
-                          className="inline-flex items-center rounded-full bg-primary/10 text-foreground px-2 py-0.5 text-[10px] font-medium"
+                          className="inline-flex items-center rounded-full bg-primary/10 text-foreground px-2 py-0.5 text-[10px] font-medium dark:bg-neutral-700 dark:text-neutral-200"
                           title={t.name}
                         >
                           #{t.name}
                         </span>
                       ))}
                       {(r.tags?.length ?? 0) > 2 ? (
-                        <Popover>
-                          <PopoverTrigger asChild>
+                        <HoverCard openDelay={10} closeDelay={100}>
+                          <HoverCardTrigger asChild>
                             <button
                               type="button"
-                              className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-[10px] text-foreground/70 hover:bg-muted/80"
-                              title="More tags"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                              }}
-                              onMouseDown={(e) => e.preventDefault()}
+                              className="inline-flex items-center rounded-full bg-muted dark:bg-transparent px-2 py-0.5 text-[10px] text-foreground/70"
                             >
                               +{(r.tags?.length ?? 0) - 2}
                             </button>
-                          </PopoverTrigger>
-                          <PopoverContent
+                          </HoverCardTrigger>
+                          <HoverCardContent
                             align="start"
-                            className="w-56 p-2"
-                            onOpenAutoFocus={(e) => e.preventDefault()}
+                            className="w-56 p-2 dark:bg-neutral-800"
                           >
                             <div className="flex flex-wrap gap-1">
                               {(r.tags ?? []).slice(0, 5).map((t: Tag) => (
                                 <span
                                   key={t.id ?? t.name}
-                                  className="inline-flex items-center rounded-full bg-primary/10 text-foreground px-2 py-0.5 text-[10px] font-medium"
+                                  className="inline-flex items-center rounded-full bg-primary/10 text-foreground dark:bg-neutral-700 dark:text-neutral-200 px-2 py-0.5 text-[10px] font-medium"
                                   title={t.name}
                                 >
                                   #{t.name}
@@ -310,8 +308,8 @@ export default function SearchSection() {
                                 </span>
                               ) : null}
                             </div>
-                          </PopoverContent>
-                        </Popover>
+                          </HoverCardContent>
+                        </HoverCard>
                       ) : null}
                     </div>
                   ) : null}

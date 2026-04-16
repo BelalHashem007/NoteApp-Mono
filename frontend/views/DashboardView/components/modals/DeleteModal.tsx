@@ -208,7 +208,7 @@ export function DeleteModal({ onClose, folder, note }: DeleteFolderModalProps) {
                   mutatuionToDeleteNote.isPending
                 }
                 type="button"
-                className="bg-muted hover:bg-muted/80 text-foreground h-10 px-6 rounded-full
+                className="bg-neutral-200 dark:bg-neutral-500 hover:bg-neutral-300 dark:hover:bg-neutral-600 text-foreground h-10 px-6 rounded-full
                         disabled:bg-[#e0e0e0] disabled:text-[#a1a1a1] disabled:opacity-70 disabled:border disabled:border-[#d1d1d1]"
               >
                 Cancel
@@ -220,7 +220,7 @@ export function DeleteModal({ onClose, folder, note }: DeleteFolderModalProps) {
                 mutatuionToDeleteNote.isPending
               }
               type="submit"
-              className="bg-destructive hover:bg-destructive/90 text-destructive-foreground h-10 px-6 gap-2 flex items-center justify-center rounded-full "
+              className="bg-destructive/80 hover:bg-destructive/90 text-neutral-200 h-10 px-6 gap-2 flex items-center justify-center rounded-full "
             >
               {mutatuionToDeleteFolder.isPending ||
               mutatuionToDeleteNote.isPending ? (

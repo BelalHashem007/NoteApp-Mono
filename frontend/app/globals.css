@@ -5,7 +5,7 @@
 @import "highlight.js/styles/github-dark.css";
 
 /*---break---*/
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (&:where(.dark, .dark *));
 
 /*TipTap global styles*/
 .tiptap {
@@ -66,6 +66,9 @@
     li[data-checked="true"] {
       text-decoration: line-through;
       color: var(--muted-foreground);
+      &:where(.dark, .dark *) {
+        color: #e0e0e0/50;
+      }
     }
 
     input[type="checkbox"] {
@@ -85,6 +88,10 @@
     margin: 1.5rem 0;
     padding-left: 1rem;
     background-color: #f0f2f5;
+    &:where(.dark, .dark *) {
+      border-left: 5px solid white;
+      background-color: #171717;
+    }
   }
   pre {
     background: black;
@@ -93,6 +100,10 @@
     font-family: "JetBrainsMono", monospace;
     margin: 1.5rem 0;
     padding: 0.75rem 1rem;
+
+    &:where(.dark, .dark *) {
+      background-color: #171717;
+    }
 
     code {
       background: none;
@@ -185,46 +196,46 @@
 }
 
 .dark {
-  --neutral: #2a1835;
-  --background: #12081a;
-  --foreground: #faf4fc;
-  --card: #1c1024;
-  --card-foreground: #faf4fc;
-  --popover: #1c1024;
-  --popover-foreground: #faf4fc;
-  --primary: #c266f5;
-  --primary-foreground: #1a0d24;
-  --secondary: #e04d8f;
-  --secondary-foreground: #ffffff;
-  --tertiary: #ffd709;
-  --tertiary-foreground: #1a0d24;
-  --muted: #2a1835;
-  --muted-foreground: #c4b8cc;
-  --accent: #ffd709;
-  --accent-foreground: #1a0d24;
-  --destructive: #f87171;
-  --destructive-foreground: #1a0d24;
-  --border: #3d2a4a;
-  --input: transparent;
-  --input-background: #1c1024;
-  --switch-background: #3d2a4a;
-  --font-weight-medium: 500;
-  --font-weight-normal: 400;
-  --ring: #c266f5;
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: #12081a;
-  --sidebar-foreground: #faf4fc;
-  --sidebar-primary: #c266f5;
-  --sidebar-primary-foreground: #1a0d24;
-  --sidebar-accent: #2a1835;
-  --sidebar-accent-foreground: #faf4fc;
-  --sidebar-border: #3d2a4a;
-  --sidebar-ring: #c266f5;
+  --neutral: #1a1a1a;
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+
+  --card: oklch(0.18 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.18 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+
+  --primary: oklch(0.985 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.25 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+
+  --muted: oklch(0.25 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.25 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+
+  --destructive: oklch(0.627 0.194 28.948);
+  --border: oklch(0.25 0 0);
+  --input: oklch(0.25 0 0);
+  --ring: oklch(0.842 0 0);
+
+  --sidebar: oklch(0.145 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.985 0 0);
+  --sidebar-primary-foreground: oklch(0.205 0 0);
+  --sidebar-accent: oklch(0.25 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(0.25 0 0);
+  --sidebar-ring: oklch(0.842 0 0);
+
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.7 0.118 184.704);
+  --chart-3: oklch(0.5 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
 }
+
 @theme inline {
   --font-sans:
     var(--font-plus-jakarta-sans, ui-sans-serif), ui-sans-serif, system-ui,

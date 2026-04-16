@@ -149,7 +149,7 @@ export function TagPickerPopover({
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Add a tag…"
-            className="h-9 w-full rounded-md border border-border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-primary/30"
+            className="h-9 w-full rounded-md border border-border dark:border-0 bg-background dark:bg-neutral-700 px-3 text-sm outline-none focus:outline-0 focus:ring-2 focus:ring-primary/30 dark:focus:ring-neutral-600"
             onKeyDown={(e) => {
               if (e.key === "Escape") {
                 e.preventDefault();
@@ -165,11 +165,11 @@ export function TagPickerPopover({
             }}
           />
 
-          <div className="max-h-56 overflow-auto rounded-md border border-border bg-background">
+          <div className="max-h-56 overflow-auto rounded-md">
             {normalizedQuery && !hasExactMatch && (
               <button
                 type="button"
-                className="w-full text-left px-3 py-2 text-sm hover:bg-muted/40"
+                className="w-full text-left px-3 py-2 text-sm hover:bg-muted/40 dark:hover:bg-neutral-700/30"
                 onClick={() => commit(normalizedQuery)}
                 disabled={mutation.isPending}
               >
@@ -191,7 +191,7 @@ export function TagPickerPopover({
                 <button
                   key={t.id ?? t.name}
                   type="button"
-                  className="w-full text-left px-3 py-2 text-sm hover:bg-muted/40 disabled:opacity-60"
+                  className="w-full text-left px-3 py-2 text-sm hover:bg-muted/40 dark:hover:bg-neutral-700/30 disabled:opacity-60"
                   onClick={() => commit(t.name)}
                   disabled={alreadyOnNote || mutation.isPending}
                   title={alreadyOnNote ? "Already added" : t.name}

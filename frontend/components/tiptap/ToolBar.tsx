@@ -94,9 +94,9 @@ export default function ToolBar({
     }, 0);
   };
   return (
-    <div className="p-3 shrink-0 flex items-center gap-5 border-b border-neutral-200">
+    <div className="p-3 shrink-0 flex items-center gap-5 border-b dark:text-[#a1a1a1] border-neutral-200 dark:border-white/10">
       {/* History */}
-      <div className="flex gap-2">
+      <div className="flex gap-2 ">
         <button
           onClick={() => editor.chain().focus().undo().run()}
           disabled={!editorState?.canUndo}
@@ -147,7 +147,7 @@ export default function ToolBar({
           onOpenChange={setOpenHeadingsList}
         >
           <DropdownMenuTrigger
-            className="border p-2 shadow-accent w-32"
+            className="border dark:border-neutral-700 p-2 shadow-accent w-32"
             asChild
           >
             <button className="rounded-md text-left relative">
@@ -162,7 +162,7 @@ export default function ToolBar({
           >
             <DropdownMenuGroup>
               <DropdownMenuItem
-                className={`${editorState?.isParagraph && "bg-accent/40"} `}
+                className={`${editorState?.isParagraph && "bg-accent/40 dark:bg-neutral-700/30"} `}
                 onSelect={(e) => {
                   e.preventDefault();
                   handleHeadingChange("Paragraph");
@@ -246,7 +246,7 @@ export default function ToolBar({
       <div className="flex gap-3">
         <button
           onClick={() => editor.chain().focus().toggleBulletList().run()}
-          className={`${editorState?.isBulletList ? "bg-primary/50 shadow text-white" : "hover:bg-primary/10"} rounded-full p-2`}
+          className={`${editorState?.isBulletList ? "bg-primary/50 dark:bg-neutral-700 shadow text-white" : "hover:bg-primary/10 dark:hover:bg-neutral-800"} rounded-full p-2`}
           title="Bullet List"
           type="button"
         >
@@ -254,7 +254,7 @@ export default function ToolBar({
         </button>
         <button
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
-          className={`${editorState?.isOrderedList ? "bg-primary/50 shadow text-white" : "hover:bg-primary/10"} rounded-full p-2 transition-all`}
+          className={`${editorState?.isOrderedList ? "bg-primary/50 dark:bg-neutral-700 shadow text-white" : "hover:bg-primary/10 dark:hover:bg-neutral-800"} rounded-full p-2 transition-all`}
           title="Ordered List"
           type="button"
         >
@@ -262,7 +262,7 @@ export default function ToolBar({
         </button>
         <button
           onClick={() => editor.chain().focus().toggleTaskList().run()}
-          className={`${editorState?.isTaskList ? "bg-primary/50 shadow text-white" : "hover:bg-primary/10"} rounded-full p-2 transition-all`}
+          className={`${editorState?.isTaskList ? "bg-primary/50 dark:bg-neutral-700 shadow text-white" : "hover:bg-primary/10 dark:hover:bg-neutral-800"} rounded-full p-2 transition-all`}
           title="Task List"
           type="button"
         >
@@ -277,42 +277,42 @@ export default function ToolBar({
       <div className="flex gap-3">
         <button
           onClick={() => editor.chain().focus().toggleBold().run()}
-          className={`${editorState?.isBold ? "bg-primary/50 shadow text-white" : "hover:bg-primary/10"} rounded-full p-2 transition-all`}
+          className={`${editorState?.isBold ? "bg-primary/50 dark:bg-neutral-700 shadow text-white" : "hover:bg-primary/10 dark:hover:bg-neutral-800"} rounded-full p-2 transition-all`}
           title="Bold"
         >
           <Bold />
         </button>
         <button
           onClick={() => editor.chain().focus().toggleItalic().run()}
-          className={`${editorState?.isItalic ? "bg-primary/50 shadow text-white" : "hover:bg-primary/10"} rounded-full p-2 transition-all`}
+          className={`${editorState?.isItalic ? "bg-primary/50 dark:bg-neutral-700 shadow text-white" : "hover:bg-primary/10 dark:hover:bg-neutral-800"} rounded-full p-2 transition-all`}
           title="Italic"
         >
           <Italic />
         </button>
         <button
           onClick={() => editor.chain().focus().toggleUnderline().run()}
-          className={`${editorState?.isUnderline ? "bg-primary/50 shadow text-white" : "hover:bg-primary/10"} rounded-full p-2 transition-all`}
+          className={`${editorState?.isUnderline ? "bg-primary/50 dark:bg-neutral-700 shadow text-white" : "hover:bg-primary/10 dark:hover:bg-neutral-800"} rounded-full p-2 transition-all`}
           title="Underline"
         >
           <Underline />
         </button>
         <button
           onClick={() => editor.chain().focus().toggleStrike().run()}
-          className={`${editorState?.isStrike ? "bg-primary/50 shadow text-white" : "hover:bg-primary/10"} rounded-full p-2 transition-all`}
+          className={`${editorState?.isStrike ? "bg-primary/50 dark:bg-neutral-700 shadow text-white" : "hover:bg-primary/10 dark:hover:bg-neutral-800"} rounded-full p-2 transition-all`}
           title="Strikethrough"
         >
           <Strikethrough />
         </button>
         <button
           onClick={() => editor.chain().focus().toggleBlockquote().run()}
-          className={`${editorState?.isBlockquote ? "bg-primary/50 shadow text-white" : "hover:bg-primary/10"}  rounded-full p-2 transition-all`}
+          className={`${editorState?.isBlockquote ? "bg-primary/50 shadow text-white dark:bg-neutral-700" : "hover:bg-primary/10 dark:hover:bg-neutral-800"}  rounded-full p-2 transition-all`}
           title="Blockquote"
         >
           <TextQuote />
         </button>
         <button
           onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-          className={`${editorState?.isCodeBlock ? "bg-primary/50 shadow text-white" : "hover:bg-primary/10"}  rounded-full p-2 transition-all`}
+          className={`${editorState?.isCodeBlock ? "bg-primary/50 shadow text-white dark:bg-neutral-700" : "hover:bg-primary/10 dark:hover:bg-neutral-800"}  rounded-full p-2 transition-all`}
           title="Code Block"
         >
           <Code />
@@ -326,7 +326,7 @@ export default function ToolBar({
       <div>
         <button
           onClick={() => editor.chain().focus().setHorizontalRule().run()}
-          className={`hover:bg-primary/10 rounded-full p-2 transition-all`}
+          className={`hover:bg-primary/10 dark:hover:bg-neutral-800 rounded-full p-2 transition-all`}
           title="Horizontal Line"
         >
           <Minus />
@@ -340,7 +340,7 @@ export default function ToolBar({
       <div className="relative flex items-center gap-2">
         <label
           htmlFor="highlighter-input"
-          className="flex items-center justify-center rounded-full p-2 cursor-pointer hover:bg-primary/10 transition-all"
+          className="flex items-center justify-center border dark:border-neutral-700 rounded-full p-2 cursor-pointer hover:bg-primary/10 dark:hover:bg-neutral-800 transition-all"
         >
           <Highlighter style={{ fill: highLighterColor }} />
         </label>
@@ -365,7 +365,7 @@ export default function ToolBar({
             setHighLighterColor(color);
             editor.chain().focus().toggleHighlight({ color }).run();
           }}
-          className={`${editorState?.isHighlight ? "bg-primary/50 shadow text-white" : ""} hover:bg-primary/10 transition-colors p-2 rounded-full flex gap-1 text-black`}
+          className={`${editorState?.isHighlight ? "bg-primary/50 dark:bg-neutral-800 dark:text-white shadow text-white" : ""} hover:bg-primary/10 dark:hover:bg-neutral-800 transition-colors p-2 rounded-full flex gap-1 dark:text-[#a1a1a1] text-black`}
         >
           Toggle
         </button>

@@ -92,7 +92,7 @@ export function TagFilterSection({
               <Badge
                 asChild
                 key={t.id}
-                className={`p-2 ${isActive ? "bg-neutral-950 text-white cursor-pointer" : "bg-neutral-200 text-black"}`}
+                className={`p-2 ${isActive ? "bg-neutral-950 text-white cursor-pointer dark:bg-neutral-200 dark:text-neutral-900" : "bg-neutral-200 text-black dark:bg-neutral-800 dark:border dark:border-neutral-600 dark:text-neutral-200"}`}
                 title={t.name}
               >
                 <button onClick={() => toggle(t.name)}>#{t.name}</button>

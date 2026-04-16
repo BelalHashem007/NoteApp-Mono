@@ -101,14 +101,14 @@ export default function ExplorerSection({
           <button
             type="button"
             title="Collapse Folders"
-            className="p-1 hover:bg-primary/10 rounded-md"
+            className="p-1 hover:bg-primary/10 dark:hover:bg-neutral-700 rounded-md"
             onClick={() => setOpenFolders([])}
           >
             <CopyMinus className="w-4 h-4" />
           </button>
           <button
             type="button"
-            className="p-1 hover:bg-primary/10 rounded-md"
+            className="p-1 hover:bg-primary/10 dark:hover:bg-neutral-700 rounded-md"
             title="New Folder..."
             onClick={() => setShowFolderCreationInput(true)}
           >

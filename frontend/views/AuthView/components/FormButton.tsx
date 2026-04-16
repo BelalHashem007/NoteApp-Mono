@@ -16,7 +16,7 @@ export default function FormButton({
     <button
       type="submit"
       className={cn(
-        "w-full h-12 rounded-full bg-primary hover:bg-primary/90 focus:bg-primary/90 text-primary-foreground flex justify-center items-center disabled:bg-primary/50",
+        "w-full h-12 rounded-full bg-primary dark:bg-primary/90 dark:hover:bg-primary/80 hover:bg-primary/90 focus:bg-primary/90 text-primary-foreground flex justify-center items-center disabled:bg-primary/50",
         className,
       )}
       {...props}

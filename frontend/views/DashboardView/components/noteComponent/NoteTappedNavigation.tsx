@@ -25,24 +25,24 @@ function NoteTappedNavigationInner({ note }: { note?: Note }) {
   }, [setOpenedNotes, note]);
 
   return (
-    <div className="h-9 border-b border-neutral-200 flex items-center overflow-x-auto">
+    <div className="h-9 border-b dark:border-white/10 dark:bg-neutral-800/30 border-neutral-200 flex items-center overflow-x-auto">
       {openedNotes.map((openedNote) => {
         return (
           <div
             key={openedNote.slug}
-            className={`group h-full flex items-center gap-2 border-r border-neutral-200 cursor-pointer min-w-30 max-w-50 ${
+            className={`group h-full flex items-center gap-2 border-r dark:border-r-neutral-700 border-neutral-200 cursor-pointer min-w-30 max-w-50 ${
               note?.slug === openedNote.slug
-                ? "bg-white text-neutral-950"
-                : "bg-neutral-100 text-neutral-500 hover:text-foreground hover:bg-muted/50"
+                ? "bg-white text-neutral-950 dark:bg-neutral-950 dark:text-neutral-50 dark:border-b-2 "
+                : "bg-neutral-100 text-neutral-500 hover:text-foreground dark:hover:bg-neutral-700/80 dark:hover:text-neutral-400 hover:bg-muted/50 dark:bg-neutral-800"
             }`}
           >
             <Link
               href={`/dashboard/note/${openedNote.slug}${tagSuffix}`}
               className="pl-3 flex w-full gap-2 h-full items-center justify-center"
             >
-              <FileText className={`w-4 h-4 shrink-0 text-neutral-500`} />
+              <FileText className={`w-4 h-4 shrink-0`} />
               <span
-                className={`text-xs truncate flex-1 text-black ${note?.slug === openedNote.slug ? "font-bold" : ""} `}
+                className={`text-xs truncate flex-1 ${note?.slug === openedNote.slug ? "font-bold" : ""} `}
               >
                 {openedNote.title}
               </span>

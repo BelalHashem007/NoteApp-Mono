@@ -34,7 +34,7 @@ export default function FoldersComponent({
   }, [showFolderCreationInput, inputRef]);
 
   return (
-    <div className="h-full w-full flex flex-col min-h-0">
+    <div className="h-full w-full flex flex-col min-h-0 pb-1">
       {/* <FolderSearch query={query} setQuery={setQuery} /> */}
 
       <FolderList
@@ -47,10 +47,10 @@ export default function FoldersComponent({
 
       {showFolderCreationInput && (
         <div className="pl-2 flex gap-2 items-center w-full">
-          <ChevronRight className="w-3 h-3 text-neutral-500" />
-          <FolderClosed className="w-4 h-4 shrink-0 text-neutral-500 text-neutral-500" />
+          <ChevronRight className="w-3 h-3 text-neutral-500 dark:text-[#a1a1a1]" />
+          <FolderClosed className="w-4 h-4 shrink-0 text-neutral-500 dark:text-[#a1a1a1]" />
           <input
-            className="pl-1"
+            className="pl-1 focus:outline-1 dark:focus:outline-neutral-500 focus:outline-neutral-800"
             type="text"
             ref={inputRef}
             minLength={1}

@@ -11,12 +11,12 @@ export default function LeftSideBar() {
     "explorer",
   );
   return (
-    <div className="lg:min-w-100 min-w-min bg-neutral-50 flex h-full max-h-screen max-w-100 shrink-0 min-h-0">
-      <div className="p-2 border-r border-neutral-200 shadow-accent-foreground flex flex-col items-center py-3">
+    <div className="lg:min-w-100 min-w-min bg-neutral-50 dark:bg-neutral-900 flex h-full max-h-screen max-w-100 shrink-0 min-h-0">
+      <div className="p-2 border-r border-neutral-200 dark:border-white/10 shadow-accent-foreground flex flex-col items-center py-3">
         <button
           className={`w-10 h-10 flex items-center justify-center rounded-full transition-colors mb-1 ${
             activePanel === "explorer"
-              ? "bg-primary/10 text-primary"
+              ? "bg-neutral-700 text-neutral-100"
               : "text-muted-foreground hover:text-foreground"
           }`}
           title="Explorer"
@@ -28,7 +28,7 @@ export default function LeftSideBar() {
         <button
           className={`w-10 h-10 flex items-center justify-center rounded-full transition-colors mb-1 ${
             activePanel === "search"
-              ? "bg-primary/10 text-primary"
+              ? "bg-neutral-700 text-neutral-100"
               : "text-muted-foreground hover:text-foreground"
           }`}
           title="Search"
@@ -51,7 +51,7 @@ export default function LeftSideBar() {
           <Settings className="w-5 h-5" />
         </button>
       </div>
-      <div className="flex-1 min-h-0 min-w-0 flex flex-col overflow-hidden border-r border-neutral-200">
+      <div className="flex-1 min-h-0 min-w-0 flex flex-col overflow-hidden dark:bg-neutral-900 dark:border-white/10 border-r border-neutral-200">
         {activePanel === "explorer" ? <ExplorerPanel /> : <SearchSection />}
       </div>
     </div>

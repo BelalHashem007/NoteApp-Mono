@@ -188,32 +188,32 @@ export default function FolderList({
   });
 
   return (
-    <div className="overflow-y-auto">
+    <div className="">
       {folders.map((f) => {
         return (
           <div key={f.id}>
             {activeAction?.type === "renameFolder" &&
             activeAction.folder.id === f.id ? (
               <div
-                className="pl-2 flex gap-2 items-center w-full"
+                className="pl-2 flex gap-2 items-center w-full dark:text-neutral-50 "
                 style={{ paddingLeft: 8 + level * 8 }}
               >
                 {openFolders.includes(f.id) ? (
                   <>
-                    <ChevronDown className="w-3 h-3 text-neutral-500" />
-                    <FolderOpen className="w-4 h-4 shrink-0 text-neutral-500" />
+                    <ChevronDown className="w-3 h-3 text-neutral-500 dark:text-[#a1a1a1]" />
+                    <FolderOpen className="w-4 h-4 shrink-0 text-neutral-500 dark:text-[#a1a1a1]" />
                   </>
                 ) : (
                   <>
-                    <ChevronRight className="w-3 h-3 text-neutral-500" />
-                    <FolderClosed className="w-4 h-4 shrink-0 text-neutral-500" />
+                    <ChevronRight className="w-3 h-3 text-neutral-500 dark:text-[#a1a1a1]" />
+                    <FolderClosed className="w-4 h-4 shrink-0 text-neutral-500 dark:text-[#a1a1a1]" />
                   </>
                 )}
                 <input
                   type="text"
                   defaultValue={f.folderName}
                   autoFocus
-                  className="pl-1"
+                  className="pl-1 overflow-visible focus:outline-1 dark:focus:outline-neutral-500 focus:outline-neutral-800"
                   minLength={1}
                   maxLength={50}
                   onBlur={(e) => {
@@ -236,7 +236,7 @@ export default function FolderList({
               <ContextMenu>
                 <ContextMenuTrigger asChild>
                   <button
-                    className=" flex gap-2 hover:bg-primary/10 w-full items-center"
+                    className=" flex gap-2 hover:bg-primary/10 dark:hover:bg-neutral-700 w-full items-center dark:text-neutral-50"
                     style={{ paddingLeft: 8 + level * 8 }}
                     onClick={() =>
                       setOpenFolders(
@@ -256,13 +256,13 @@ export default function FolderList({
                   >
                     {openFolders.includes(f.id) ? (
                       <>
-                        <ChevronDown className="w-3 h-3 text-neutral-500" />
-                        <FolderOpen className="w-4 h-4 shrink-0 text-neutral-500" />
+                        <ChevronDown className="w-3 h-3 text-neutral-500 dark:text-[#a1a1a1]" />
+                        <FolderOpen className="w-4 h-4 shrink-0 text-neutral-500 dark:text-[#a1a1a1]" />
                       </>
                     ) : (
                       <>
-                        <ChevronRight className="w-3 h-3 text-neutral-500" />
-                        <FolderClosed className="w-4 h-4 shrink-0 text-neutral-500" />
+                        <ChevronRight className="w-3 h-3 text-neutral-500 dark:text-[#a1a1a1]" />
+                        <FolderClosed className="w-4 h-4 shrink-0 text-neutral-500 dark:text-[#a1a1a1]" />
                       </>
                     )}{" "}
                     <span className="truncate inline-block max-w-50">
@@ -359,13 +359,13 @@ export default function FolderList({
                 {activeAction?.type === "createFolder" &&
                   activeAction.folder.id === f.id && (
                     <div
-                      className="pl-2 flex gap-2 items-center w-full"
+                      className="pl-2 flex gap-2 items-center w-full dark:text-neutral-50"
                       style={{ paddingLeft: 8 + (level + 1) * 8 }}
                     >
-                      <ChevronRight className="w-3 h-3 text-neutral-500" />
-                      <FolderClosed className="w-4 h-4 shrink-0 text-neutral-500" />
+                      <ChevronRight className="w-3 h-3 text-neutral-500 dark:text-[#a1a1a1]" />
+                      <FolderClosed className="w-4 h-4 shrink-0 text-neutral-500 dark:text-[#a1a1a1]" />
                       <input
-                        className="pl-1"
+                        className="pl-1 focus:outline-1 dark:focus:outline-neutral-500 focus:outline-neutral-800"
                         type="text"
                         ref={creationInputRef}
                         minLength={1}
@@ -403,9 +403,9 @@ export default function FolderList({
                       className="flex gap-2  w-full  items-center "
                       style={{ paddingLeft: 28 + (level + 1) * 8 }}
                     >
-                      <FileText className="w-4 h-4 shrink-0 text-neutral-500" />
+                      <FileText className="w-4 h-4 shrink-0 text-neutral-500 dark:text-[#a1a1a1]" />
                       <input
-                        className="pl-1"
+                        className="pl-1 dark:text-[#a1a1a1] focus:outline-1 dark:focus:outline-neutral-500 focus:outline-neutral-800"
                         type="text"
                         ref={creationInputRef}
                         minLength={1}

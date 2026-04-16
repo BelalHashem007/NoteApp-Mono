@@ -100,9 +100,9 @@ export default function NoteList({
             className="flex gap-2 w-full items-center"
             style={{ paddingLeft: 28 + level * 8 }}
           >
-            <FileText className="w-4 h-4 shrink-0 text-neutral-500" />
+            <FileText className="w-4 h-4 shrink-0 text-neutral-500 dark:text-[#a1a1a1]" />
             <input
-              className="pl-1"
+              className="pl-1 focus:outline-1 dark:focus:outline-neutral-500 focus:outline-neutral-800"
               type="text"
               defaultValue={n.title}
               autoFocus
@@ -130,10 +130,10 @@ export default function NoteList({
             <ContextMenu>
               <ContextMenuTrigger asChild>
                 <Link
-                  className={`flex gap-2 w-full truncate items-center ${
+                  className={`flex gap-2 w-full truncate items-center dark:text-[#a1a1a1] ${
                     activeNoteSlug === n.slug
-                      ? "bg-neutral-900 text-neutral-50"
-                      : "hover:bg-primary/10"
+                      ? "bg-neutral-500 text-neutral-50 dark:bg-neutral-400 dark:text-neutral-900"
+                      : "hover:bg-primary/10 dark:hover:bg-neutral-700"
                   }`}
                   style={{ paddingLeft: 28 + level * 8 }}
                   href={`/dashboard/note/${n.slug}${tagSuffix}`}
@@ -146,7 +146,8 @@ export default function NoteList({
                 >
                   <FileText
                     className={`w-4 h-4 shrink-0 ${
-                      activeNoteSlug !== n.slug && "text-neutral-500"
+                      activeNoteSlug !== n.slug &&
+                      "text-neutral-500 dark:text-[#a1a1a1]"
                     }`}
                   />{" "}
                   {!mutationToUpdateNoteTitle.isError &&

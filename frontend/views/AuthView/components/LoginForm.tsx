@@ -5,13 +5,13 @@ import FormButton from "./FormButton";
 import { useActionState } from "react";
 import { LoginUser } from "@/actions/authActions";
 import GoogleLight from "@/public/google_light.svg";
+import GoogleDark from "@/public/google_dark.png";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useTheme } from "@/app/providers";
 
 export default function LoginForm() {
-  const router = useRouter();
   const [state, formAction, isPending] = useActionState(LoginUser, null);
-
+  const [theme] = useTheme();
   return (
     <>
       <form action={formAction} className="space-y-6">
@@ -40,13 +40,6 @@ export default function LoginForm() {
             <label htmlFor="password" className="text-sm">
               Password
             </label>
-            <button
-              type="button"
-              className="text-sm text-primary hover:text-primary/80 transition-colors"
-              tabIndex={-1}
-            >
-              Forgot?
-            </button>
           </div>
           <FormInput type="password" id="password" name="password" />
           {state?.validationErrors?.map(
@@ -72,7 +65,7 @@ export default function LoginForm() {
             Don&apos;t have an account?{" "}
             <Link
               href={"/signup"}
-              className="text-primary hover:text-primary/80 transition-colors font-medium"
+              className="text-primary hover:text-primary/80 underline transition-colors font-medium"
             >
               Create one now
             </Link>
@@ -89,7 +82,11 @@ export default function LoginForm() {
           className="w-full flex justify-center items-center"
           onClick={() => (window.location.href = "/api/auth/google/login")}
         >
-          <Image src={GoogleLight} alt="Sign up with google" />
+          {theme === "light" ? (
+            <Image src={GoogleLight} alt="Sign up with google" />
+          ) : (
+            <Image src={GoogleDark} alt="Sign up with google" />
+          )}
         </button>
       </div>
     </>

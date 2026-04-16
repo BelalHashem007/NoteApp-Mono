@@ -177,12 +177,12 @@ export function NoteTagsRow({
   });
 
   return (
-    <div className="border-neutral-200 border-b px-3 py-2">
+    <div className="border-neutral-200 dark:border-white/10 border-b px-3 py-2">
       <div className="flex flex-wrap items-center gap-2 min-h-8">
         {(tags ?? []).map((tag) => (
           <span
             key={tag.id ?? tag.name}
-            className="group/tag inline-flex items-center gap-1 rounded-full bg-primary/10 text-foreground pl-2.5 pr-1 py-1 text-xs font-medium hover:bg-primary/15 transition-colors"
+            className="group/tag inline-flex items-center gap-1 rounded-full dark:bg-neutral-800 dark:border dark:border-neutral-600 dark:text-neutral-200 bg-primary/10 text-foreground pl-2.5 pr-1 py-1 text-xs font-medium hover:bg-primary/15 dark:hover:bg-neutral-800  transition-colors"
             title={tag.name}
           >
             <span className="truncate max-w-40">#{tag.name}</span>
@@ -211,7 +211,7 @@ export function NoteTagsRow({
         >
           <button
             type="button"
-            className="inline-flex items-center rounded-full border border-border bg-background/60 text-muted-foreground px-2.5 py-1 text-xs font-medium hover:bg-background hover:text-foreground transition-colors"
+            className="inline-flex items-center rounded-full border border-border bg-background/60 text-muted-foreground px-2.5 py-1 text-xs font-medium hover:bg-background dark:hover:bg-neutral-700 dark:bg-neutral-700/70 dark:text-neutral-400 hover:text-foreground transition-colors"
           >
             + Add tag
           </button>
