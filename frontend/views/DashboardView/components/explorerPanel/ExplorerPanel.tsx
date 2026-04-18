@@ -4,7 +4,7 @@ import { Suspense, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
 import ExplorerSection from "./ExplorerSection";
-import { TagFilterSection } from "./tagComponents/TagFilterSection";
+import { TagFilterSection } from "../tagComponents/TagFilterSection";
 import { fetchFoldersAndNotes } from "@/lib/folderApi";
 import { getFoldersFromQueryData } from "@/lib/foldersAndNotesCache";
 import { getAllUserTagsFromFoldersCache } from "@/lib/tagsFromFoldersCache";

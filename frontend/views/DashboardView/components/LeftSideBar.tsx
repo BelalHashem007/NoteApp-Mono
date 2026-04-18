@@ -2,9 +2,9 @@
 
 import { Settings, Files, Search } from "lucide-react";
 import AccountComponent from "./AccountComponent";
-import ExplorerPanel from "./ExplorerPanel";
+import ExplorerPanel from "./explorerPanel/ExplorerPanel";
 import { useState } from "react";
-import SearchSection from "./SearchSection";
+import SearchSection from "./searchPanel/SearchPanel";
 
 export default function LeftSideBar() {
   const [activePanel, setActivePanel] = useState<"explorer" | "search">(

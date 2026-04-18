@@ -57,3 +57,14 @@ export async function searchNotesRequest(
   await throwIfNotOk(res);
   return res.json() as Promise<ApiResponse<SearchNotesResponse>>;
 }
+
+export async function moveNoteToFolder(noteId: string, folderId: string) {
+  const res = await fetchWithAuth(`/api/notes/moveNote`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ noteId, folderId }),
+    keepalive: true,
+  });
+  await throwIfNotOk(res);
+  return res.json();
+}

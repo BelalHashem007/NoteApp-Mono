@@ -1,4 +1,4 @@
-import NoteView from "@/views/DashboardView/NoteView";
+import NoteView from "@/views/DashboardView/NoteView/index";
 
 export default async function page({
   params,

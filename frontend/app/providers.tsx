@@ -58,10 +58,8 @@ export default function Providers({ children }: { children: React.ReactNode }) {
     handleInitialTheme(mediaQuery);
 
     const handleMediaQueryChanges = (e: MediaQueryListEvent) => {
-      if (!localStorage.getItem("theme")) {
-        const newTheme = e.matches ? "dark" : "light";
-        setTheme(newTheme);
-      }
+      const newTheme = e.matches ? "dark" : "light";
+      setTheme(newTheme);
     };
 
     mediaQuery.addEventListener("change", handleMediaQueryChanges);

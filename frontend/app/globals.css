@@ -294,6 +294,9 @@
   body {
     @apply bg-background text-foreground;
   }
+  *:where(.dark, .dark *) {
+    scrollbar-color: gray black;
+  }
   html {
     font-size: var(--font-size);
     @apply font-sans;

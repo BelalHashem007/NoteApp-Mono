@@ -1,9 +1,9 @@
 "use client";
 import Tiptap from "@/components/tiptap/TipTap";
 import { useQuery } from "@tanstack/react-query";
-import NoteTappedNavigation from "./components/noteComponent/NoteTappedNavigation";
+import NoteTappedNavigation from "../components/explorerPanel/noteComponent/NoteTappedNavigation";
 import { fetchWithAuth } from "@/lib/fetchWithAuthentication";
-import { NoteTagsRow } from "./components/tagComponents/NoteTagsRow";
+import { NoteTagsRow } from "../components/tagComponents/NoteTagsRow";
 
 export default function NoteView({ slug }: { slug: string }) {
   const { data, isPending, error, isError } = useQuery({
@@ -33,7 +33,11 @@ export default function NoteView({ slug }: { slug: string }) {
   return (
     <div className="flex flex-col min-h-0 overflow-hidden">
       <NoteTappedNavigation note={data.data} />
-      <NoteTagsRow noteId={data.data.id} noteSlug={slug} tags={data?.data?.tags} />
+      <NoteTagsRow
+        noteId={data.data.id}
+        noteSlug={slug}
+        tags={data?.data?.tags}
+      />
       <Tiptap note={data?.data} />
     </div>
   );
