@@ -12,5 +12,6 @@ namespace NoteApp.Api.Interfaces.IService
         public Task DeleteNote(string userId, Guid id, CancellationToken ct);
         public Task<string> UploadImage(string userId, Guid noteId, IFormFile file, CancellationToken ct);
         public Task<NoteViewModel> GetBySlugName(string userId, string slug, CancellationToken ct);
+        public Task<NoteViewModel> MoveNote(string userId, Guid noteId, Guid folderId, CancellationToken ct);
     }
 }

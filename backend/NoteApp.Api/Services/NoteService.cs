@@ -212,5 +212,18 @@ namespace NoteApp.Api.Services
 
             return noteView;
         }
+
+        public async Task<NoteViewModel> MoveNote(string userId, Guid noteId, Guid folderId, CancellationToken ct)
+        {
+            var note = await unitOfWork.Notes.FindWithTags(x => x.Id == noteId && x.UserId == userId, ct) ?? throw new NotFoundException("Note does not exist");
+            if (note.FolderId != folderId)
+            {
+                note.FolderId = folderId;
+                //TODO: pass ct into all complete methods in all services
+                await unitOfWork.Complete(ct);
+            }
+
+            return ObjectMapperHelper.Map<Note,NoteViewModel>(note);
+        }
     }
 }
