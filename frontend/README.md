@@ -8,15 +8,17 @@ The frontend for a note management app.
 - Nested folder structure with notes inside each one for organization
 - VS code like layout i.e. explorer on the left and text editor on the left
 - Rich text editor with text formatting, images (drag and drop, and paste) and code blocks etc
+- Drag And Drop for notes
 - Auto save
+- Search
+- Tags
+- Dark Mode
 
 ## Features To Come
 
-- Better UI
-- Note Search
 - Note Share Link
-- Tags (maybe)
-- More tools for the text editor like dropping enitre files and collaboration etc
+- More tools for the text editor
+- Landing Page
 
 ## Tech Stack
 
