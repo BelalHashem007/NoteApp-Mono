@@ -1,59 +1,61 @@
 "use client";
 
-import { Settings, Files, Search } from "lucide-react";
+import { Files, Search } from "lucide-react";
 import AccountComponent from "./AccountComponent";
 import ExplorerPanel from "./explorerPanel/ExplorerPanel";
 import { useState } from "react";
 import SearchSection from "./searchPanel/SearchPanel";
+import { Sidebar, SidebarContent } from "@/components/ui/sidebar";
+import { cn } from "@/lib/utils";
+
+function activityButtonClass(active: boolean) {
+  return cn(
+    "flex size-10 shrink-0 items-center justify-center rounded-full transition-colors",
+    active
+      ? "bg-neutral-700 text-neutral-100 dark:bg-neutral-600"
+      : "text-muted-foreground hover:text-foreground",
+  );
+}
 
 export default function LeftSideBar() {
   const [activePanel, setActivePanel] = useState<"explorer" | "search">(
     "explorer",
   );
+
   return (
-    <div className="lg:min-w-100 min-w-min bg-neutral-50 dark:bg-neutral-900 flex h-full max-h-screen max-w-100 shrink-0 min-h-0">
-      <div className="p-2 border-r border-neutral-200 dark:border-white/10 shadow-accent-foreground flex flex-col items-center py-3">
-        <button
-          className={`w-10 h-10 flex items-center justify-center rounded-full transition-colors mb-1 ${
-            activePanel === "explorer"
-              ? "bg-neutral-700 text-neutral-100"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-          title="Explorer"
-          type="button"
-          onClick={() => setActivePanel("explorer")}
+    <Sidebar className="border-0">
+      <div className="flex h-full min-h-0 w-full flex-1 flex-row">
+        <div
+          className="flex w-12 shrink-0 flex-col items-center gap-1 border-r border-sidebar-border bg-sidebar py-3"
+          aria-label="Activity bar"
         >
-          <Files className="w-5 h-5" />
-        </button>
-        <button
-          className={`w-10 h-10 flex items-center justify-center rounded-full transition-colors mb-1 ${
-            activePanel === "search"
-              ? "bg-neutral-700 text-neutral-100"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-          title="Search"
-          type="button"
-          onClick={() => setActivePanel("search")}
-        >
-          <Search className="w-5 h-5" />
-        </button>
-        <div className="flex-1" />
-        <AccountComponent />
-        <button
-          className={`w-10 h-10 flex items-center justify-center rounded-full transition-colors ${
-            false
-              ? "bg-primary/10 text-primary"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-          title="Settings"
-          type="button"
-        >
-          <Settings className="w-5 h-5" />
-        </button>
+          <button
+            type="button"
+            title="Explorer"
+            className={activityButtonClass(activePanel === "explorer")}
+            onClick={() => setActivePanel("explorer")}
+          >
+            <Files className="size-5" />
+          </button>
+          <button
+            type="button"
+            title="Search"
+            className={activityButtonClass(activePanel === "search")}
+            onClick={() => setActivePanel("search")}
+          >
+            <Search className="size-5" />
+          </button>
+          <div className="min-h-2 flex-1" />
+          <AccountComponent
+            triggerClassName={cn(activityButtonClass(false), "mb-0")}
+          />
+        </div>
+        <SidebarContent className="min-w-0 flex-1 border-0 bg-neutral-50 dark:bg-neutral-900">
+          <div className=" flex min-h-0 flex-1 flex-col overflow-hidden">
+            {activePanel === "explorer" ? <ExplorerPanel /> : <SearchSection />}
+          </div>
+        </SidebarContent>
       </div>
-      <div className="flex-1 min-h-0 min-w-0 flex flex-col overflow-hidden dark:bg-neutral-900 dark:border-white/10 border-r border-neutral-200">
-        {activePanel === "explorer" ? <ExplorerPanel /> : <SearchSection />}
-      </div>
-    </div>
+    </Sidebar>
   );
 }

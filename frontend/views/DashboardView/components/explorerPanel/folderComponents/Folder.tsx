@@ -37,7 +37,7 @@ export function Folder({ folder, level, creationInputRef }: Props) {
     <ContextMenu>
       <ContextMenuTrigger asChild>
         <button
-          className=" flex gap-2 hover:bg-primary/10 dark:hover:bg-neutral-700 w-full items-center dark:text-neutral-50"
+          className=" flex pr-3 gap-2 hover:bg-primary/10 dark:hover:bg-neutral-700 w-full items-center dark:text-neutral-50"
           style={{ paddingLeft: 8 + level * 8 }}
           onClick={() =>
             setOpenFolders(

@@ -35,7 +35,7 @@ const FolderEntry = ({
   return (
     <div
       ref={ref}
-      style={{ backgroundColor: isDropTarget ? "lightgray" : "transparent" }}
+      className={`${isDropTarget && "dark:bg-neutral-700 bg-neutral-200"}`}
     >
       {/* show input for rename if its renamefolder action */}
       {activeAction?.type === "renameFolder" &&

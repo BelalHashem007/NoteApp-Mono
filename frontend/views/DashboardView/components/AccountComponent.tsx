@@ -10,8 +10,15 @@ import {
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { useTheme } from "@/app/providers";
+import { cn } from "@/lib/utils";
 
-export default function AccountComponent() {
+type AccountComponentProps = {
+  triggerClassName?: string;
+};
+
+export default function AccountComponent({
+  triggerClassName,
+}: AccountComponentProps) {
   const [theme, setTheme] = useTheme();
   const { setOpenedNotes } = useTapsContext();
   const router = useRouter();
@@ -37,14 +44,13 @@ export default function AccountComponent() {
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          className={`w-10 h-10 flex items-center justify-center rounded-full transition-colors mb-1 ${
-            false
-              ? "bg-primary/10 text-primary"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
+          className={cn(
+            "flex size-10 items-center justify-center rounded-full transition-colors text-muted-foreground hover:text-foreground",
+            triggerClassName,
+          )}
           title="Account"
         >
-          <User className="w-5 h-5" />
+          <User className="size-5" />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
@@ -53,19 +59,11 @@ export default function AccountComponent() {
         className="flex flex-col gap-0.5"
       >
         <DropdownMenuItem
-          variant="destructive"
-          className="w-full cursor-pointer flex items-center gap-3 px-3 py-2 rounded-full text-foreground/70 hover:bg-background hover:text-foreground transition-colors text-sm"
-          onSelect={onLogout}
-        >
-          <LogOut className="w-4 h-4" />
-          Log Out
-        </DropdownMenuItem>
-        <DropdownMenuItem
           onSelect={(e) => e.preventDefault()}
           className="flex w-full focus:ring-0 focus:bg-transparent focus:text-transparent dark:focus:bg-transparent"
         >
           <label
-            className="relative inline-block w-15 h-6 "
+            className="relative inline-block h-6 w-15"
             title={
               theme === "light"
                 ? "Switch to dark theme"
@@ -74,17 +72,17 @@ export default function AccountComponent() {
           >
             <input
               type="checkbox"
-              className="opacity-0 w-0 h-0 peer"
+              className="peer h-0 w-0 opacity-0"
               checked={theme === "dark"}
               onChange={(e) => {
                 setTheme(e.target.checked ? "dark" : "light");
               }}
             />
             <span
-              className={`border ${theme === "dark" ? "border-neutral-600" : "border-neutral-400"} absolute inset-0 bg-neutral-200 rounded-full duration-400 cursor-pointer peer-checked:bg-neutral-700   peer-focus:shadow-[0_0_1px_#2196F3] overflow-hidden`}
+              className={`absolute inset-0 cursor-pointer rounded-full border duration-400 ${theme === "dark" ? "border-neutral-600" : "border-neutral-400"} overflow-hidden bg-neutral-200 peer-checked:bg-neutral-700 peer-focus:shadow-[0_0_1px_#2196F3]`}
             >
               <span
-                className={`absolute inset-0 bg-[white] w-6 rounded-full duration-400 transition-all ${theme === "dark" && "translate-x-9 bg-neutral-950"}`}
+                className={`absolute inset-0 w-6 rounded-full bg-[white] duration-400 transition-all ${theme === "dark" && "translate-x-9 bg-neutral-950"}`}
               >
                 {theme === "light" ? (
                   <Sun className="absolute top-1 left-1 size-3.5 text-neutral-700" />
@@ -94,6 +92,14 @@ export default function AccountComponent() {
               </span>
             </span>
           </label>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          variant="destructive"
+          className="flex w-full cursor-pointer items-center gap-3 rounded-full px-3 py-2 text-sm text-foreground/70 transition-colors hover:bg-background hover:text-foreground"
+          onSelect={onLogout}
+        >
+          <LogOut className="size-4" />
+          Log Out
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -25,7 +25,7 @@ function NoteTappedNavigationInner({ note }: { note?: Note }) {
   }, [setOpenedNotes, note]);
 
   return (
-    <div className="h-9 border-b dark:border-white/10 dark:bg-neutral-800/30 border-neutral-200 flex items-center overflow-x-auto">
+    <div className="h-9 shrink-0 max-[900px]:hidden border-b dark:border-white/10 dark:bg-neutral-800/30 border-neutral-200 flex items-center overflow-x-auto">
       {openedNotes.map((openedNote) => {
         return (
           <div
@@ -78,7 +78,11 @@ function NoteTappedNavigationInner({ note }: { note?: Note }) {
 
 export default function NoteTappedNavigation({ note }: { note?: Note }) {
   return (
-    <Suspense fallback={<div className="h-9 bg-muted/30 border-b" />}>
+    <Suspense
+      fallback={
+        <div className="h-9 bg-muted/30 border-b shrink-0 max-[900px]:hidden" />
+      }
+    >
       <NoteTappedNavigationInner note={note} />
     </Suspense>
   );

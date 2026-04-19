@@ -52,7 +52,7 @@ export function Note({
     <ContextMenu>
       <ContextMenuTrigger asChild>
         <Link
-          className={`flex gap-2 w-full truncate items-center dark:text-[#a1a1a1] ${
+          className={`flex pr-3 gap-2 w-full truncate items-center dark:text-[#a1a1a1] ${
             activeNoteSlug === note.slug
               ? "bg-neutral-500 text-neutral-50 dark:bg-neutral-400 dark:text-neutral-900"
               : "hover:bg-primary/10 dark:hover:bg-neutral-700"

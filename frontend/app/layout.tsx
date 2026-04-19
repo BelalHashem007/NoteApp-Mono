@@ -30,7 +30,7 @@ export default function RootLayout({
       data-theme="cerberus"
       className={cn("font-sans antialiased", plusJakartaSans.variable)}
     >
-      <body className={geistMono.variable}>
+      <body className={`${geistMono.variable} h-screen`}>
         <Providers>{children}</Providers>
       </body>
     </html>

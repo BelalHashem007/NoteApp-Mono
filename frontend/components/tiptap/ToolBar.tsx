@@ -24,6 +24,7 @@ import {
   Underline,
   ListTodo,
   Highlighter,
+  EllipsisVertical,
 } from "lucide-react";
 import { TagPickerPopover } from "@/views/DashboardView/components/tagComponents/TagPickerPopover";
 import { Separator } from "../ui/separator";
@@ -41,9 +42,11 @@ type DropDownState =
 export default function ToolBar({
   editor,
   note,
+  variant = "main",
 }: {
   editor: Editor | null;
   note?: Note;
+  variant?: "main" | "menu";
 }) {
   const [openHeadingsList, setOpenHeadingsList] = useState<boolean>(false);
   const [highLighterColor, setHighLighterColor] = useState<string>("yellow");
@@ -94,7 +97,7 @@ export default function ToolBar({
     }, 0);
   };
   return (
-    <div className="p-3 shrink-0 flex items-center gap-5 border-b dark:text-[#a1a1a1] border-neutral-200 dark:border-white/10">
+    <div className="p-3 px-6 min-w-0 w-full flex flex-nowrap items-center gap-5 border-b dark:text-[#a1a1a1] border-neutral-200 dark:border-white/10">
       {/* History */}
       <div className="flex gap-2 ">
         <button
@@ -117,28 +120,6 @@ export default function ToolBar({
 
       {/*Seperator*/}
       <Separator orientation="vertical" />
-
-      {/* Tags */}
-      {note?.id && note?.slug && (
-        <>
-          <TagPickerPopover
-            noteId={note.id}
-            noteSlug={note.slug}
-            currentTags={note.tags}
-          >
-            <button
-              type="button"
-              className="hover:bg-primary/10 rounded-full px-3 py-2 text-sm font-semibold transition-all"
-              title="Tags"
-            >
-              #
-            </button>
-          </TagPickerPopover>
-
-          {/*Seperator*/}
-          <Separator orientation="vertical" />
-        </>
-      )}
 
       {/*Headers List*/}
       <div>
@@ -274,7 +255,7 @@ export default function ToolBar({
       <Separator orientation="vertical" />
 
       {/* Text Formatting */}
-      <div className="flex gap-3">
+      <div className="flex gap-3 max-[1120px]:hidden">
         <button
           onClick={() => editor.chain().focus().toggleBold().run()}
           className={`${editorState?.isBold ? "bg-primary/50 dark:bg-neutral-700 shadow text-white" : "hover:bg-primary/10 dark:hover:bg-neutral-800"} rounded-full p-2 transition-all`}
@@ -298,21 +279,21 @@ export default function ToolBar({
         </button>
         <button
           onClick={() => editor.chain().focus().toggleStrike().run()}
-          className={`${editorState?.isStrike ? "bg-primary/50 dark:bg-neutral-700 shadow text-white" : "hover:bg-primary/10 dark:hover:bg-neutral-800"} rounded-full p-2 transition-all`}
+          className={`${editorState?.isStrike ? "bg-primary/50 dark:bg-neutral-700 shadow text-white" : "hover:bg-primary/10 dark:hover:bg-neutral-800"} max-[1350px]:hidden rounded-full p-2 transition-all`}
           title="Strikethrough"
         >
           <Strikethrough />
         </button>
         <button
           onClick={() => editor.chain().focus().toggleBlockquote().run()}
-          className={`${editorState?.isBlockquote ? "bg-primary/50 shadow text-white dark:bg-neutral-700" : "hover:bg-primary/10 dark:hover:bg-neutral-800"}  rounded-full p-2 transition-all`}
+          className={`${editorState?.isBlockquote ? "bg-primary/50 shadow text-white dark:bg-neutral-700" : "hover:bg-primary/10 dark:hover:bg-neutral-800"} max-[1350px]:hidden rounded-full p-2 transition-all`}
           title="Blockquote"
         >
           <TextQuote />
         </button>
         <button
           onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-          className={`${editorState?.isCodeBlock ? "bg-primary/50 shadow text-white dark:bg-neutral-700" : "hover:bg-primary/10 dark:hover:bg-neutral-800"}  rounded-full p-2 transition-all`}
+          className={`${editorState?.isCodeBlock ? "bg-primary/50 shadow text-white dark:bg-neutral-700" : "hover:bg-primary/10 dark:hover:bg-neutral-800"} max-[1350px]:hidden rounded-full p-2 transition-all`}
           title="Code Block"
         >
           <Code />
@@ -320,10 +301,10 @@ export default function ToolBar({
       </div>
 
       {/*Seperator*/}
-      <Separator orientation="vertical" />
+      <Separator orientation="vertical" className="max-[1120px]:hidden" />
 
       {/* HorizontalLine */}
-      <div>
+      <div className="max-[1450px]:hidden">
         <button
           onClick={() => editor.chain().focus().setHorizontalRule().run()}
           className={`hover:bg-primary/10 dark:hover:bg-neutral-800 rounded-full p-2 transition-all`}
@@ -334,10 +315,12 @@ export default function ToolBar({
       </div>
 
       {/*Seperator*/}
-      <Separator orientation="vertical" />
+      <Separator orientation="vertical" className="max-[1450px]:hidden" />
 
       {/* HighLighter */}
-      <div className="relative flex items-center gap-2">
+      <div
+        className={`relative items-center gap-2 min-[1550px]:flex ${variant === "menu" ? "flex" : "hidden"}`}
+      >
         <label
           htmlFor="highlighter-input"
           className="flex items-center justify-center border dark:border-neutral-700 rounded-full p-2 cursor-pointer hover:bg-primary/10 dark:hover:bg-neutral-800 transition-all"
@@ -369,6 +352,41 @@ export default function ToolBar({
         >
           Toggle
         </button>
+      </div>
+
+      {/* Tags */}
+      {note?.id && note?.slug && (
+        <>
+          {/*Seperator*/}
+          <Separator orientation="vertical" className="max-[1550px]:hidden" />
+          <TagPickerPopover
+            noteId={note.id}
+            noteSlug={note.slug}
+            currentTags={note.tags}
+          >
+            <button
+              type="button"
+              className="hover:bg-primary/10 rounded-full px-3 py-2 text-sm font-semibold transition-all max-[1550px]:hidden"
+              title="Tags"
+            >
+              #
+            </button>
+          </TagPickerPopover>
+        </>
+      )}
+
+      <div className="flex items-center">
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            className="min-[1550px]:hidden hover:bg-primary/10 dark:hover:bg-neutral-800 p-2 rounded-full"
+            title="More"
+          >
+            <EllipsisVertical />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <ToolBar editor={editor} note={note} variant="menu" />
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   );

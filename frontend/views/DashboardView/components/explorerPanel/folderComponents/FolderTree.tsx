@@ -123,16 +123,13 @@ export default function FolderTree({
   return (
     <DragDropProvider
       onDragEnd={({ operation }) => {
-        console.log("targetId", operation.target?.id);
-        console.log("sourceFolderId", operation.source?.data?.currentFolderId);
         if (
           operation.target &&
           operation.target.id !== operation.source?.data.currentFolderId
         ) {
           const { target, source } = operation;
-          const noteId = source?.id as string;
           const folderId = target.id as string;
-          const note = operation.source?.data.note as NoteWithoutBody;
+          const note = source?.data.note as NoteWithoutBody;
           mutationToMoveNote.mutate({ note, folderId });
         }
       }}
