@@ -23,8 +23,8 @@ export default function layout({
         style={sidebarLayoutStyle}
       >
         <LeftSideBar />
-        <SidebarInset className="overflow-x-hidden flex min-h-0 min-w-0 flex-1 flex-col bg-white dark:bg-neutral-950">
-          <header className="flex shrink-0 items-center gap-2 h-9 px-2 py-2 min-[900px]:hidden">
+        <SidebarInset className="overflow-hidden flex min-h-0 min-w-0 flex-1 flex-col bg-white dark:bg-neutral-950">
+          <header className="flex shrink-0 items-center gap-2 h-9 px-2 py-2">
             <SidebarTrigger />
           </header>
           <div className="flex min-h-0 flex-1 flex-col">{children}</div>

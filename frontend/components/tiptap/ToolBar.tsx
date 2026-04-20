@@ -1,390 +1,90 @@
 "use client";
 import { Editor, useEditorState } from "@tiptap/react";
-import { useState, useRef, useEffect } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toolBarStateSelector } from "@/lib/toolBarState";
+import { EllipsisVertical } from "lucide-react";
 import {
-  ChevronDown,
-  List,
-  ListOrdered,
-  Redo,
-  Undo,
-  Bold,
-  Italic,
-  Strikethrough,
-  TextQuote,
-  Code,
-  Minus,
-  Underline,
-  ListTodo,
-  Highlighter,
-  EllipsisVertical,
-} from "lucide-react";
-import { TagPickerPopover } from "@/views/DashboardView/components/tagComponents/TagPickerPopover";
-import { Separator } from "../ui/separator";
-
-type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
-type DropDownState =
-  | "Paragraph"
-  | "Heading 1"
-  | "Heading 2"
-  | "Heading 3"
-  | "Heading 4"
-  | "Heading 5"
-  | "Heading 6";
+  HIDE_AT_OR_BELOW,
+  SHOWN_AT_OR_BELOW,
+  TOOLS,
+  ToolCtx,
+  VerticalSeparator,
+} from "./toolbarItems";
 
 export default function ToolBar({
   editor,
   note,
-  variant = "main",
 }: {
   editor: Editor | null;
   note?: Note;
-  variant?: "main" | "menu";
 }) {
-  const [openHeadingsList, setOpenHeadingsList] = useState<boolean>(false);
-  const [highLighterColor, setHighLighterColor] = useState<string>("yellow");
-  const colorInputRef = useRef<HTMLInputElement | null>(null);
   const editorState = useEditorState({
     editor,
     selector: toolBarStateSelector,
   });
 
-  useEffect(() => {
-    if (!editor) return;
+  if (editor === null) return null;
 
-    const updateColor = () => {
-      const attrs = editor.getAttributes("highlight");
-      if (attrs?.color && colorInputRef.current) {
-        colorInputRef.current.value = attrs.color;
-        setHighLighterColor(attrs.color);
-      }
-    };
+  const ctx: ToolCtx = { editor, editorState: editorState ?? undefined, note };
 
-    editor.on("selectionUpdate", updateColor);
+  // Tools that ever overflow into the menu (hiddenAtOrBelow > 0).
+  const overflowTools = TOOLS.filter((t) => t.hiddenAtOrBelow > 0);
 
-    return () => {
-      editor.off("selectionUpdate", updateColor);
-    };
-  }, [editor]);
-
-  if (editor === null) return;
-
-  const getLabel = (): DropDownState => {
-    if (!editorState) return "Paragraph";
-    if (editorState?.isHeading1) return "Heading 1";
-    if (editorState?.isHeading2) return "Heading 2";
-    if (editorState?.isHeading3) return "Heading 3";
-    if (editorState?.isHeading4) return "Heading 4";
-    if (editorState?.isHeading5) return "Heading 5";
-    if (editorState?.isHeading6) return "Heading 6";
-    return "Paragraph";
-  };
-
-  const handleHeadingChange = (label: DropDownState, level?: HeadingLevel) => {
-    setTimeout(() => {
-      if (level) {
-        editor.chain().focus().toggleHeading({ level }).run();
-      } else {
-        editor.chain().focus().setParagraph().run();
-      }
-    }, 0);
-  };
   return (
     <div className="p-3 px-6 min-w-0 w-full flex flex-nowrap items-center gap-5 border-b dark:text-[#a1a1a1] border-neutral-200 dark:border-white/10">
-      {/* History */}
-      <div className="flex gap-2 ">
-        <button
-          onClick={() => editor.chain().focus().undo().run()}
-          disabled={!editorState?.canUndo}
-          className="disabled:text-gray-400 disabled:hover:cursor-not-allowed disabled:cursor-not-allowed *:pointer-events-none rounded-full p-2 enabled:hover:bg-primary/10 transition-all"
-          title="Undo "
-        >
-          <Undo className="size-5" />
-        </button>
-        <button
-          title="Redo"
-          onClick={() => editor.chain().focus().redo().run()}
-          disabled={!editorState?.canRedo}
-          className="disabled:text-gray-400 disabled:hover:cursor-not-allowed disabled:cursor-not-allowed *:pointer-events-none rounded-full p-2 enabled:hover:bg-primary/10 transition-all"
-        >
-          <Redo className="size-5" />
-        </button>
-      </div>
+      {TOOLS.map((item) => {
+        const hideClass = HIDE_AT_OR_BELOW[item.hiddenAtOrBelow] ?? "";
+        if (item.kind === "separator") {
+          return (
+            <div key={item.id} className={`${hideClass} shrink-0 h-full`}>
+              <VerticalSeparator />
+            </div>
+          );
+        }
+        return (
+          <div key={item.id} className={hideClass}>
+            {item.render(ctx)}
+          </div>
+        );
+      })}
 
-      {/*Seperator*/}
-      <Separator orientation="vertical" />
-
-      {/*Headers List*/}
-      <div>
-        <DropdownMenu
-          open={openHeadingsList}
-          onOpenChange={setOpenHeadingsList}
-        >
-          <DropdownMenuTrigger
-            className="border dark:border-neutral-700 p-2 shadow-accent w-32"
-            asChild
-          >
-            <button className="rounded-md text-left relative">
-              <span className="">{getLabel()}</span>{" "}
-              <ChevronDown className="size-4 shrink-0 absolute right-2 top-1/2 -translate-y-1/2" />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            className="w-40 "
-            align="start"
-            onCloseAutoFocus={(e) => e.preventDefault()}
-          >
-            <DropdownMenuGroup>
-              <DropdownMenuItem
-                className={`${editorState?.isParagraph && "bg-accent/40 dark:bg-neutral-700/30"} `}
-                onSelect={(e) => {
-                  e.preventDefault();
-                  handleHeadingChange("Paragraph");
-                  setOpenHeadingsList(false);
-                }}
-              >
-                Paragraph
-                {/* <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut> */}
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className={`${editorState?.isHeading1 && "bg-accent/40"} `}
-                onSelect={(e) => {
-                  e.preventDefault();
-                  handleHeadingChange("Heading 1", 1);
-                  setOpenHeadingsList(false);
-                }}
-              >
-                Heading 1
-                {/* <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut> */}
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className={`${editorState?.isHeading2 && "bg-accent/40"} `}
-                onSelect={(e) => {
-                  e.preventDefault();
-                  handleHeadingChange("Heading 2", 2);
-                  setOpenHeadingsList(false);
-                }}
-              >
-                Heading 2{/* <DropdownMenuShortcut>⌘B</DropdownMenuShortcut> */}
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className={`${editorState?.isHeading3 && "bg-accent/40"} `}
-                onSelect={(e) => {
-                  e.preventDefault();
-                  handleHeadingChange("Heading 3", 3);
-                  setOpenHeadingsList(false);
-                }}
-              >
-                Heading 3{/* <DropdownMenuShortcut>⌘S</DropdownMenuShortcut> */}
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className={`${editorState?.isHeading4 && "bg-accent/40"} `}
-                onSelect={(e) => {
-                  e.preventDefault();
-                  handleHeadingChange("Heading 4", 4);
-                  setOpenHeadingsList(false);
-                }}
-              >
-                Heading 4
-                {/* <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut> */}
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className={`${editorState?.isHeading5 && "bg-accent/40"} `}
-                onSelect={(e) => {
-                  e.preventDefault();
-                  handleHeadingChange("Heading 5", 5);
-                  setOpenHeadingsList(false);
-                }}
-              >
-                Heading 5{/* <DropdownMenuShortcut>⌘B</DropdownMenuShortcut> */}
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className={`${editorState?.isHeading6 && "bg-accent/40"} `}
-                onSelect={(e) => {
-                  e.preventDefault();
-                  handleHeadingChange("Heading 6", 6);
-                  setOpenHeadingsList(false);
-                }}
-              >
-                Heading 6{/* <DropdownMenuShortcut>⌘S</DropdownMenuShortcut> */}
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-
-      {/*Seperator*/}
-      <Separator orientation="vertical" />
-
-      {/*Lists*/}
-      <div className="flex gap-3">
-        <button
-          onClick={() => editor.chain().focus().toggleBulletList().run()}
-          className={`${editorState?.isBulletList ? "bg-primary/50 dark:bg-neutral-700 shadow text-white" : "hover:bg-primary/10 dark:hover:bg-neutral-800"} rounded-full p-2`}
-          title="Bullet List"
-          type="button"
-        >
-          <List className="pointer-events-none" />
-        </button>
-        <button
-          onClick={() => editor.chain().focus().toggleOrderedList().run()}
-          className={`${editorState?.isOrderedList ? "bg-primary/50 dark:bg-neutral-700 shadow text-white" : "hover:bg-primary/10 dark:hover:bg-neutral-800"} rounded-full p-2 transition-all`}
-          title="Ordered List"
-          type="button"
-        >
-          <ListOrdered className="pointer-events-none" />
-        </button>
-        <button
-          onClick={() => editor.chain().focus().toggleTaskList().run()}
-          className={`${editorState?.isTaskList ? "bg-primary/50 dark:bg-neutral-700 shadow text-white" : "hover:bg-primary/10 dark:hover:bg-neutral-800"} rounded-full p-2 transition-all`}
-          title="Task List"
-          type="button"
-        >
-          <ListTodo className="pointer-events-none" />
-        </button>
-      </div>
-
-      {/*Seperator*/}
-      <Separator orientation="vertical" />
-
-      {/* Text Formatting */}
-      <div className="flex gap-3 max-[1120px]:hidden">
-        <button
-          onClick={() => editor.chain().focus().toggleBold().run()}
-          className={`${editorState?.isBold ? "bg-primary/50 dark:bg-neutral-700 shadow text-white" : "hover:bg-primary/10 dark:hover:bg-neutral-800"} rounded-full p-2 transition-all`}
-          title="Bold"
-        >
-          <Bold />
-        </button>
-        <button
-          onClick={() => editor.chain().focus().toggleItalic().run()}
-          className={`${editorState?.isItalic ? "bg-primary/50 dark:bg-neutral-700 shadow text-white" : "hover:bg-primary/10 dark:hover:bg-neutral-800"} rounded-full p-2 transition-all`}
-          title="Italic"
-        >
-          <Italic />
-        </button>
-        <button
-          onClick={() => editor.chain().focus().toggleUnderline().run()}
-          className={`${editorState?.isUnderline ? "bg-primary/50 dark:bg-neutral-700 shadow text-white" : "hover:bg-primary/10 dark:hover:bg-neutral-800"} rounded-full p-2 transition-all`}
-          title="Underline"
-        >
-          <Underline />
-        </button>
-        <button
-          onClick={() => editor.chain().focus().toggleStrike().run()}
-          className={`${editorState?.isStrike ? "bg-primary/50 dark:bg-neutral-700 shadow text-white" : "hover:bg-primary/10 dark:hover:bg-neutral-800"} max-[1350px]:hidden rounded-full p-2 transition-all`}
-          title="Strikethrough"
-        >
-          <Strikethrough />
-        </button>
-        <button
-          onClick={() => editor.chain().focus().toggleBlockquote().run()}
-          className={`${editorState?.isBlockquote ? "bg-primary/50 shadow text-white dark:bg-neutral-700" : "hover:bg-primary/10 dark:hover:bg-neutral-800"} max-[1350px]:hidden rounded-full p-2 transition-all`}
-          title="Blockquote"
-        >
-          <TextQuote />
-        </button>
-        <button
-          onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-          className={`${editorState?.isCodeBlock ? "bg-primary/50 shadow text-white dark:bg-neutral-700" : "hover:bg-primary/10 dark:hover:bg-neutral-800"} max-[1350px]:hidden rounded-full p-2 transition-all`}
-          title="Code Block"
-        >
-          <Code />
-        </button>
-      </div>
-
-      {/*Seperator*/}
-      <Separator orientation="vertical" className="max-[1120px]:hidden" />
-
-      {/* HorizontalLine */}
-      <div className="max-[1450px]:hidden">
-        <button
-          onClick={() => editor.chain().focus().setHorizontalRule().run()}
-          className={`hover:bg-primary/10 dark:hover:bg-neutral-800 rounded-full p-2 transition-all`}
-          title="Horizontal Line"
-        >
-          <Minus />
-        </button>
-      </div>
-
-      {/*Seperator*/}
-      <Separator orientation="vertical" className="max-[1450px]:hidden" />
-
-      {/* HighLighter */}
-      <div
-        className={`relative items-center gap-2 min-[1550px]:flex ${variant === "menu" ? "flex" : "hidden"}`}
-      >
-        <label
-          htmlFor="highlighter-input"
-          className="flex items-center justify-center border dark:border-neutral-700 rounded-full p-2 cursor-pointer hover:bg-primary/10 dark:hover:bg-neutral-800 transition-all"
-        >
-          <Highlighter style={{ fill: highLighterColor }} />
-        </label>
-        <input
-          id="highlighter-input"
-          type="color"
-          ref={colorInputRef}
-          defaultValue={highLighterColor}
-          className="absolute inset-0 w-0 h-0 opacity-0"
-          autoFocus={false}
-          onBlur={() => {
-            const color = colorInputRef.current?.value;
-            if (color) {
-              setHighLighterColor(color);
-            }
-          }}
-        />
-
-        <button
-          onClick={() => {
-            const color = colorInputRef.current?.value || "#eab308";
-            setHighLighterColor(color);
-            editor.chain().focus().toggleHighlight({ color }).run();
-          }}
-          className={`${editorState?.isHighlight ? "bg-primary/50 dark:bg-neutral-800 dark:text-white shadow text-white" : ""} hover:bg-primary/10 dark:hover:bg-neutral-800 transition-colors p-2 rounded-full flex gap-1 dark:text-[#a1a1a1] text-black`}
-        >
-          Toggle
-        </button>
-      </div>
-
-      {/* Tags */}
-      {note?.id && note?.slug && (
-        <>
-          {/*Seperator*/}
-          <Separator orientation="vertical" className="max-[1550px]:hidden" />
-          <TagPickerPopover
-            noteId={note.id}
-            noteSlug={note.slug}
-            currentTags={note.tags}
-          >
-            <button
-              type="button"
-              className="hover:bg-primary/10 rounded-full px-3 py-2 text-sm font-semibold transition-all max-[1550px]:hidden"
-              title="Tags"
-            >
-              #
-            </button>
-          </TagPickerPopover>
-        </>
-      )}
-
-      <div className="flex items-center">
+      {/* Overflow menu — trigger is hidden once viewport is wide enough that
+          nothing overflows (above the largest breakpoint used in TOOLS). */}
+      <div className="flex items-center min-[1551px]:hidden">
         <DropdownMenu>
           <DropdownMenuTrigger
-            className="min-[1550px]:hidden hover:bg-primary/10 dark:hover:bg-neutral-800 p-2 rounded-full"
+            className="hover:bg-primary/10 dark:hover:bg-neutral-800 p-2 rounded-full"
             title="More"
           >
             <EllipsisVertical />
           </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <ToolBar editor={editor} note={note} variant="menu" />
+          <DropdownMenuContent
+            align="end"
+            className="flex flex-wrap items-center gap-2 p-2 w-72"
+          >
+            {overflowTools.map((item) => {
+              const showClass = SHOWN_AT_OR_BELOW[item.hiddenAtOrBelow] ?? "";
+              if (item.kind === "separator") {
+                return (
+                  <div
+                    key={item.id}
+                    className={`${showClass} shrink-0 h-8 *:bg-neutral-600`}
+                  >
+                    <VerticalSeparator />
+                  </div>
+                );
+              }
+
+              return (
+                <div key={item.id} className={showClass}>
+                  {item.render(ctx)}
+                </div>
+              );
+            })}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

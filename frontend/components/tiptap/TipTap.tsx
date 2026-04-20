@@ -135,10 +135,10 @@ const Tiptap = ({ note }: { note?: Note }) => {
   }, [debounced]);
 
   return (
-    <div className="flex flex-1 min-w-0">
-      <div className="flex-1 flex flex-col min-w-0">
+    <div className="flex flex-1 min-w-0 min-h-0">
+      <div className="flex-1 flex flex-col min-w-0 min-h-0">
         <ToolBar editor={editor} note={note} />
-        <div className="grow overflow-auto min-h-0 max-h-200 shrink-0">
+        <div className="flex-1 overflow-auto min-h-0">
           {editor && (
             <DragHandle
               editor={editor}
