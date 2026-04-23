@@ -182,23 +182,6 @@ export default function FolderList({
           />
         );
       })}
-
-      {/* modals */}
-      <Dialog
-        open={!!activeAction}
-        onOpenChange={(open) => {
-          if (!open) setActiveAction(null);
-        }}
-      >
-        {activeAction?.type === "delete" && (
-          <DeleteModal
-            folder={activeAction.folder}
-            onClose={() => {
-              setActiveAction(null);
-            }}
-          />
-        )}
-      </Dialog>
     </div>
   );
 }

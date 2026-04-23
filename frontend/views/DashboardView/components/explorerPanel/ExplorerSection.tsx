@@ -16,6 +16,8 @@ import { updateFoldersInQueryCache } from "@/lib/foldersAndNotesCache";
 import FolderTree from "./folderComponents/FolderTree";
 import { updateFolderRequest } from "@/lib/folderApi";
 import { createNoteRequest } from "@/lib/noteApi";
+import { Dialog } from "@/components/ui/dialog";
+import { DeleteModal } from "../modals/DeleteModal";
 
 export type ActiveAction =
   | null
@@ -298,6 +300,22 @@ export default function ExplorerSection({
           />
         </div>
       </div>
+      {/* modals */}
+      <Dialog
+        open={!!activeAction}
+        onOpenChange={(open) => {
+          if (!open) setActiveAction(null);
+        }}
+      >
+        {activeAction?.type === "delete" && (
+          <DeleteModal
+            folder={activeAction.folder}
+            onClose={() => {
+              setActiveAction(null);
+            }}
+          />
+        )}
+      </Dialog>
     </ExplorerContext>
   );
 }
