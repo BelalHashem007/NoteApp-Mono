@@ -54,7 +54,7 @@ export default function ToolBar({
 
       {/* Overflow menu — trigger is hidden once viewport is wide enough that
           nothing overflows (above the largest breakpoint used in TOOLS). */}
-      <div className="flex items-center min-[1551px]:hidden">
+      <div className="flex items-center min-[1601px]:hidden">
         <DropdownMenu>
           <DropdownMenuTrigger
             className="hover:bg-primary/10 dark:hover:bg-neutral-800 p-2 rounded-full"

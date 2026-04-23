@@ -28,8 +28,10 @@ import {
   Redo,
   Undo,
   Link,
+  Image,
 } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { checkImage } from "@/lib/utils";
 
 type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
 type DropDownState =
@@ -72,22 +74,22 @@ export type ToolItem =
 export const HIDE_AT_OR_BELOW: Record<number, string> = {
   0: "",
   360: "max-[360px]:hidden",
-  580: "max-[550px]:hidden",
+  580: "max-[580px]:hidden",
   1120: "max-[1120px]:hidden",
   1350: "max-[1350px]:hidden",
   1450: "max-[1450px]:hidden",
-  1550: "max-[1550px]:hidden",
+  1600: "max-[1600px]:hidden",
 };
 
 /** Inverse of HIDE_AT_OR_BELOW: visible only when viewport is at/below the bp. */
 export const SHOWN_AT_OR_BELOW: Record<number, string> = {
   0: "hidden",
   360: "min-[361px]:hidden",
-  580: "min-[551px]:hidden",
+  580: "min-[581px]:hidden",
   1120: "min-[1121px]:hidden",
   1350: "min-[1351px]:hidden",
   1450: "min-[1451px]:hidden",
-  1550: "min-[1551px]:hidden",
+  1600: "min-[1601px]:hidden",
 };
 
 // ---------------------------------------------------------------------------
@@ -454,11 +456,12 @@ function LinkButton({ editor }: ToolCtx) {
       editor.off("selectionUpdate", findLinkHref);
     };
   }, [editor]);
+
   return (
     <Popover>
       <PopoverTrigger asChild>
         <button
-          className={`${linkHref && "bg-primary/50 dark:bg-neutral-700 shadow text-white"} hover:bg-primary/10 dark:hover:bg-neutral-800 transition-colors p-2 rounded-full`}
+          className={`${linkHref && "bg-primary/50 dark:bg-neutral-700 shadow text-white"} dark:hover:bg-primary/10 dark:hover:bg-neutral-800 transition-colors p-2 rounded-full`}
           onClick={(e) => {
             if (linkHref) {
               e.preventDefault();
@@ -468,7 +471,7 @@ function LinkButton({ editor }: ToolCtx) {
           }}
           title="Link"
         >
-          <Link className="size-5" />
+          <Link className="size-6" />
         </button>
       </PopoverTrigger>
       <PopoverContent>
@@ -484,7 +487,7 @@ function LinkButton({ editor }: ToolCtx) {
           }}
         >
           <label className="flex flex-col gap-1">
-            Url
+            Link Url
             <input
               type="text"
               value={url}
@@ -498,6 +501,83 @@ function LinkButton({ editor }: ToolCtx) {
             className="p-2 rounded-md bg-blue-500 text-white dark:bg-blue-500/50"
           >
             Add Link
+          </button>
+        </form>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+function ImageButton({ editor }: ToolCtx) {
+  const [imgUrl, setImgUrl] = useState<string | null>(null);
+  const [altText, setAltText] = useState<string | null>(null);
+
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <button
+          className={` hover:bg-primary/10 dark:hover:bg-neutral-800 transition-colors p-2 rounded-full`}
+          title="Image"
+        >
+          {/* eslint-disable-next-line */}
+          <Image className="size-6" />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent>
+        <form
+          className="flex-col flex gap-5"
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (imgUrl && imgUrl.trim().length > 0) {
+              checkImage(imgUrl).then((isValied) => {
+                const finalUrl = isValied
+                  ? imgUrl
+                  : "https://placehold.co/400?text=Failed+To+Load+Image&font=roboto";
+                editor
+                  .chain()
+                  .insertContent({
+                    type: "imageResize",
+                    attrs: {
+                      src: finalUrl,
+                      alt: altText ?? "Random image",
+                    },
+                  })
+                  .focus()
+                  .run();
+                setImgUrl(null);
+                setAltText(null);
+              });
+            }
+          }}
+        >
+          <label className="flex flex-col gap-1">
+            Image Url
+            <input
+              type="text"
+              value={imgUrl || ""}
+              onChange={(e) => setImgUrl(e.target.value)}
+              placeholder="i.e. https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=1274&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+              className="border bg-neutral-100 dark:border-neutral-600 p-1 dark:bg-neutral-700 focus:outline-1"
+            />
+          </label>
+
+          <label className="flex flex-col gap-1">
+            Alt Text (useful for search)
+            <input
+              type="text"
+              value={altText || ""}
+              onChange={(e) => setAltText(e.target.value)}
+              placeholder="Random image"
+              className="border bg-neutral-100 dark:border-neutral-600 p-1 dark:bg-neutral-700 focus:outline-1"
+            />
+          </label>
+
+          <button
+            type="submit"
+            className="p-2 rounded-md bg-blue-500 text-white disabled:cursor-not-allowed dark:bg-blue-500/50 disabled:text-gray-400 disabled:bg-gray-300"
+            disabled={!imgUrl || imgUrl.trim().length === 0}
+          >
+            Add Image
           </button>
         </form>
       </PopoverContent>
@@ -600,23 +680,29 @@ export const TOOLS: ToolItem[] = [
   {
     kind: "tool",
     id: "link",
-    hiddenAtOrBelow: 0,
+    hiddenAtOrBelow: 1450,
     render: (c) => <LinkButton {...c} />,
+  },
+  {
+    kind: "tool",
+    id: "image",
+    hiddenAtOrBelow: 1450,
+    render: (c) => <ImageButton {...c} />,
   },
 
   { kind: "separator", id: "sep-hr", hiddenAtOrBelow: 1450 },
   {
     kind: "tool",
     id: "highlighter",
-    hiddenAtOrBelow: 1550,
+    hiddenAtOrBelow: 1600,
     render: (c) => <HighlighterControl {...c} />,
   },
 
-  { kind: "separator", id: "sep-highlighter", hiddenAtOrBelow: 1550 },
+  { kind: "separator", id: "sep-highlighter", hiddenAtOrBelow: 1600 },
   {
     kind: "tool",
     id: "tags",
-    hiddenAtOrBelow: 1550,
+    hiddenAtOrBelow: 1600,
     render: (c) => <TagsButton {...c} />,
   },
 ];

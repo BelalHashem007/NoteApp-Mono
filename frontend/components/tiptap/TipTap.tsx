@@ -118,10 +118,13 @@ const Tiptap = ({ note }: { note?: Note }) => {
 
   const debounced = useDebouncedCallback(
     (json) => {
-      console.log("iam saving....");
+      console.log("saving....");
       const imageIds: string[] = [];
       editor?.state.doc.descendants((node) => {
-        if (node.type.name === "image") {
+        if (
+          node.type.name === "imageResize" &&
+          node.attrs.src.includes("/api/attachments/")
+        ) {
           imageIds.push(node.attrs.src.split("/").filter(Boolean)[2]);
         }
       });
