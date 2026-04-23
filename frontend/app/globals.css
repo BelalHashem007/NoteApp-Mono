@@ -27,6 +27,14 @@
   padding-inline: 4rem;
 }
 .tiptap {
+  a {
+    color: blue;
+    cursor: pointer;
+
+    &:where(.dark, .dark *) {
+      color: lightblue;
+    }
+  }
   ul,
   ol {
     padding: 0 1rem;

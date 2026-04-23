@@ -27,7 +27,9 @@ import {
   Highlighter,
   Redo,
   Undo,
+  Link,
 } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 
 type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
 type DropDownState =
@@ -427,6 +429,82 @@ function TagsButton({ note }: ToolCtx) {
   );
 }
 
+function LinkButton({ editor }: ToolCtx) {
+  const [url, setUrl] = useState<string>("https://");
+  const [linkHref, setLinkHref] = useState<string | null>(null);
+
+  useEffect(() => {
+    const findLinkHref = () => {
+      const { state } = editor;
+      const { from, empty } = state.selection;
+      const marks = empty
+        ? state.doc.resolve(from).marks()
+        : state.selection.$from.marks();
+      const linkMark = marks.find((mark) => mark.type.name === "link");
+      if (linkMark) {
+        setLinkHref(linkMark.attrs.href);
+      } else {
+        setLinkHref(null);
+      }
+    };
+
+    editor.on("selectionUpdate", findLinkHref);
+
+    return () => {
+      editor.off("selectionUpdate", findLinkHref);
+    };
+  }, [editor]);
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <button
+          className={`${linkHref && "bg-primary/50 dark:bg-neutral-700 shadow text-white"} hover:bg-primary/10 dark:hover:bg-neutral-800 transition-colors p-2 rounded-full`}
+          onClick={(e) => {
+            if (linkHref) {
+              e.preventDefault();
+              editor.chain().focus().toggleLink({ href: linkHref }).run();
+              setLinkHref(null);
+            }
+          }}
+          title="Link"
+        >
+          <Link className="size-5" />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent>
+        <form
+          className="flex-col flex gap-5"
+          onSubmit={(e) => {
+            e.preventDefault();
+            editor.chain().focus().toggleLink({ href: url }).run();
+            setTimeout(() => {
+              setUrl("https://");
+              setLinkHref(null);
+            }, 100);
+          }}
+        >
+          <label className="flex flex-col gap-1">
+            Url
+            <input
+              type="text"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              className="border bg-neutral-100 dark:border-neutral-600 p-1 dark:bg-neutral-700 focus:outline-1"
+            />
+          </label>
+
+          <button
+            type="submit"
+            className="p-2 rounded-md bg-blue-500 text-white dark:bg-blue-500/50"
+          >
+            Add Link
+          </button>
+        </form>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
 // ---------------------------------------------------------------------------
 // Tool registry — single source of truth for both the toolbar and the
 // overflow menu. To add a tool: drop a new entry here.
@@ -518,6 +596,12 @@ export const TOOLS: ToolItem[] = [
     id: "hr",
     hiddenAtOrBelow: 1450,
     render: (c) => <HorizontalRuleButton {...c} />,
+  },
+  {
+    kind: "tool",
+    id: "link",
+    hiddenAtOrBelow: 0,
+    render: (c) => <LinkButton {...c} />,
   },
 
   { kind: "separator", id: "sep-hr", hiddenAtOrBelow: 1450 },

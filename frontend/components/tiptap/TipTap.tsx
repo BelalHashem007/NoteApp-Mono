@@ -19,6 +19,8 @@ import { updateNoteBodyRequest } from "@/lib/noteApi";
 import DragHandle from "@tiptap/extension-drag-handle-react";
 import { GripVertical } from "lucide-react";
 import HighLight from "@tiptap/extension-highlight";
+import Link from "@tiptap/extension-link";
+import { LinkHoverElement } from "@/views/DashboardView/NoteView/components/LinkHoverElement";
 
 const lowlight = createLowlight(all);
 
@@ -74,6 +76,10 @@ const Tiptap = ({ note }: { note?: Note }) => {
       StarterKit.configure({
         codeBlock: false,
         underline: false,
+        link: false,
+      }),
+      Link.configure({
+        openOnClick: false,
       }),
       TaskList,
       TaskItem.configure({
@@ -140,16 +146,22 @@ const Tiptap = ({ note }: { note?: Note }) => {
         <ToolBar editor={editor} note={note} />
         <div className="flex-1 overflow-auto min-h-0">
           {editor && (
-            <DragHandle
-              editor={editor}
-              nested={{ edgeDetection: { threshold: -16 } }}
-              computePositionConfig={{
-                placement: "left",
-                strategy: "fixed",
-              }}
-            >
-              <GripVertical className="size-5 cursor-grab text-center p-0.5 mr-5" />
-            </DragHandle>
+            <>
+              {/* dragHandler */}
+              <DragHandle
+                editor={editor}
+                nested={{ edgeDetection: { threshold: -16 } }}
+                computePositionConfig={{
+                  placement: "left",
+                  strategy: "fixed",
+                }}
+              >
+                <GripVertical className="size-5 cursor-grab text-center p-0.5 mr-5" />
+              </DragHandle>
+
+              {/* link floating ui */}
+              <LinkHoverElement editor={editor} />
+            </>
           )}
           <EditorContent
             editor={editor}

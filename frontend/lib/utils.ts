@@ -25,3 +25,12 @@ export function toMaxAge(dateString: string) {
     Math.floor((new Date(dateString).getTime() - Date.now()) / 1000),
   );
 }
+
+export function normalizeUrl(url: string) {
+  try {
+    const parsed = new URL(url.startsWith("http") ? url : `https://${url}`);
+    return parsed.href;
+  } catch {
+    return null;
+  }
+}
