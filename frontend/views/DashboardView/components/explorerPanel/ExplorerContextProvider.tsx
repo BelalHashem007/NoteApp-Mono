@@ -14,7 +14,7 @@ import { updateFoldersInQueryCache } from "@/lib/foldersAndNotesCache";
 
 export type ActiveAction =
   | null
-  | { type: "createNote"; folder: FolderWithNotes }
+  | { type: "createNote"; folderId: string }
   | { type: "createFolder"; parentId?: string }
   | { type: "renameFolder"; folder: FolderWithNotes }
   | { type: "delete"; folder: FolderWithNotes };

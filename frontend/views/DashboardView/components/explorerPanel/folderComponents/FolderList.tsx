@@ -123,7 +123,7 @@ const FolderEntry = ({
           <FolderList folders={f.subFolders} level={level + 1} />
           {/* input for note creation */}
           {activeAction?.type === "createNote" &&
-            activeAction.folder.id === f.id && (
+            activeAction.folderId === f.id && (
               <div
                 className="flex gap-2  w-full  items-center "
                 style={{ paddingLeft: 28 + (level + 1) * 8 }}
@@ -133,6 +133,7 @@ const FolderEntry = ({
                   className="pl-1 dark:text-[#a1a1a1] focus:outline-1 dark:focus:outline-neutral-500 focus:outline-neutral-800"
                   type="text"
                   ref={creationInputRef}
+                  autoFocus
                   minLength={1}
                   maxLength={50}
                   onBlur={(e) => {

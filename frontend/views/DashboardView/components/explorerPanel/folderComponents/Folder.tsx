@@ -95,7 +95,7 @@ export function Folder({ folder, level, creationInputRef }: Props) {
               }
               setActiveAction({
                 type: "createNote",
-                folder: folder,
+                folderId: folder.id,
               });
             }}
           >

@@ -3,7 +3,7 @@ import { useTapsContext } from "@/app/dashboard/providers";
 import Link from "next/link";
 import { FileText, X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useRef } from "react";
 import { tagQuerySuffix } from "@/lib/tagQueryUrl";
 
 function NoteTappedNavigationInner({ note }: { note?: Note }) {
@@ -11,10 +11,11 @@ function NoteTappedNavigationInner({ note }: { note?: Note }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const tagSuffix = tagQuerySuffix(searchParams.getAll("tag"));
+  const openedNotesRef = useRef(openedNotes);
 
   useEffect(() => {
     const handleLocalStorage = () => {
-      if (note && !openedNotes.find((x) => x.slug === note.slug)) {
+      if (note && !openedNotesRef.current.find((x) => x.slug === note.slug)) {
         setOpenedNotes((prev) => [
           ...prev,
           { slug: note.slug, title: note.title },
@@ -22,7 +23,7 @@ function NoteTappedNavigationInner({ note }: { note?: Note }) {
       }
     };
     handleLocalStorage();
-  }, [setOpenedNotes, note, openedNotes]);
+  }, [setOpenedNotes, note]);
 
   return (
     <div className="h-9 shrink-0 max-[900px]:hidden border-b dark:border-white/10 dark:bg-neutral-800/30 border-neutral-200 flex items-center overflow-x-auto">

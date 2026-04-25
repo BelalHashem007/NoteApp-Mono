@@ -1,7 +1,7 @@
 "use client";
 
-import { CopyMinus, FolderPlus } from "lucide-react";
-import { useRef, useState } from "react";
+import { CopyMinus, FilePlus, FolderPlus } from "lucide-react";
+import { useRef } from "react";
 import FolderTree from "./folderComponents/FolderTree";
 import { Dialog } from "@/components/ui/dialog";
 import { DeleteModal } from "../modals/DeleteModal";
@@ -30,11 +30,20 @@ export default function ExplorerSection({
           <div>
             <button
               type="button"
-              title="Collapse Folders"
               className="p-1 hover:bg-primary/10 dark:hover:bg-neutral-700 rounded-md"
-              onClick={() => setOpenFolders([])}
+              title="New Note..."
+              onClick={() => {
+                if (activeItem && !openFolders.includes(activeItem.folderId))
+                  setOpenFolders((prev) => [...prev, activeItem.folderId]);
+
+                if (activeItem)
+                  setActiveAction({
+                    type: "createNote",
+                    folderId: activeItem?.folderId,
+                  });
+              }}
             >
-              <CopyMinus className="w-4 h-4" />
+              <FilePlus className="w-4 h-4" />
             </button>
             <button
               type="button"
@@ -50,6 +59,14 @@ export default function ExplorerSection({
               }}
             >
               <FolderPlus className="w-4 h-4" />
+            </button>
+            <button
+              type="button"
+              title="Collapse Folders"
+              className="p-1 hover:bg-primary/10 dark:hover:bg-neutral-700 rounded-md"
+              onClick={() => setOpenFolders([])}
+            >
+              <CopyMinus className="w-4 h-4" />
             </button>
           </div>
         </div>
