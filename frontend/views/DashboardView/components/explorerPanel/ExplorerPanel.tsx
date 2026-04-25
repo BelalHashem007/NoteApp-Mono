@@ -10,6 +10,7 @@ import { getFoldersFromQueryData } from "@/lib/foldersAndNotesCache";
 import { getAllUserTagsFromFoldersCache } from "@/lib/tagsFromFoldersCache";
 import { filterFolderTreeByTag } from "@/lib/filterFoldersByTag";
 import FolderComponentSkeleton from "@/components/placeholders/FolderComponentSkeleton";
+import { ExplorerContextProvider } from "./ExplorerContextProvider";
 
 function ExplorerPanelContent() {
   const searchParams = useSearchParams();
@@ -45,7 +46,9 @@ function ExplorerPanelContent() {
   return (
     <div className="flex h-full flex-col flex-1 min-h-0 w-full min-w-0 overflow-hidden">
       <div className="flex-7 min-h-0 flex flex-col overflow-hidden">
-        <ExplorerSection folders={filteredFolders} />
+        <ExplorerContextProvider>
+          <ExplorerSection folders={filteredFolders} />
+        </ExplorerContextProvider>
       </div>
       <div className="flex-3 min-h-0 flex flex-col overflow-hidden dark:border-white/10 border-neutral-200 border-t shrink-0">
         <TagFilterSection

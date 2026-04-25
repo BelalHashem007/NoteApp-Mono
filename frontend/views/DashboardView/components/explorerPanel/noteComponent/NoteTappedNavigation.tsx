@@ -22,7 +22,7 @@ function NoteTappedNavigationInner({ note }: { note?: Note }) {
       }
     };
     handleLocalStorage();
-  }, [setOpenedNotes, note]);
+  }, [setOpenedNotes, note, openedNotes]);
 
   return (
     <div className="h-9 shrink-0 max-[900px]:hidden border-b dark:border-white/10 dark:bg-neutral-800/30 border-neutral-200 flex items-center overflow-x-auto">

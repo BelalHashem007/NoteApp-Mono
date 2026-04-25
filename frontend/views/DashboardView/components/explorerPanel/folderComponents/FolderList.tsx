@@ -7,11 +7,9 @@ import {
   ChevronDown,
   FileText,
 } from "lucide-react";
-import { Dialog } from "@/components/ui/dialog";
-import { DeleteModal } from "../../modals/DeleteModal";
 import { Folder } from "./Folder";
 import { useDroppable } from "@dnd-kit/react";
-import { useExplorerContext } from "../ExplorerSection";
+import { useExplorerContext } from "../ExplorerContextProvider";
 
 //it only exists to make droppable possible
 const FolderEntry = ({
@@ -31,7 +29,9 @@ const FolderEntry = ({
     createFolder,
     createNote,
   } = useExplorerContext();
+
   const { ref, isDropTarget } = useDroppable({ id: f.id });
+
   return (
     <div
       ref={ref}
@@ -86,7 +86,7 @@ const FolderEntry = ({
         <div>
           {/* input for folder creation */}
           {activeAction?.type === "createFolder" &&
-            activeAction.folder.id === f.id && (
+            activeAction.parentId === f.id && (
               <div
                 className="pl-2 flex gap-2 items-center w-full dark:text-neutral-50"
                 style={{ paddingLeft: 8 + (level + 1) * 8 }}
@@ -97,6 +97,7 @@ const FolderEntry = ({
                   className="pl-1 focus:outline-1 dark:focus:outline-neutral-500 focus:outline-neutral-800"
                   type="text"
                   ref={creationInputRef}
+                  autoFocus
                   minLength={1}
                   maxLength={50}
                   onBlur={(e) => {
@@ -168,7 +169,6 @@ export default function FolderList({
   level: number;
 }) {
   const creationInputRef = useRef<HTMLInputElement>(null);
-  const { activeAction, setActiveAction } = useExplorerContext();
 
   return (
     <div className="">

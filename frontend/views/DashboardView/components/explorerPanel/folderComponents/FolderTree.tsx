@@ -1,6 +1,6 @@
 "use client";
 import FolderList from "./FolderList";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -10,7 +10,7 @@ import {
 import { ChevronRight, FolderClosed, FolderPlus } from "lucide-react";
 import { DragDropProvider } from "@dnd-kit/react";
 import { usePathname } from "next/navigation";
-import { useExplorerContext } from "../ExplorerSection";
+import { useExplorerContext } from "../ExplorerContextProvider";
 import { useMutation } from "@tanstack/react-query";
 import { moveNoteToFolder } from "@/lib/noteApi";
 import { updateFoldersInQueryCache } from "@/lib/foldersAndNotesCache";
@@ -18,20 +18,23 @@ import toast from "react-hot-toast";
 
 type FoldersComponentProps = {
   folders: FolderWithNotes[];
-  showFolderCreationInput: boolean;
-  setShowFolderCreationInput: React.Dispatch<React.SetStateAction<boolean>>;
   inputRef: React.RefObject<HTMLInputElement | null>;
 };
 
 export default function FolderTree({
   folders,
-  showFolderCreationInput,
-  setShowFolderCreationInput,
   inputRef,
 }: FoldersComponentProps) {
+  const {
+    setOpenFolders,
+    createFolder,
+    activeAction,
+    setActiveAction,
+    setActiveItem,
+  } = useExplorerContext();
+
   const pathname = usePathname();
   const activeNoteSlug = pathname.split("/").filter(Boolean)[2];
-  const { setOpenFolders, createFolder } = useExplorerContext();
 
   const mutationToMoveNote = useMutation({
     mutationFn: ({
@@ -80,6 +83,9 @@ export default function FolderTree({
     },
   });
 
+  //ref to hold folders so that when the folders change size react does not throw error saying the folders changed but its not mentioned in the dependancy array
+  const foldersRef = useRef(folders);
+
   //open folders of the current active note
   useEffect(() => {
     if (!activeNoteSlug) return;
@@ -88,9 +94,10 @@ export default function FolderTree({
       const path: string[] = [];
 
       for (const folder of foldersList) {
-        const hasNote = folder.notes.some((n) => n.slug === activeNoteSlug);
-        if (hasNote) {
+        const note = folder.notes.find((n) => n.slug === activeNoteSlug);
+        if (note) {
           path.push(folder.id);
+          setActiveItem({ type: "note", folderId: folder.id, noteId: note.id });
           return path;
         }
 
@@ -104,7 +111,7 @@ export default function FolderTree({
       return path;
     };
 
-    const folderIdsToOpen = findPathToNote(folders);
+    const folderIdsToOpen = findPathToNote(foldersRef.current);
 
     const updateState = () =>
       setOpenFolders((prev) => {
@@ -113,12 +120,12 @@ export default function FolderTree({
       });
 
     updateState();
-  }, [activeNoteSlug, folders]);
+  }, [activeNoteSlug]);
 
   useEffect(() => {
-    if (!showFolderCreationInput) return;
+    if (activeAction?.type !== "createFolder") return;
     inputRef.current?.focus();
-  }, [showFolderCreationInput, inputRef]);
+  }, [activeAction?.type, inputRef]);
 
   return (
     <DragDropProvider
@@ -134,9 +141,9 @@ export default function FolderTree({
         }
       }}
     >
-      <div className="h-full w-full flex flex-col min-h-0 pb-1">
+      <div className="h-full w-full flex flex-col min-h-0">
         <FolderList folders={folders} level={0} />
-        {showFolderCreationInput && (
+        {activeAction?.type === "createFolder" && !activeAction.parentId && (
           <div className="pl-2 flex gap-2 items-center w-full">
             <ChevronRight className="w-3 h-3 text-neutral-500 dark:text-[#a1a1a1]" />
             <FolderClosed className="w-4 h-4 shrink-0 text-neutral-500 dark:text-[#a1a1a1]" />
@@ -147,20 +154,23 @@ export default function FolderTree({
               minLength={1}
               maxLength={50}
               onBlur={(e) => {
-                if (e.target.value.length === 0)
-                  return setShowFolderCreationInput(false);
+                if (e.target.value.length === 0) return setActiveAction(null);
+
                 createFolder.mutate({ folderName: e.target.value });
-                setShowFolderCreationInput(false);
+                setActiveAction(null);
               }}
               onKeyDown={(e) => {
                 if (e.key === "Enter") e.currentTarget.blur();
-                if (e.key === "Escape") setShowFolderCreationInput(false);
+                if (e.key === "Escape") setActiveAction(null);
               }}
             />
           </div>
         )}
         <ContextMenu>
-          <ContextMenuTrigger className="grow"></ContextMenuTrigger>
+          <ContextMenuTrigger
+            className="grow pb-20"
+            onClick={() => setActiveItem(null)}
+          ></ContextMenuTrigger>
           <ContextMenuContent
             onCloseAutoFocus={(e) => {
               if (inputRef.current) {
@@ -170,7 +180,9 @@ export default function FolderTree({
               }
             }}
           >
-            <ContextMenuItem onSelect={() => setShowFolderCreationInput(true)}>
+            <ContextMenuItem
+              onSelect={() => setActiveAction({ type: "createFolder" })}
+            >
               <div className="flex items-center gap-2">
                 <FolderPlus className="w-4 h-4 shrink-0" />
                 <span className="text-sm">New Folder...</span>

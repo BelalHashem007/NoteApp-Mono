@@ -17,7 +17,7 @@ import {
   FilePlus,
 } from "lucide-react";
 import { RefObject } from "react";
-import { useExplorerContext } from "../ExplorerSection";
+import { useExplorerContext } from "../ExplorerContextProvider";
 
 type Props = {
   folder: FolderWithNotes;
@@ -32,20 +32,23 @@ export function Folder({ folder, level, creationInputRef }: Props) {
     activeAction,
     setActiveAction,
     updateFolder,
+    activeItem,
+    setActiveItem,
   } = useExplorerContext();
   return (
     <ContextMenu>
       <ContextMenuTrigger asChild>
         <button
-          className=" flex pr-3 gap-2 hover:bg-primary/10 dark:hover:bg-neutral-700 w-full items-center dark:text-neutral-50"
+          className={`${activeItem?.type === "folder" && activeItem?.folderId === folder.id ? "dark:bg-neutral-700 bg-primary/10" : "hover:bg-primary/10 dark:hover:bg-neutral-700"} flex pr-3 gap-2 w-full items-center dark:text-neutral-50`}
           style={{ paddingLeft: 8 + level * 8 }}
-          onClick={() =>
+          onClick={() => {
             setOpenFolders(
               openFolders.includes(folder.id)
                 ? openFolders.filter((folderId) => folderId !== folder.id)
                 : [folder.id, ...openFolders],
-            )
-          }
+            );
+            setActiveItem({ type: "folder", folderId: folder.id });
+          }}
           onKeyDown={(e) => {
             if (e.key === "Delete" && activeAction?.type !== "delete") {
               setActiveAction({ type: "delete", folder: folder });
@@ -108,7 +111,6 @@ export function Folder({ folder, level, creationInputRef }: Props) {
               }
               setActiveAction({
                 type: "createFolder",
-                folder: folder,
                 parentId: folder.id,
               });
             }}

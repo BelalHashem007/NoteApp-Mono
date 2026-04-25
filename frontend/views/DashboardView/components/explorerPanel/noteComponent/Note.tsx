@@ -10,11 +10,12 @@ import {
 } from "@/components/ui/context-menu";
 import { FileText, Pencil, Trash2 } from "lucide-react";
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { tagQuerySuffix } from "@/lib/tagQueryUrl";
 import { UseMutationResult } from "@tanstack/react-query";
 import { Dispatch, SetStateAction } from "react";
 import { useDraggable } from "@dnd-kit/react";
+import { useExplorerContext } from "../ExplorerContextProvider";
 
 type Props = {
   note: NoteWithoutBody;
@@ -39,9 +40,8 @@ export function Note({
   folderId,
 }: Props) {
   const { setOpenedNotes } = useTapsContext();
-  const pathname = usePathname();
+  const { activeItem, setActiveItem } = useExplorerContext();
   const searchParams = useSearchParams();
-  const activeNoteSlug = pathname.split("/").filter(Boolean)[2];
   const tagSuffix = tagQuerySuffix(searchParams.getAll("tag"));
   const { ref } = useDraggable({
     id: note.id,
@@ -53,8 +53,8 @@ export function Note({
       <ContextMenuTrigger asChild>
         <Link
           className={`flex pr-3 gap-2 w-full truncate items-center dark:text-[#a1a1a1] ${
-            activeNoteSlug === note.slug
-              ? "bg-neutral-500 text-neutral-50 dark:bg-neutral-400 dark:text-neutral-900"
+            activeItem?.noteId === note.id
+              ? "dark:bg-neutral-700 bg-primary/10"
               : "hover:bg-primary/10 dark:hover:bg-neutral-700"
           }`}
           style={{ paddingLeft: 28 + level * 8 }}
@@ -64,12 +64,17 @@ export function Note({
               if (prev.some((x) => x.slug === note.slug)) return prev;
               else return [...prev, note];
             });
+            setActiveItem({
+              type: "note",
+              noteId: note.id,
+              folderId: folderId,
+            });
           }}
           ref={ref}
         >
           <FileText
             className={`w-4 h-4 shrink-0 ${
-              activeNoteSlug !== note.slug &&
+              activeItem?.noteId !== note.id &&
               "text-neutral-500 dark:text-[#a1a1a1]"
             }`}
           />{" "}

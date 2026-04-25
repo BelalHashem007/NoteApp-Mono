@@ -81,7 +81,21 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ThemeContext value={[theme ? theme : "light", setTheme]}>
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-      <Toaster toastOptions={{ duration: 5000 }} />
+      <Toaster
+        toastOptions={{
+          duration: 5000,
+          success: {
+            iconTheme: {
+              primary: theme === "dark" ? "green" : "",
+              secondary: theme === "dark" ? "lab(15.204 0 0)" : "",
+            },
+          },
+          style: {
+            background: theme === "dark" ? "lab(15.204 0 0)" : "",
+            color: theme === "dark" ? "white" : "",
+          },
+        }}
+      />
     </ThemeContext>
   );
 }
