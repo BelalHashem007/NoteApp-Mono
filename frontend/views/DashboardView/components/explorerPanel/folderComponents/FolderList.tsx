@@ -1,4 +1,4 @@
-import { useRef, RefObject } from "react";
+import { useRef, RefObject, useState } from "react";
 import NoteList from "../noteComponent/NoteList";
 import {
   FolderOpen,
@@ -8,10 +8,9 @@ import {
   FileText,
 } from "lucide-react";
 import { Folder } from "./Folder";
-import { useDroppable } from "@dnd-kit/react";
 import { useExplorerContext } from "../ExplorerContextProvider";
 
-//it only exists to make droppable possible
+//it only exists for visual feedback
 const FolderEntry = ({
   f,
   level,
@@ -30,13 +29,10 @@ const FolderEntry = ({
     createNote,
   } = useExplorerContext();
 
-  const { ref, isDropTarget } = useDroppable({ id: f.id });
+  const [isDropTarget, setIsDropTarget] = useState<boolean>(false);
 
   return (
-    <div
-      ref={ref}
-      className={`${isDropTarget && "dark:bg-neutral-700 bg-neutral-200"}`}
-    >
+    <div className={`${isDropTarget && "dark:bg-neutral-700 bg-neutral-200"}`}>
       {/* show input for rename if its renamefolder action */}
       {activeAction?.type === "renameFolder" &&
       activeAction.folder.id === f.id ? (
@@ -80,7 +76,12 @@ const FolderEntry = ({
         </div>
       ) : (
         // else show actual folder
-        <Folder folder={f} creationInputRef={creationInputRef} level={level} />
+        <Folder
+          folder={f}
+          creationInputRef={creationInputRef}
+          level={level}
+          setIsDropTarget={setIsDropTarget}
+        />
       )}
       {openFolders.includes(f.id) && (
         <div>

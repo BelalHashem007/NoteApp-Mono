@@ -16,16 +16,23 @@ import {
   Pencil,
   FilePlus,
 } from "lucide-react";
-import { RefObject } from "react";
+import { Dispatch, RefObject, SetStateAction, useEffect } from "react";
 import { useExplorerContext } from "../ExplorerContextProvider";
+import { useDroppable } from "@dnd-kit/react";
 
 type Props = {
   folder: FolderWithNotes;
   level: number;
   creationInputRef: RefObject<HTMLInputElement | null>;
+  setIsDropTarget: Dispatch<SetStateAction<boolean>>;
 };
 
-export function Folder({ folder, level, creationInputRef }: Props) {
+export function Folder({
+  folder,
+  level,
+  creationInputRef,
+  setIsDropTarget,
+}: Props) {
   const {
     openFolders,
     setOpenFolders,
@@ -35,10 +42,25 @@ export function Folder({ folder, level, creationInputRef }: Props) {
     activeItem,
     setActiveItem,
   } = useExplorerContext();
+
+  const { ref, isDropTarget } = useDroppable({ id: folder.id });
+
+  useEffect(() => {
+    const updateIsDropTarget = () => {
+      setIsDropTarget(isDropTarget);
+      if (!openFolders.includes(folder.id) && isDropTarget) {
+        setOpenFolders((prev) => [...prev, folder.id]);
+      }
+    };
+
+    updateIsDropTarget();
+  }, [isDropTarget, setIsDropTarget, folder.id, setOpenFolders, openFolders]);
+
   return (
     <ContextMenu>
       <ContextMenuTrigger asChild>
         <button
+          ref={ref}
           className={`${activeItem?.type === "folder" && activeItem?.folderId === folder.id ? "dark:bg-neutral-700 bg-primary/10" : "hover:bg-primary/10 dark:hover:bg-neutral-700"} flex pr-3 gap-2 w-full items-center dark:text-neutral-50`}
           style={{ paddingLeft: 8 + level * 8 }}
           onClick={() => {

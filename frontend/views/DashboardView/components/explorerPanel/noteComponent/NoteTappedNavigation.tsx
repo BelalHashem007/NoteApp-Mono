@@ -25,7 +25,7 @@ function NoteTappedNavigationInner({ note }: { note?: Note }) {
   }, [setOpenedNotes, note]);
 
   return (
-    <div className="h-9 shrink-0 max-[900px]:hidden border-b dark:border-white/10 dark:bg-neutral-800/30 border-neutral-200 flex items-center overflow-x-auto">
+    <div className="h-9 shrink-0 max-[900px]:hidden border-b border-t dark:border-white/10 dark:bg-neutral-800/30 border-neutral-200 flex items-center overflow-x-auto">
       {openedNotes.map((openedNote) => {
         return (
           <div
