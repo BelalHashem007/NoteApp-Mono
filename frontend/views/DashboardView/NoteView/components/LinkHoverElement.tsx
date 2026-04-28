@@ -1,6 +1,6 @@
 "use client";
 import { Editor } from "@tiptap/react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   computePosition,
   flip,
@@ -20,37 +20,52 @@ export function LinkHoverElement({ editor }: { editor: Editor }) {
 
   const tooltipRef = useRef<HTMLDivElement | null>(null);
   const cleanupRef = useRef<(() => void) | null>(null);
+  const anchorPositionRef = useRef<number | null>(null);
+
+  const stopTrackingAnchor = useCallback(() => {
+    if (cleanupRef.current) {
+      cleanupRef.current();
+      cleanupRef.current = null;
+    }
+  }, []);
+
+  const startTrackingAnchor = useCallback(
+    (a: HTMLAnchorElement) => {
+      if (!tooltipRef.current) return;
+
+      stopTrackingAnchor();
+
+      anchorPositionRef.current = editor.view.posAtDOM(a, 0);
+      setAnchorElement(a);
+      setEditedHref(a.href);
+
+      cleanupRef.current = autoUpdate(a, tooltipRef.current, () => {
+        computePosition(a, tooltipRef.current as HTMLDivElement, {
+          placement: "bottom",
+          middleware: [offset(6), flip(), shift({ padding: 10 })],
+        }).then(({ x, y }) => {
+          Object.assign(tooltipRef.current?.style || {}, {
+            left: `${x}px`,
+            top: `${y}px`,
+          });
+        });
+      });
+
+      setIsOpen(true);
+    },
+    [editor, stopTrackingAnchor],
+  );
 
   useEffect(() => {
     const handleMouseClick = (e: Event) => {
       const a = (e.target as HTMLElement).closest("a");
 
       if (tooltipRef.current && a) {
-        if (cleanupRef.current) cleanupRef.current();
-
-        setAnchorElement(a);
-        setEditedHref(a.href);
-
-        cleanupRef.current = autoUpdate(a, tooltipRef.current, () => {
-          computePosition(a, tooltipRef.current as HTMLDivElement, {
-            placement: "bottom",
-            middleware: [offset(6), flip(), shift({ padding: 10 })],
-          }).then(({ x, y }) => {
-            Object.assign(tooltipRef.current?.style || {}, {
-              left: `${x}px`,
-              top: `${y}px`,
-            });
-          });
-        });
-
-        setIsOpen(true);
+        startTrackingAnchor(a);
       } else {
         setIsOpen(false);
         setIsEdit(false);
-        if (cleanupRef.current) {
-          cleanupRef.current();
-          cleanupRef.current = null;
-        }
+        stopTrackingAnchor();
       }
     };
 
@@ -59,8 +74,9 @@ export function LinkHoverElement({ editor }: { editor: Editor }) {
 
     return () => {
       dom.removeEventListener("click", handleMouseClick);
+      stopTrackingAnchor();
     };
-  });
+  }, [editor, startTrackingAnchor, stopTrackingAnchor]);
 
   return (
     <div
@@ -100,12 +116,29 @@ export function LinkHoverElement({ editor }: { editor: Editor }) {
             <button
               className="size-6 bg-neutral-900 text-white rounded-full items-center flex justify-center"
               onClick={() => {
+                const anchorPosition = anchorPositionRef.current;
+
                 editor
                   .chain()
+                  .focus()
                   .extendMarkRange("link", { href: anchorElement?.href })
                   .updateAttributes("link", { href: editedHref })
                   .run();
                 setIsEdit(false);
+
+                requestAnimationFrame(() => {
+                  if (anchorPosition === null) return;
+
+                  const domAtPosition =
+                    editor.view.domAtPos(anchorPosition).node;
+                  if (domAtPosition.hasChildNodes()) {
+                    for (const node of domAtPosition.childNodes) {
+                      if (node instanceof HTMLAnchorElement) {
+                        startTrackingAnchor(node);
+                      }
+                    }
+                  }
+                });
               }}
             >
               ✓
