@@ -1,7 +1,7 @@
 "use client";
 
 import { Editor } from "@tiptap/react";
-import { useState, useRef, useEffect, useId } from "react";
+import { useState, useEffect, memo } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -32,6 +32,9 @@ import {
 } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { checkImage } from "@/lib/utils";
+import { SketchPicker } from "react-color";
+import { useDebouncedCallback } from "use-debounce";
+import { useTheme } from "@/app/providers";
 
 type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
 type DropDownState =
@@ -120,8 +123,8 @@ function ToggleButton({
       className={`${
         active
           ? "bg-primary/50 dark:bg-neutral-700 shadow text-white"
-          : "hover:bg-primary/10 dark:hover:bg-neutral-800"
-      } rounded-full p-2 transition-all ${extraClassName}`}
+          : "hover:bg-primary/10 dark:hover:bg-neutral-700"
+      } rounded-full p-2 transition-colors duration-200 ${extraClassName}`}
     >
       {children}
     </button>
@@ -138,7 +141,7 @@ function UndoButton({ editor, editorState }: ToolCtx) {
       type="button"
       onClick={() => editor.chain().focus().undo().run()}
       disabled={!editorState?.canUndo}
-      className="disabled:text-gray-400 disabled:hover:cursor-not-allowed disabled:cursor-not-allowed *:pointer-events-none rounded-full p-2 enabled:hover:bg-primary/10 transition-all"
+      className="disabled:text-gray-400 disabled:hover:cursor-not-allowed disabled:cursor-not-allowed *:pointer-events-none rounded-full p-2 enabled:hover:bg-primary/10 enabled:dark:hover:bg-neutral-700 transition-colors duration-200"
       title="Undo"
     >
       <Undo className="size-5" />
@@ -354,60 +357,72 @@ function HorizontalRuleButton({ editor }: ToolCtx) {
   );
 }
 
-function HighlighterControl({ editor, editorState }: ToolCtx) {
-  const [color, setColor] = useState("yellow");
-  const colorInputRef = useRef<HTMLInputElement | null>(null);
-  const inputId = useId();
-
-  useEffect(() => {
-    const update = () => {
-      const attrs = editor.getAttributes("highlight");
-      if (attrs?.color && colorInputRef.current) {
-        colorInputRef.current.value = attrs.color;
-        setColor(attrs.color);
-      }
-    };
-    editor.on("selectionUpdate", update);
-    return () => {
-      editor.off("selectionUpdate", update);
-    };
-  }, [editor]);
+const ColorPickerWrapper = memo(function ColorPicker({
+  initialColor,
+  onFinalChange,
+}: {
+  initialColor: string;
+  onFinalChange: (a: string) => void;
+}) {
+  const [internalColor, setInternalColor] = useState(initialColor);
+  const [theme] = useTheme();
 
   return (
-    <div className="relative flex items-center gap-2">
-      <label
-        htmlFor={inputId}
-        className="flex items-center justify-center border dark:border-neutral-700 rounded-full p-2 cursor-pointer hover:bg-primary/10 dark:hover:bg-neutral-800 transition-all"
-      >
-        <Highlighter style={{ fill: color }} />
-      </label>
-      <input
-        id={inputId}
-        type="color"
-        ref={colorInputRef}
-        defaultValue={color}
-        className="absolute inset-0 w-0 h-0 opacity-0"
-        autoFocus={false}
-        onBlur={() => {
-          const c = colorInputRef.current?.value;
-          if (c) setColor(c);
-        }}
-      />
-      <button
-        type="button"
-        onClick={() => {
-          const c = colorInputRef.current?.value || "#eab308";
-          setColor(c);
-          editor.chain().focus().toggleHighlight({ color: c }).run();
-        }}
-        className={`${
-          editorState?.isHighlight
-            ? "bg-primary/50 dark:bg-neutral-800 dark:text-white shadow text-white"
-            : ""
-        } hover:bg-primary/10 dark:hover:bg-neutral-800 transition-colors p-2 rounded-full flex gap-1 dark:text-[#a1a1a1] text-black`}
-      >
-        Toggle
-      </button>
+    <SketchPicker
+      color={internalColor}
+      onChange={(c) => setInternalColor(c.hex)}
+      onChangeComplete={(c) => onFinalChange(c.hex)}
+      styles={{
+        default: {
+          picker: {
+            background: theme === "dark" ? "#3B3B3B" : "transparent",
+          },
+        },
+      }}
+    />
+  );
+});
+
+function HighlighterControl({ editor }: ToolCtx) {
+  const [color, setColor] = useState("yellow");
+  const [showPicker, setShowPicker] = useState<boolean>(false);
+
+  const debounced = useDebouncedCallback((value: string) => {
+    editor.chain().setHighlight({ color: value }).run();
+  }, 50);
+
+  const handleApplyColor = (hex: string) => {
+    setColor(hex);
+    debounced(hex);
+  };
+
+  return (
+    <div className="flex items-center gap-2">
+      <Popover open={showPicker} onOpenChange={setShowPicker}>
+        <PopoverTrigger
+          title="Highlighter"
+          className="flex items-center justify-center border dark:border-neutral-700 rounded-full p-2 cursor-pointer hover:bg-primary/10 dark:hover:bg-neutral-700 transition-colors duration-200"
+        >
+          <Highlighter style={{ fill: color }} />
+        </PopoverTrigger>
+        <PopoverContent
+          className="bg-transparent dark:bg-transparent ring-0 shadow-none flex items-center"
+          onInteractOutside={(e) => {
+            const target = e.target as HTMLElement;
+
+            if (target.closest(".color-picker-class")) {
+              e.preventDefault();
+            }
+          }}
+        >
+          <div className="color-picker-class">
+            <ColorPickerWrapper
+              initialColor={color}
+              onFinalChange={handleApplyColor}
+            />
+          </div>
+        </PopoverContent>
+      </Popover>
     </div>
   );
 }
@@ -461,7 +476,7 @@ function LinkButton({ editor }: ToolCtx) {
     <Popover>
       <PopoverTrigger asChild>
         <button
-          className={`${linkHref && "bg-primary/50 dark:bg-neutral-700 shadow text-white"} dark:hover:bg-primary/10 dark:hover:bg-neutral-800 transition-colors p-2 rounded-full`}
+          className={`${linkHref && "bg-primary/50 dark:bg-neutral-700 shadow text-white"} dark:hover:bg-neutral-700 transition-colors duration-200 p-2 rounded-full`}
           onClick={(e) => {
             if (linkHref) {
               e.preventDefault();
@@ -516,7 +531,7 @@ function ImageButton({ editor }: ToolCtx) {
     <Popover>
       <PopoverTrigger asChild>
         <button
-          className={` hover:bg-primary/10 dark:hover:bg-neutral-800 transition-colors p-2 rounded-full`}
+          className={` hover:bg-primary/10 dark:hover:bg-neutral-700 transition-colors duration-200 p-2 rounded-full`}
           title="Image"
         >
           {/* eslint-disable-next-line */}

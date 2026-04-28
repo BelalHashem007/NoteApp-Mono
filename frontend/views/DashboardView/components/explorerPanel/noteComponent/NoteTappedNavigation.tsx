@@ -11,11 +11,10 @@ function NoteTappedNavigationInner({ note }: { note?: Note }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const tagSuffix = tagQuerySuffix(searchParams.getAll("tag"));
-  const openedNotesRef = useRef(openedNotes);
 
   useEffect(() => {
     const handleLocalStorage = () => {
-      if (note && !openedNotesRef.current.find((x) => x.slug === note.slug)) {
+      if (note && !openedNotes.some((x) => x.slug === note.slug)) {
         setOpenedNotes((prev) => [
           ...prev,
           { slug: note.slug, title: note.title },

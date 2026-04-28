@@ -64,7 +64,7 @@ export default function ToolBar({
           </DropdownMenuTrigger>
           <DropdownMenuContent
             align="end"
-            className="flex flex-wrap items-center gap-2 p-2 w-72"
+            className="flex flex-wrap items-center gap-2 p-2 w-72 dark:text-[#a1a1a1]"
           >
             {overflowTools.map((item) => {
               const showClass = SHOWN_AT_OR_BELOW[item.hiddenAtOrBelow] ?? "";
