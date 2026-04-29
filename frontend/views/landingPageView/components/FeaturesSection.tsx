@@ -26,7 +26,7 @@ const features = [
     imageAlt: "Rich text editor picture",
   },
   {
-    title: "VSCode Layout",
+    title: "IDE-Inspired Workspace",
     description:
       "Work in a familiar editor-inspired interface with organized panels and a distraction-free writing area.",
     imageSrc: VSCodeImg,

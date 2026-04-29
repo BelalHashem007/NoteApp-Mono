@@ -7,7 +7,6 @@ const navLinks = [
   { label: "Live Demo", href: "#live-demo" },
   { label: "Features", href: "#features" },
   { label: "Technical", href: "#technical-highlights" },
-  { label: "About", href: "#about" },
 ];
 
 export default function NavComponent() {
