@@ -2,7 +2,10 @@ import TipTapDemo from "@/components/tiptap/TipTap-Demo";
 
 export default function HeroSection() {
   return (
-    <section className="px-4 pb-20 pt-16 sm:pt-20" aria-labelledby="hero-title">
+    <section
+      className="px-4 pb-20 pt-16 sm:pt-20"
+      aria-labelledby="Rich Text Editor"
+    >
       <div className="mx-auto flex max-w-7xl flex-col items-center gap-12">
         <div className="max-w-4xl text-center">
           <h1
