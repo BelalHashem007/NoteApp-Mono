@@ -16,13 +16,16 @@ export default function ThemeToggle({ className }: ThemeToggleProps) {
 
   return (
     <label
-      className={cn("relative inline-block h-6 w-15 shrink-0", className)}
+      className={cn(
+        "relative inline-block h-6 w-15 shrink-0 focus:outline outline-neutral-600",
+        className,
+      )}
       title={title}
     >
       <input
         type="checkbox"
         aria-label={title}
-        className="peer h-0 w-0 opacity-0"
+        className="peer sr-only"
         checked={isDark}
         onChange={(e) => {
           setTheme(e.target.checked ? "dark" : "light");
@@ -30,7 +33,8 @@ export default function ThemeToggle({ className }: ThemeToggleProps) {
       />
       <span
         className={cn(
-          "absolute inset-0 cursor-pointer overflow-hidden rounded-full border bg-neutral-200 duration-400 peer-checked:bg-neutral-700 peer-focus:shadow-[0_0_1px_#2196F3]",
+          "absolute inset-0 overflow-hidden rounded-full border bg-neutral-200 duration-400 transition-colors",
+          "peer-checked:bg-neutral-700 peer-focus-visible:ring-1 peer-focus-visible:ring-neutral-600 peer-focus-visible:ring-offset-1",
           isDark ? "border-neutral-600" : "border-neutral-400",
         )}
       >

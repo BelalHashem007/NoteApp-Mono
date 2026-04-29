@@ -1,9 +1,11 @@
 import NavComponent from "./components/NavComponent";
+import HeroSection from "./components/HeroSection";
 
 export default function LandingPageView() {
   return (
     <main className="min-h-screen bg-neutral text-foreground dark:bg-background">
       <NavComponent />
+      <HeroSection />
     </main>
   );
 }

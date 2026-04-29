@@ -26,10 +26,25 @@
   padding-top: 2rem;
   padding-inline: 4rem;
 }
+
+@media (max-width: 768px) {
+  .demoEditor .tiptap {
+    padding-inline: 1rem;
+    padding-bottom: 30vh;
+  }
+}
+
+@media (max-width: 480px) {
+  .demoEditor .tiptap {
+    padding-inline: 0rem;
+  }
+}
+
 .tiptap {
   img {
     margin: 1rem 0;
   }
+
   a {
     color: blue;
     cursor: pointer;
@@ -38,6 +53,7 @@
       color: lightblue;
     }
   }
+
   ul,
   ol {
     padding: 0 1rem;
@@ -48,12 +64,7 @@
       margin-bottom: 0.25em;
     }
   }
-  .dragging-highlight {
-    background-color: rgba(59, 130, 246, 0.05);
-    outline: 2px solid rgba(59, 130, 246, 0.2);
-    border-radius: 4px;
-    transition: background-color 0.2s ease;
-  }
+
   ul[data-type="taskList"] {
     list-style: none;
     padding: 0;
@@ -91,9 +102,13 @@
     }
   }
 
-  img {
-    border: 1px solid gray;
+  .dragging-highlight {
+    background-color: rgba(59, 130, 246, 0.05);
+    outline: 2px solid rgba(59, 130, 246, 0.2);
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
   }
+
   blockquote {
     border-left: 5px solid black;
     margin: 1.5rem 0;
@@ -104,6 +119,7 @@
       background-color: #171717;
     }
   }
+
   pre {
     background: black;
     border-radius: 0.5rem;

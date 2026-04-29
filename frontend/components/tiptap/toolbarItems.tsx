@@ -76,8 +76,8 @@ export type ToolItem =
  */
 export const HIDE_AT_OR_BELOW: Record<number, string> = {
   0: "",
-  360: "max-[360px]:hidden",
-  580: "max-[580px]:hidden",
+  480: "max-[480px]:hidden",
+  620: "max-[620px]:hidden",
   1120: "max-[1120px]:hidden",
   1350: "max-[1350px]:hidden",
   1450: "max-[1450px]:hidden",
@@ -87,8 +87,8 @@ export const HIDE_AT_OR_BELOW: Record<number, string> = {
 /** Inverse of HIDE_AT_OR_BELOW: visible only when viewport is at/below the bp. */
 export const SHOWN_AT_OR_BELOW: Record<number, string> = {
   0: "hidden",
-  360: "min-[361px]:hidden",
-  580: "min-[581px]:hidden",
+  480: "min-[481px]:hidden",
+  620: "min-[621px]:hidden",
   1120: "min-[1121px]:hidden",
   1350: "min-[1351px]:hidden",
   1450: "min-[1451px]:hidden",
@@ -623,31 +623,31 @@ export const TOOLS: ToolItem[] = [
   {
     kind: "tool",
     id: "heading",
-    hiddenAtOrBelow: 360,
+    hiddenAtOrBelow: 480,
     render: (c) => <HeadingsSelect {...c} />,
   },
 
-  { kind: "separator", id: "sep-heading", hiddenAtOrBelow: 360 },
+  { kind: "separator", id: "sep-heading", hiddenAtOrBelow: 480 },
   {
     kind: "tool",
     id: "bullet",
-    hiddenAtOrBelow: 580,
+    hiddenAtOrBelow: 620,
     render: (c) => <BulletListButton {...c} />,
   },
   {
     kind: "tool",
     id: "ordered",
-    hiddenAtOrBelow: 580,
+    hiddenAtOrBelow: 620,
     render: (c) => <OrderedListButton {...c} />,
   },
   {
     kind: "tool",
     id: "task",
-    hiddenAtOrBelow: 580,
+    hiddenAtOrBelow: 620,
     render: (c) => <TaskListButton {...c} />,
   },
 
-  { kind: "separator", id: "sep-lists", hiddenAtOrBelow: 580 },
+  { kind: "separator", id: "sep-lists", hiddenAtOrBelow: 620 },
   {
     kind: "tool",
     id: "bold",

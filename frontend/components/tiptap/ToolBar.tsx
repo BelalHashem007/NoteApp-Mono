@@ -18,9 +18,11 @@ import {
 export default function ToolBar({
   editor,
   note,
+  hiddenToolIds = [],
 }: {
   editor: Editor | null;
   note?: Note;
+  hiddenToolIds?: string[];
 }) {
   const editorState = useEditorState({
     editor,
@@ -30,13 +32,14 @@ export default function ToolBar({
   if (editor === null) return null;
 
   const ctx: ToolCtx = { editor, editorState: editorState ?? undefined, note };
+  const visibleTools = TOOLS.filter((tool) => !hiddenToolIds.includes(tool.id));
 
   // Tools that ever overflow into the menu (hiddenAtOrBelow > 0).
-  const overflowTools = TOOLS.filter((t) => t.hiddenAtOrBelow > 0);
+  const overflowTools = visibleTools.filter((t) => t.hiddenAtOrBelow > 0);
 
   return (
-    <div className="p-3 px-6 min-w-0 w-full flex flex-nowrap items-center gap-5 border-b dark:text-[#a1a1a1] border-neutral-200 dark:border-white/10">
-      {TOOLS.map((item) => {
+    <div className="p-3 px-6 min-w-0 w-full flex flex-nowrap items-center justify-center gap-5 border-b dark:text-[#a1a1a1] border-neutral-200 dark:border-white/10">
+      {visibleTools.map((item) => {
         const hideClass = HIDE_AT_OR_BELOW[item.hiddenAtOrBelow] ?? "";
         if (item.kind === "separator") {
           return (
