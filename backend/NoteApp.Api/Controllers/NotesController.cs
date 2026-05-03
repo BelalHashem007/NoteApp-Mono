@@ -15,16 +15,16 @@ namespace NoteApp.Api.Controllers
     public class NotesController(INoteService service) : ControllerBase
     {
         [HttpGet]
-        [Route("")]
-        public async Task<ActionResult<ResponseViewModel<List<NoteForSearchFilteredViewModel>>>> GetNotesWithSearch(CancellationToken ct, [FromQuery] string searchQuery, [FromQuery] string? tags = null)
+        [Route("{id}")]
+        public async Task<ActionResult<ResponseViewModel<NoteViewModel>>> GetNote(Guid id, CancellationToken ct)
         {
             var userId = User.GetUserId();
 
-            var result = await service.GetNotes(userId, searchQuery, tags, ct);
-            var response = new ResponseViewModel<List<NoteForSearchFilteredViewModel>>
+            var result = await service.GetNote(userId, id, ct);
+            var response = new ResponseViewModel<NoteViewModel>
             {
                 Success = true,
-                Message = "Retrieved Search Results Successfully",
+                Message = "Retrieved note successfully",
                 Data = result,
             };
 

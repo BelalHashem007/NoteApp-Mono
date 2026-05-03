@@ -1,53 +1,39 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
+using Microsoft.EntityFrameworkCore;
 using NoteApp.Api.Data;
 
 namespace NoteApp.Api.Jobs
 {
-    public class AttachmentsCleaning(AppDbContext context, ILogger<AttachmentsCleaning> logger)
+    public class AttachmentsCleaning(AppDbContext context, ILogger<AttachmentsCleaning> logger, Cloudinary cloudinary)
     {
         public async Task Execute()
         {
             var thresholdDate = DateTime.UtcNow.AddDays(-2); 
             var attachmentsToDelete = await context.Attachments.Where(a => a.IsDeleted && a.DeletedAt < thresholdDate).ToListAsync();
-            foreach(var attachment in attachmentsToDelete)
+
+            if (attachmentsToDelete.Count == 0)
             {
-                if (File.Exists(attachment.StoragePath))
-                {
-                    File.Delete(attachment.StoragePath);
-                    DeleteDirectoryIfEmpty(attachment.StoragePath);
-                }
+                logger.LogInformation("No attachments to delete at this time.");
+                return;
             }
+
+            var publicIds = attachmentsToDelete.Select(a => a.PublicId).ToList();
+            await DeleteResourcesFromCloudinary(publicIds);
             context.Attachments.RemoveRange(attachmentsToDelete);
             var result = await context.SaveChangesAsync();
             logger.LogInformation("Deleted {rowsAffected} from Attachments Table", result);
         }
 
-        private void DeleteDirectoryIfEmpty(string filePath)
+        private async Task DeleteResourcesFromCloudinary(List<string> publicIds)
         {
-            try
+            var delResourceParams = new DelResParams()
             {
-                string? noteFolder = Path.GetDirectoryName(filePath);
-
-                for (int i = 0; i < 2; i++)
-                {
-                    if (string.IsNullOrEmpty(noteFolder) || !Directory.Exists(noteFolder))
-                        return;
-
-                    if (!Directory.EnumerateFileSystemEntries(noteFolder).Any())
-                    {
-                        Directory.Delete(noteFolder);
-                        noteFolder = Path.GetDirectoryName(noteFolder);
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error cleaning up directory for file {path}", filePath);
-            }
+                PublicIds = publicIds,
+                Type = "upload",
+                ResourceType = ResourceType.Image
+            };
+            await cloudinary.DeleteResourcesAsync(delResourceParams);
         }
     }
 }
