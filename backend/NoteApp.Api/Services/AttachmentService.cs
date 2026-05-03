@@ -14,9 +14,6 @@ namespace NoteApp.Api.Services
             if (attachment == null)
                 throw new NotFoundException("Resource not found");
 
-            if (!File.Exists(attachment.StoragePath))
-                throw new ValidationException("File does not exist");
-
             return attachment;
         }
     }

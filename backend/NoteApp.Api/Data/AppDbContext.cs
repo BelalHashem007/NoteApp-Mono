@@ -94,6 +94,11 @@ namespace NoteApp.Api.Data
                 .Property(a => a.Id)
                 .HasDefaultValueSql("NEWSEQUENTIALID()");
 
+            modelBuilder.Entity<Attachment>()
+                .Property(a => a.PublicId)
+                .HasMaxLength(200)
+                .IsRequired(false);
+
             //refresh token constrains
             modelBuilder.Entity<RefreshToken>()
                 .ToTable("RefreshToken");

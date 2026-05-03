@@ -18,6 +18,7 @@ using NoteApp.Api.Repositories;
 using NoteApp.Api.Services;
 using System.Text;
 using NoteApp.Api.Infrastructure.RateLimiting;
+using CloudinaryDotNet;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -70,6 +71,11 @@ builder.Services.AddHangfire(config =>
 });
 
 builder.Services.AddHangfireServer();
+
+//Cloudinary configuration
+Cloudinary cloudinary = new Cloudinary(builder.Configuration["Cloudinary:CloudinaryUrl"]);
+cloudinary.Api.Secure = true;
+builder.Services.AddSingleton(cloudinary);
 
 //Services and Repositories
 builder.Services.AddScoped<INoteService, NoteService>();

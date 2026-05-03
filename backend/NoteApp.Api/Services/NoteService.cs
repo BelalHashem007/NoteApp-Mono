@@ -1,13 +1,16 @@
-﻿using NoteApp.Api.Entities;
+﻿using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
+using NoteApp.Api.Entities;
 using NoteApp.Api.Entities.DTOs;
 using NoteApp.Api.Exceptions;
 using NoteApp.Api.Helpers;
 using NoteApp.Api.Interfaces.IRepositories;
 using NoteApp.Api.Interfaces.IService;
+using System.Net;
 
 namespace NoteApp.Api.Services
 {
-    public class NoteService(IUnitOfWork unitOfWork) : INoteService
+    public class NoteService(IUnitOfWork unitOfWork, Cloudinary cloudinary) : INoteService
     {
         public async Task<List<NoteForSearchFilteredViewModel>> GetNotes(string userId, string searchQuery,string? tags, CancellationToken ct)
         {
@@ -149,6 +152,7 @@ namespace NoteApp.Api.Services
         {
             if (string.IsNullOrEmpty(userId))
                 throw new ValidationException("Invalid user id");
+
             //check existance
             if (file == null || file.Length == 0)
             {
@@ -166,17 +170,27 @@ namespace NoteApp.Api.Services
             if (size > 10 * 1024 * 1024)
                 throw new ValidationException("Invalid file size. Max allowed file size is 10MB");
 
-            //save to file
-            var fileName = Guid.NewGuid().ToString() + fileExtension;
-            var path = Path.Combine(Directory.GetCurrentDirectory(), $"Uploads/{userId}/{noteId.ToString()}");
+            //save to cloud
+            var path = $"note_app/{userId}/{noteId.ToString()}";
 
-            if (!Directory.Exists(path))
-                Directory.CreateDirectory(path);
 
-            using (var stream = new FileStream(Path.Combine(path, fileName), FileMode.Create))
+            var uploadResults = new ImageUploadResult();
+
+            using (var stream = file.OpenReadStream())
             {
-                await file.CopyToAsync(stream, ct);
+                var uploadParams = new ImageUploadParams()
+                {
+                    File = new FileDescription(file.FileName, stream),
+                    AssetFolder = path,
+                    UseFilename = true,
+                    Overwrite = false,
+                };
+
+                uploadResults = await cloudinary.UploadAsync(uploadParams, ct);
             }
+
+            if (uploadResults.StatusCode != HttpStatusCode.OK)
+                throw new CloudinaryException(uploadResults.Error.Message);
 
             //save to db
             var attachment = new Attachment()
@@ -184,9 +198,10 @@ namespace NoteApp.Api.Services
                 UserId = userId,
                 NoteId = noteId,
                 OriginalName = file.FileName,
-                CreatedAt = DateTime.Now,
+                CreatedAt = DateTime.UtcNow,
                 FileSize = size,
-                StoragePath = Path.Combine(path, fileName),
+                StoragePath = uploadResults.SecureUrl.ToString(),
+                PublicId = uploadResults.PublicId,
                 MimeType = file.ContentType,
             };
 

@@ -4,7 +4,8 @@
     {
         public Guid Id { get; set; }
         public string UserId { get; set; }
-        public Guid? NoteId { get; set; }
+        public Guid? NoteId { get; set; } 
+        public string PublicId { get; set; }
         public string StoragePath { get; set; }
         public string OriginalName { get; set; }
         public string MimeType { get; set; }

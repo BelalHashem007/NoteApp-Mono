@@ -18,7 +18,7 @@ namespace NoteApp.Api.Controllers
 
             var attachment = await attachmentService.GetAttachment(attachmentId, userId, ct);
 
-            return PhysicalFile(attachment.StoragePath, attachment.MimeType);
+            return Redirect(attachment.StoragePath);
         }
     }
 }
