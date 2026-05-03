@@ -6,9 +6,12 @@ Built with a Next.js frontend and a ASP.NET Core backend.
 
 ---
 
-## Preview:
+## Screenshots:
 
-![App Preview](./screenshots/app.png)
+![Home page](./screenshots/homepage.png)
+![Login page](./screenshots/login.png)
+![Signin page](./screenshots/signin.png)
+![Editor page](./screenshots/app.png)
 
 ---
 

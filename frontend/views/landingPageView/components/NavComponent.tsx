@@ -34,8 +34,9 @@ export default function NavComponent() {
 
         <div className="flex items-center gap-3">
           <Link
-            href="#"
+            href="https://github.com/BelalHashem007/NoteApp-Mono"
             aria-label="View code on GitHub"
+            target="_blank"
             className="flex size-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           >
             <Image
