@@ -7,9 +7,6 @@
     <UserSecretsId>2a366a00-18ae-4f77-896e-47b31a6f7493</UserSecretsId>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Include="Data\SQL\StoredProcedure\spFolders_DeleteRecursion.sql" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.1.72" />
