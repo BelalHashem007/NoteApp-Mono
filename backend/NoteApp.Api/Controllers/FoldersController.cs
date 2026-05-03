@@ -13,22 +13,6 @@ namespace NoteApp.Api.Controllers
     [Route("api/[controller]")]
     public class FoldersController(IFolderService folderService) : ControllerBase
     {
-        [HttpGet]
-        [Route("")]
-        public async Task<ActionResult<ResponseViewModel<IEnumerable<FolderViewModel>>>> GetFolders(CancellationToken ct)
-        {
-            var userId = User.GetUserId();
-
-            var result = await folderService.GetFolders(userId, ct);
-            var response = new ResponseViewModel<IEnumerable<FolderViewModel>>
-            {
-                Success = true,
-                Message = "Retrieved folders successfully",
-                Data = result,
-            };
-
-            return Ok(response);
-        }
 
         [HttpGet]
         [Route("{id}")]

@@ -31,25 +31,8 @@ namespace NoteApp.Api.Controllers
             return Ok(response);
         }
 
-        [HttpGet]
-        [Route("{id}")]
-        public async Task<ActionResult<ResponseViewModel<NoteViewModel>>> GetNote(Guid id, CancellationToken ct)
-        {
-            var userId = User.GetUserId();
-
-            var result = await service.GetNote(userId, id, ct);
-            var response = new ResponseViewModel<NoteViewModel>
-            {
-                Success = true,
-                Message = "Retrieved note successfully",
-                Data = result,
-            };
-
-            return Ok(response);
-        }
-
         [HttpPost]
-        [Route("~/api/folders/{folderid}/notes")]
+        [Route("~/api/folders/{folderId}/notes")]
         public async Task<ActionResult> CreateNote(Guid folderId, CreateNoteViewModel dto, CancellationToken ct)
         {
             var userId = User.GetUserId();
@@ -67,7 +50,7 @@ namespace NoteApp.Api.Controllers
 
         [HttpPut]
         [Route("{id}")]
-        public async Task<ActionResult<ResponseViewModel<NoteViewModel>>> UpdateNote(Guid folderId, Guid id, UpdateNoteViewModel dto, CancellationToken ct)
+        public async Task<ActionResult<ResponseViewModel<NoteViewModel>>> UpdateNote(Guid id, UpdateNoteViewModel dto, CancellationToken ct)
         {
             var userId = User.GetUserId();
 
