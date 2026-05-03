@@ -23,7 +23,7 @@ Built with a Next.js frontend and a ASP.NET Core backend.
 ## Features
 
 - Rich Text Editor
-  - Notion-like editor built with Tiptap
+  - Built with Tiptap
   - Supports formatting, lists, code blocks, links, and images
   - Drag & drop + paste image support
   - Auto-save with debounce + safe flush on exit
