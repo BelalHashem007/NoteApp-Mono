@@ -122,39 +122,3 @@ export async function LoginUser(
 
   if (success) redirect("dashboard");
 }
-
-export async function loginExternal(req: Request) {
-  console.log("test");
-  const cookieHeader = req.headers.get("cookie");
-  if (!cookieHeader) return null;
-
-  const response = await fetch("http://localhost:5001/api/auth/refresh", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Cookie: cookieHeader ?? "",
-    },
-  });
-  console.log(response);
-  if (!response.ok) return null;
-
-  const body = await response.json();
-  console.log(body);
-
-  const setCookieHeader = response.headers.getSetCookie?.()?.[0] ?? "";
-  const rawToken = setCookieHeader.includes("=")
-    ? setCookieHeader.substring(
-        setCookieHeader.indexOf("=") + 1,
-        setCookieHeader.indexOf(";"),
-      )
-    : "";
-  console.log(rawToken);
-  return {
-    id: body.data.user.id,
-    email: body.data.user.email,
-    name: body.data.user.fullName,
-    accessToken: body.data.accessToken,
-    refreshToken: decodeURIComponent(rawToken),
-    accessTokenExpirationDate: body.data.accessTokenExpirationDate,
-  };
-}

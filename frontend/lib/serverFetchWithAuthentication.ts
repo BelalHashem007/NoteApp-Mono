@@ -1,6 +1,4 @@
 import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
-import { toMaxAge } from "@/lib/utils";
 
 export async function serverFetchWithAuth(
   url: string,
