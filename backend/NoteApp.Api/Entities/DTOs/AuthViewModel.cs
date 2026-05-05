@@ -1,6 +1,4 @@
 ﻿using FluentValidation;
-using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 
 namespace NoteApp.Api.Entities.DTOs
 {

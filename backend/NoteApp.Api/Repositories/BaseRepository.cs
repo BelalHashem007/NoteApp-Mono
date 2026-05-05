@@ -20,6 +20,10 @@ namespace NoteApp.Api.Repositories
         {
             return await _context.Set<T>().FindAsync(id,ct);
         }
+        public async Task<T?> GetById(string id, CancellationToken ct = default)
+        {
+            return await _context.Set<T>().FindAsync(id,ct);
+        }
         public async Task<T> Add(T entity, CancellationToken ct = default)
         {
             await _context.Set<T>().AddAsync(entity,ct);

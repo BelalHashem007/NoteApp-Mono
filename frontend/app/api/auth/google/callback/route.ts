@@ -1,18 +1,8 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
-function toMaxAge(dateString: string) {
-  return Math.max(
-    0,
-    Math.floor((new Date(dateString).getTime() - Date.now()) / 1000),
-  );
-}
-
 export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url);
   const cookieStore = await cookies();
-  console.log(cookieStore);
-
   const accessToken = cookieStore.get("accessToken");
   const refreshToken = cookieStore.get("refreshToken");
 

@@ -7,6 +7,7 @@ namespace NoteApp.Api.Interfaces.IRepositories
         public Task<List<T>> GetAll(CancellationToken ct = default);
         public Task<T?> GetById(int id, CancellationToken ct = default);
         public Task<T?> GetById(Guid id, CancellationToken ct = default);
+        public Task<T?> GetById(string id, CancellationToken ct = default);
         public Task<T> Add(T entity, CancellationToken ct = default);
         public T Update(T entity, CancellationToken ct = default);
         public List<T> UpdateRange(List<T> entities, CancellationToken ct = default);

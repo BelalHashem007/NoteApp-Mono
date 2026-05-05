@@ -70,15 +70,17 @@ type ApiError = {
 };
 
 type LoginResponse = {
-  user: {
-    id: string;
-    email: string;
-    userName: string;
-    fullName: string;
-    roles: string[];
-  };
+  user: User;
   accessToken: string;
   accessTokenExpirationDate: string;
   refreshTokenExpiration: string;
   refreshToken: string;
+};
+
+type User = {
+  id: string;
+  email: string;
+  userName: string;
+  fullName: string;
+  roles: string[];
 };

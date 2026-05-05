@@ -11,6 +11,12 @@ import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import ThemeToggle from "@/components/ThemeToggle";
+import { useUser } from "@/hooks/useUser";
+import {
+  DropdownMenuGroup,
+  DropdownMenuLabel,
+} from "@radix-ui/react-dropdown-menu";
+import { useQueryClient } from "@tanstack/react-query";
 
 type AccountComponentProps = {
   triggerClassName?: string;
@@ -19,8 +25,11 @@ type AccountComponentProps = {
 export default function AccountComponent({
   triggerClassName,
 }: AccountComponentProps) {
+  const queryClient = useQueryClient();
   const { setOpenedNotes } = useTapsContext();
   const router = useRouter();
+  const { user } = useUser();
+  console.log(user);
 
   const onLogout = async () => {
     try {
@@ -32,6 +41,7 @@ export default function AccountComponent({
       }
       localStorage.removeItem("openNotes");
       setOpenedNotes([]);
+      queryClient.clear();
       router.push("/login");
     } catch (error) {
       toast.error("Failed to logout");
@@ -55,22 +65,29 @@ export default function AccountComponent({
       <DropdownMenuContent
         align="start"
         side="right"
-        className="flex flex-col gap-0.5"
+        className="flex flex-col gap-0.5 p-2"
       >
-        <DropdownMenuItem
-          onSelect={(e) => e.preventDefault()}
-          className="flex w-full focus:ring-0 focus:bg-transparent focus:text-transparent dark:focus:bg-transparent"
-        >
-          <ThemeToggle />
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          variant="destructive"
-          className="flex w-full cursor-pointer items-center gap-3 rounded-full px-3 py-2 text-sm text-foreground/70 transition-colors hover:bg-background hover:text-foreground"
-          onSelect={onLogout}
-        >
-          <LogOut className="size-4" />
-          Log Out
-        </DropdownMenuItem>
+        <DropdownMenuGroup>
+          {user && (
+            <DropdownMenuLabel className="text-xs text-muted-foreground max-w-25 truncate">
+              Hello, <strong>{user?.fullName}</strong>
+            </DropdownMenuLabel>
+          )}
+          <DropdownMenuItem
+            onSelect={(e) => e.preventDefault()}
+            className="flex w-full focus:ring-0 focus:bg-transparent focus:text-transparent dark:focus:bg-transparent"
+          >
+            <ThemeToggle />
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            variant="destructive"
+            className="flex w-full cursor-pointer items-center gap-3 rounded-full text-sm text-foreground/70 transition-colors hover:bg-background hover:text-foreground"
+            onSelect={onLogout}
+          >
+            <LogOut className="size-4" />
+            Log Out
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
   );

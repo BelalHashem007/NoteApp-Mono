@@ -10,6 +10,7 @@ namespace NoteApp.Api.Repositories
         IBaseRepository<Attachment> attachments,
         IBaseRepository<Tag> tags,
         IBaseRepository<NotesToTags> notesToTages,
+        IBaseRepository<ApplicationUser> users,
         AppDbContext context) : IUnitOfWork
     {
         public IFolderRepository Folders => folders;
@@ -17,6 +18,7 @@ namespace NoteApp.Api.Repositories
         public IBaseRepository<Attachment> Attachments => attachments;
         public IBaseRepository<Tag> Tags => tags;
         public IBaseRepository<NotesToTags> NotesToTages => notesToTages;
+        public IBaseRepository<ApplicationUser> Users => users;
 
         public INoteRepository Notes => notes;
 
