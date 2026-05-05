@@ -252,9 +252,9 @@ namespace NoteApp.Api.Services
                 return new LoginExternalViewModel
                 {
                     AccessToken = tokenService.GenerateJwtToken(user, await authRepository.GetUserRoles(user)),
-                    AccessTokenExpiresOn = DateTime.UtcNow.AddMinutes(30).ToString("O"),
+                    AccessTokenExpiresOn = DateTime.UtcNow.AddMinutes(30),
                     RefreshToken = activeRefreshToken.Token,
-                    RefreshTokenExpiresOn = activeRefreshToken.ExpiresOn.ToString("O")
+                    RefreshTokenExpiresOn = activeRefreshToken.ExpiresOn
                 };
             }
 
@@ -269,9 +269,9 @@ namespace NoteApp.Api.Services
             return new LoginExternalViewModel
             {
                 AccessToken = accessToken,
-                AccessTokenExpiresOn = DateTime.UtcNow.AddMinutes(30).ToString("O"),
+                AccessTokenExpiresOn = DateTime.UtcNow.AddMinutes(30),
                 RefreshToken = refreshToken.Token,
-                RefreshTokenExpiresOn = refreshToken.ExpiresOn.ToString("O")
+                RefreshTokenExpiresOn = refreshToken.ExpiresOn
             };
         }
     }

@@ -1,3 +1,4 @@
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 function toMaxAge(dateString: string) {
@@ -9,11 +10,11 @@ function toMaxAge(dateString: string) {
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
+  const cookieStore = await cookies();
+  console.log(cookieStore);
 
-  const accessToken = searchParams.get("accessToken");
-  const refreshToken = searchParams.get("refreshToken");
-  const accessExp = searchParams.get("accessExp");
-  const refreshExp = searchParams.get("refreshExp");
+  const accessToken = cookieStore.get("accessToken");
+  const refreshToken = cookieStore.get("refreshToken");
 
   if (!accessToken || !refreshToken) {
     return NextResponse.redirect("/login?error=oauth_failed");
@@ -21,20 +22,20 @@ export async function GET(req: Request) {
 
   const res = NextResponse.redirect(new URL("/dashboard", req.url));
 
-  res.cookies.set("accessToken", accessToken, {
+  res.cookies.set("accessToken", accessToken.value, {
     httpOnly: true,
     secure: true,
     sameSite: "lax",
     path: "/",
-    maxAge: toMaxAge(accessExp!) - 10,
+    maxAge: 29 * 60,
   });
 
-  res.cookies.set("refreshToken", refreshToken, {
+  res.cookies.set("refreshToken", refreshToken.value, {
     httpOnly: true,
     secure: true,
     sameSite: "lax",
     path: "/",
-    maxAge: toMaxAge(refreshExp!) - 10,
+    maxAge: 10 * 24 * 60 * 60,
   });
 
   return res;

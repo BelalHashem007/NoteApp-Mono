@@ -20,7 +20,7 @@ namespace NoteApp.Api.Controllers
         {
             var result = await authService.Login(dto);
             if (result != null && !string.IsNullOrWhiteSpace(result.RefreshToken))
-                SetRefreshTokenToCookie(result.RefreshToken, result.RefreshTokenExpiration);
+                SetToCookies("refreshToken", result.RefreshToken, result.RefreshTokenExpiration);
 
             var response = new ResponseViewModel<AuthViewModel>
             {
@@ -38,7 +38,7 @@ namespace NoteApp.Api.Controllers
         {
             var result = await authService.Register(dto);
             if (result != null && !string.IsNullOrWhiteSpace(result.RefreshToken))
-                SetRefreshTokenToCookie(result.RefreshToken, result.RefreshTokenExpiration);
+                SetToCookies("refreshToken" ,result.RefreshToken, result.RefreshTokenExpiration);
 
             var response = new ResponseViewModel<AuthViewModel>
             {
@@ -61,7 +61,7 @@ namespace NoteApp.Api.Controllers
 
             var result = await authService.RefreshToken(refreshToken, ct);
             if (result != null && !string.IsNullOrWhiteSpace(result.RefreshToken))
-                SetRefreshTokenToCookie(result.RefreshToken, result.RefreshTokenExpiration);
+                SetToCookies("refreshToken" ,result.RefreshToken, result.RefreshTokenExpiration);
 
             var response = new ResponseViewModel<AuthViewModel>
             {
@@ -89,15 +89,20 @@ namespace NoteApp.Api.Controllers
         {
             var info = await signInManager.GetExternalLoginInfoAsync();
             var result = await authService.GoogleLogin(info);
-            return Redirect($"{returnUrl}?accessToken={result.AccessToken}&refreshToken={Uri.EscapeDataString(result.RefreshToken)}&accessExp={result.AccessTokenExpiresOn}&refreshExp={result.RefreshTokenExpiresOn}");
+            SetToCookies("refreshToken", result.RefreshToken, result.RefreshTokenExpiresOn);
+            SetToCookies("accessToken", result.AccessToken, result.AccessTokenExpiresOn);
+            return Redirect(returnUrl);
         }
 
-        private void SetRefreshTokenToCookie(string refreshToken, DateTime refreshTokenExpiration)
+        private void SetToCookies(string name, string token, DateTime expirationDate)
         {
-            Response.Cookies.Append("refreshToken", refreshToken, new CookieOptions
+            Response.Cookies.Append(name, token, new CookieOptions
             {
-                Expires = refreshTokenExpiration.ToLocalTime(),
+                Expires = expirationDate.ToLocalTime(),
                 HttpOnly = true,
+                Path = "/",
+                SameSite = SameSiteMode.Lax,
+                Secure = false
             });
         }
     }

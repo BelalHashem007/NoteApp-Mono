@@ -75,8 +75,8 @@ namespace NoteApp.Api.Entities.DTOs
     {
         public string AccessToken { get; set; }
         public string RefreshToken { get; set; }
-        public string RefreshTokenExpiresOn { get; set; }
-        public string AccessTokenExpiresOn { get; set; }
+        public DateTime RefreshTokenExpiresOn { get; set; }
+        public DateTime AccessTokenExpiresOn { get; set; }
     }
 
     public class RefreshTokenViewModel()
