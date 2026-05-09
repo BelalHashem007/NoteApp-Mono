@@ -9,7 +9,7 @@ namespace NoteApp.Api.Data
 {
     public class AppDbContextDapper(IConfiguration config)
     {
-        public async Task<bool> DeleteFolderRecursively(Guid folderId, string userId)
+        public virtual async Task<bool> DeleteFolderRecursively(Guid folderId, string userId)
         {
             using (var dbConnection = new SqlConnection(config.GetConnectionString("Default")))
             {

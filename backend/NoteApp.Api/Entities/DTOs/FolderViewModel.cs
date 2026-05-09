@@ -19,7 +19,8 @@ namespace NoteApp.Api.Entities.DTOs
         public UpdateFolderViewModelValidator()
         {
             RuleFor(updateFolderModel => updateFolderModel.FolderName)
-                .NotEmpty();
+                .NotEmpty()
+                .MaximumLength(50);
         }
     }
 
@@ -34,7 +35,8 @@ namespace NoteApp.Api.Entities.DTOs
         public CreateFolderViewModelValidator()
         {
             RuleFor(createFolderModel => createFolderModel.FolderName)
-                .NotEmpty();
+                .NotEmpty()
+                .MaximumLength(50);
         }
     }
 }
