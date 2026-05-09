@@ -10,7 +10,7 @@ using System.Net;
 
 namespace NoteApp.Api.Services
 {
-    public class NoteService(IUnitOfWork unitOfWork, Cloudinary cloudinary) : INoteService
+    public class NoteService(IUnitOfWork unitOfWork, ICloudinaryUploader cloudinaryUploader) : INoteService
     {
         public async Task<List<NoteForSearchFilteredViewModel>> GetNotes(string userId, string searchQuery,string? tags, CancellationToken ct)
         {
@@ -186,7 +186,7 @@ namespace NoteApp.Api.Services
                     Overwrite = false,
                 };
 
-                uploadResults = await cloudinary.UploadAsync(uploadParams, ct);
+                uploadResults = await cloudinaryUploader.UploadAsync(uploadParams, ct);
             }
 
             if (uploadResults.StatusCode != HttpStatusCode.OK)

@@ -76,6 +76,7 @@ builder.Services.AddHangfireServer();
 Cloudinary cloudinary = new Cloudinary(builder.Configuration["Cloudinary:CloudinaryUrl"]);
 cloudinary.Api.Secure = true;
 builder.Services.AddSingleton(cloudinary);
+builder.Services.AddSingleton<ICloudinaryUploader, CloudinaryUploader>();
 
 //Services and Repositories
 builder.Services.AddScoped<INoteService, NoteService>();
